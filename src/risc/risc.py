@@ -105,9 +105,9 @@ import re
 import base64
 import hashlib
 import MySQLdb as mysql
-import ftplib
 from warnings import filterwarnings
 import unicodedata
+import json
 
 HELP = None
 CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set"
@@ -135,7 +135,6 @@ class Debug:
         t = time.time()
         if not use__stdout__:
             sys.stdout = open("risc_"+str(int(t))+'.log', "w+", 0)
-        print "dbgg"
         return None
 
     def info(self, info_msg):
@@ -359,6 +358,7 @@ class Risc():
                          "chat": ["chat"],
                          "seen": ["seen"],
                          "set": ["set"],
+                         "google": ["google"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -1216,8 +1216,23 @@ class Risc():
                          ': Setting the Cvar for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
         return None
 
-    # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    def cmd_google(self, msg0, nick):
+        clean_msg = self.list_clean(msg0.split(' '))
+        if len(clean_msg) <= 1:
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help google.")
+            return None
+        API_url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&"
+        query = urllib2.urlencode({'q': searchfor})
+        data_search = clean_msg[1]
+        response = urllib2.urlopen(API_url+query)
+        results = response.read()
+        res = json.loads(results)
+        data = res['responseData']
+        self.privmsg(nick, "nb_res: "+ data['cursor']['estimatedResultCount'])
+        return None
+
+    # -------------------------------------------------------------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------------------------------------------
 
     def search_accurate(self, p, serv):
         """
@@ -1381,6 +1396,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["ikick"]:
             self.cmd_ikick(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["google"]:
+            self.cmd_google(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
             self.cmd_ileveltest(msg[0], sourceNick)
