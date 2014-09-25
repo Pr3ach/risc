@@ -85,6 +85,7 @@
 #       - update README file [OK]
 # ------- v1.4.4 - Pr3acher - 09/07/2014
 #       - fix minor dbg code [OK]
+#       - fixed Sv failling -> crash [OK]
 #       - cmd google
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
