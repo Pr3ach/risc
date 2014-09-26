@@ -100,7 +100,7 @@ import threading
 import time
 import sys
 import os
-import urllib2
+import urllib
 import ConfigParser
 import re
 import base64
@@ -1239,9 +1239,9 @@ class Risc():
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help google.")
             return None
         API_url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&"
-        query = urllib2.urlencode({'q': searchfor})
+        query = urllib.urlencode({'q': searchfor})
         data_search = clean_msg[1]
-        response = urllib2.urlopen(API_url+query)
+        response = urllib.urlopen(API_url+query)
         results = response.read()
         res = json.loads(results)
         data = res['responseData']
