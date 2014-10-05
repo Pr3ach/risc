@@ -1829,7 +1829,7 @@ class Risc():
             return None
 
         if content[0] != self.cmd_prefix and content[0] != self.cmd_prefix_global:
-            self.process_irc(raw_msg)
+            self.process_irc(msgList)
             return None
 
         if content[0] == self.cmd_prefix_global:
