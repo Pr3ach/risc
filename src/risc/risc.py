@@ -1490,8 +1490,10 @@ class Risc():
         player = data_list[0]
         reason = data_list[1]
 
-        self.privmsg(self.channel, COLOR['boldwhite'] + '[' + COLOR['rewind'] + COLOR['boldgreen'] + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' +
-                     COLOR['rewind'] + COLOR['boldblue'] + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue'] + reason + COLOR['rewind'])
+        self.privmsg(self.channel, COLOR['boldwhite'] + '[' + COLOR['rewind'] + COLOR['boldgreen'] 
+                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + COLOR['boldblue'] 
+                     + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue'] 
+                     + reason + COLOR['rewind'])
         return None
 
     # <map_name> <cl_count> <max_cl_count>
@@ -1504,9 +1506,10 @@ class Risc():
         cl_count = data_list[1]
         max_cl_count = data_list[2]
 
-        self.privmsg(self.channel, COLOR['boldwhite'] + '['+COLOR['rewind'] + COLOR['boldgreen'] + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' +
-                     COLOR['rewind'] + ' map: ' + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue'] + ' ' + cl_count +
-                     COLOR['rewind'] + '/' + str(max_cl_count))
+        self.privmsg(self.channel, COLOR['boldwhite'] + '['+COLOR['rewind'] + COLOR['boldgreen'] 
+                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + ' map: ' 
+                     + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue'] 
+                     + ' ' + cl_count + COLOR['rewind'] + '/' + str(max_cl_count))
         return None
 
     # <admin> <admin_id> <client> <client_id> <reason=''>
@@ -1525,9 +1528,10 @@ class Risc():
         else:
             reason = COLOR['boldblue']+data_list[4]+COLOR['rewind']
 
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' +
-                     COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @' + admin_id + COLOR['rewind'] + ' kicked' + COLOR['boldyellow'] +
-                     ' '+client+' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
+        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] + sv 
+                    + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind']+COLOR['boldyellow']
+                    +' '+admin+' @' + admin_id + COLOR['rewind'] + ' kicked' + COLOR['boldyellow'] +
+                    ' '+client+' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
     # <admin> <admin_id> <client> <client_id> <duration_min> <reason=''>
@@ -1547,9 +1551,10 @@ class Risc():
         else:
             reason = COLOR['boldblue']+data_list[5]+COLOR['rewind']
 
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']+COLOR['boldwhite']+']' +
-                     COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id+COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' +
-                     client_id + COLOR['rewind'] + ' for' + duration + ': '+re.sub('\^[0-9]{1}', '', reason))
+        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']
+                    +COLOR['boldwhite']+']' + COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id
+                    +COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' + client_id 
+                    + COLOR['rewind'] + ' for' + duration + ': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
     # <admin> <admin_id> <client> <client_id> <reason=''>
@@ -1778,6 +1783,10 @@ class Risc():
                 l.append(ch)
         return ''.join(l)
 
+    def process_irc(self, content):
+        print content
+        return None
+
     def _on_privmsg(self, msg):
         """
         Disptach PRIVMSG messages to the right functions
@@ -1815,6 +1824,7 @@ class Risc():
             return None
 
         if content[0] != self.cmd_prefix and content[0] != self.cmd_prefix_global:
+            self.process_irc(content)
             return None
 
         if content[0] == self.cmd_prefix_global:
