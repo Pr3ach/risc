@@ -1784,9 +1784,8 @@ class Risc():
         return ''.join(l)
 
     def process_irc(self, raw_msg):
-        print raw_msg
-        nick = raw_msg[0].split('!'[0][1:])
-        msg = self.clean_unicode(' '.join(raw_msg[0].split(" ")[3:]))
+        msg = raw_msg[0].split(':')[2]
+        nick = raw_msg[0].split('!')[0][1:]
 
         print "nick = "+nick
         print "msg = "+msg
