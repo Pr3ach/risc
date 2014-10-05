@@ -1798,6 +1798,7 @@ class Risc():
             url_dump = urllib.urlopen(is_url[0]).read()
             print "dump: "
             print url_dump
+        print "no url"
 
         return None
 
