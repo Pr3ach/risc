@@ -1783,9 +1783,10 @@ class Risc():
                 l.append(ch)
         return ''.join(l)
 
-    def process_irc(self, content):
+    def process_irc(self, raw_msg):
+        print raw_msg
         nick = raw_msg[0].split('!'[0][1:])
-        msg = self.clean_unicode(' '.join(raw_msg[0].split(" ")[3:][1:]))
+        msg = self.clean_unicode(' '.join(raw_msg[0].split(" ")[3:]))
 
         print "nick = "+nick
         print "msg = "+msg
@@ -1828,7 +1829,7 @@ class Risc():
             return None
 
         if content[0] != self.cmd_prefix and content[0] != self.cmd_prefix_global:
-            self.process_irc(content)
+            self.process_irc(raw_msg)
             return None
 
         if content[0] == self.cmd_prefix_global:
