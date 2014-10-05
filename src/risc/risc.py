@@ -1784,7 +1784,11 @@ class Risc():
         return ''.join(l)
 
     def process_irc(self, content):
-        print content
+        nick = raw_msg[0].split('!'[0][1:])
+        msg = self.clean_unicode(' '.join(raw_msg[0].split(" ")[3:][1:]))
+
+        print "nick = "+nick
+        print "msg = "+msg
         return None
 
     def _on_privmsg(self, msg):
