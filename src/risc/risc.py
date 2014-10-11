@@ -1319,6 +1319,8 @@ class Risc():
         if not sv:
             return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
 
+        print "dbg"
+
         if sv.clientsList == -1:
             nbClients = 0
         else:
