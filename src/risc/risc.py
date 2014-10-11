@@ -1335,12 +1335,12 @@ class Risc():
         print "dbg"
 
         ret = COLOR['boldgreen'] + ip+':'+port + COLOR['rewind'] + ' : Playing: ' +\
-            COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
-            str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
-            re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
-            ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
-            COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
-            ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
+            COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' #+\
+            #str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
+            #re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
+            #', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
+            #COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
+            #', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
         return ret
 
     def search_accurate(self, p, serv):
