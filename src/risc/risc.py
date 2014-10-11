@@ -1515,7 +1515,7 @@ class Risc():
             self.cmd_google(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
-            self.cmd_google(msg[0], sourceNick)
+            self.cmd_server(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
             self.cmd_ileveltest(msg[0], sourceNick)
