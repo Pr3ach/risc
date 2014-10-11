@@ -105,7 +105,6 @@ import threading
 import time
 import sys
 import os
-import urllib
 import ConfigParser
 import re
 import base64
@@ -114,6 +113,7 @@ import MySQLdb as mysql
 from warnings import filterwarnings
 import unicodedata
 import json
+import urllib
 
 HELP = None
 CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say"
@@ -1259,18 +1259,27 @@ class Risc():
         return None
 
     def cmd_google(self, msg0, nick):
-        clean_msg = self.list_clean(msg0.split(' '))
-        if len(clean_msg) <= 1:
-            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help google.")
+        i = 0
+        search_str = " ".join(msg0.split(' ')[1:])
+        if len(search_str) >= 255:
+            self.privmsg(nick, "Input too long.")
             return None
-        API_url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&"
-        query = urllib.urlencode({'q': searchfor})
-        data_search = clean_msg[1]
-        response = urllib.urlopen(API_url+query)
-        results = response.read()
-        res = json.loads(results)
-        data = res['responseData']
-        self.privmsg(nick, "nb_res: "+ data['cursor']['estimatedResultCount'])
+
+        query = urllib.urlencode({'q': search_str})
+        url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
+        search_response = urllib.urlopen(url)
+        search_results = search_response.read()
+        results = json.loads(search_results)
+        data = results['responseData']
+        self.privmsg(nick, "Top hits: ")
+        hits = data['results']
+        if not len(hits):
+            self.privmsg(nick, "No results.")
+        for h in hits: 
+            self.privmsg(nick, h["url"])
+            i+=1
+            if i >= 4:
+                break
         return None
 
     # -------------------------------------------------------------------------------------------------------------------------------------
