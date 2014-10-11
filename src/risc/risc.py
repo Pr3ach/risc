@@ -922,7 +922,7 @@ class Risc():
                 else:
                     nbClients = len(sv.clientsList)
 
-                ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Players: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
+                ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Playining: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
                              '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
                 del sv
             ret = ret[:-3]
@@ -970,15 +970,16 @@ class Risc():
         if command in self.commands["quit"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: " + ', '.join(self.commands["quit"])+\
                          ". Tells risc to leave. You need to be registered as admin["+str(self.commandLevels['quit'])+\
-                         "] with risc."
+                         "] with "+self.nick+"."
 
         elif command in self.commands["seen"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
                          ". Return the last time a player was seen in the server set."
 
         elif command in self.commands["say"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
-                         ". Makes "+self.nick+ " say <str>."
+            return COLOR['boldgreen'] + comma"+self.nick+" + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
+                    ". Makes "+self.nick+ " say <str>. You need to be registered s admin["+str(self.commandLevels['say'])+\
+                    "] with "+self.nick+"."
 
         elif command in self.commands["hello"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> Aliases: " + ', '.join(self.commands["hello"])+\
@@ -1247,7 +1248,7 @@ class Risc():
         auth, level = self.irc_is_admin(nick)
 
         if not auth or level < self.commandLevels['say']:
-            self.privmsg(nick, "You must be at least in the admin["+self.commandLevels['say']+"] group to access this command.")
+            self.privmsg(nick, "You must be at least in the admin["+str(self.commandLevels['say'])+"] group to access this command.")
             return None
 
         self.privmsg(self.channel, " ".join(msg0.split(' ')[1:]))
