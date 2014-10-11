@@ -1339,8 +1339,8 @@ class Risc():
             ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
-            print ret
-            self.privmsg(nick, ret)
+        print ret
+        self.privmsg(nick, ret)
         return ret
 
     def search_accurate(self, p, serv):
