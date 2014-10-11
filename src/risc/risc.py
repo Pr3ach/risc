@@ -1319,8 +1319,6 @@ class Risc():
         if not sv:
             return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
 
-        print "dbg"
-
         if sv.clientsList == -1:
             nbClients = 0
         else:
@@ -1333,6 +1331,8 @@ class Risc():
             sv.allowVote = COLOR['boldgreen']+'ON'+COLOR['rewind']
         elif sv.allowVote == '0':
             sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
+
+        print "dbg"
 
         ret = COLOR['boldgreen'] + ip+':'+port + COLOR['rewind'] + ' : Playing: ' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
