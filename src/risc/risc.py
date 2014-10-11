@@ -763,7 +763,8 @@ class Risc():
                 return None
         else:
             self.privmsg(self.channel, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": "+COLOR['boldred']+
-                         "You need to be admin["+str(self.commandLevels['ikick'])+"] to access this command."+COLOR['rewind'])
+                         "You need to be admin["+str(self.commandLevels['ikick'])+"] to access this command, or the target admin"+\
+                                 " group is higher or equal to yours."+COLOR['rewind'])
 
     def cmd_sha1(self, msg0, sourceNick):
         cleanSha1Data = ''.join(msg0[6:])  # In case we have spaces in the string, they're taken into account
