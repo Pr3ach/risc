@@ -90,7 +90,7 @@
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
 #       - ability to use st & p with any server IP
-#       - cmd 'say' for 60+ admins
+#       - cmd 'say' for admins
 #       - anti-spam
 
 
@@ -975,6 +975,10 @@ class Risc():
         elif command in self.commands["seen"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
                          ". Return the last time a player was seen in the server set."
+
+        elif command in self.commands["say"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
+                         ". Makes "+self.nick+ " say <str>."
 
         elif command in self.commands["hello"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> Aliases: " + ', '.join(self.commands["hello"])+\
