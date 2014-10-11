@@ -1339,6 +1339,8 @@ class Risc():
             ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
+            print ret
+            self.privmsg(nick, ret)
         return ret
 
     def search_accurate(self, p, serv):
@@ -1511,7 +1513,7 @@ class Risc():
             self.cmd_google(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
-            self.privmsg(nick, self.cmd_server(msg[0], sourceNick))
+            self.cmd_server(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
             self.cmd_ileveltest(msg[0], sourceNick)
