@@ -89,7 +89,8 @@
 #       - cmd 'say' for admins [OK]
 #       - fix typo in help & help say [OK]
 #       - fix typo in cmd_status [OK]
-#       - cmd google
+#       - cmd google [OK]
+#       - fix bug for is_global_cmd [OK]
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
 #       - ability to use st & p with any server IP
@@ -116,7 +117,7 @@ import json
 import urllib
 
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -368,7 +369,7 @@ class Risc():
                          "seen": ["seen"],
                          "set": ["set"],
                          "say": ["say"],
-                         "google": ["google"],
+                         "google": ["google", "g"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -1001,6 +1002,10 @@ class Risc():
         elif command in self.commands["ishowadmins"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["ishowadmins"])+". Shows all "+\
                          self.nick+" admins."
+
+        elif command in self.commands["google"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["google"])+". Perform a"+\
+                    " google search and echo the top 4 hits."
 
         elif command in self.commands["base64"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <utf8String>: Aliases: "+', '.join(self.commands["base64"])+\
