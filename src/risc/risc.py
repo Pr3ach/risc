@@ -91,9 +91,9 @@
 #       - fix typo in cmd_status [OK]
 #       - cmd google [OK]
 #       - fix bug for is_global_cmd [OK]
+#       - ability to use st & p with any server IP
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
-#       - ability to use st & p with any server IP
 #       - anti-spam
 
 
@@ -117,7 +117,7 @@ import json
 import urllib
 
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -370,6 +370,7 @@ class Risc():
                          "set": ["set"],
                          "say": ["say"],
                          "google": ["google", "g"],
+                         "server": ["server", "sv"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -1287,6 +1288,60 @@ class Risc():
                 break
         return None
 
+    def cmd_server(self, msg0, nick):
+        """
+        Return info about the specified game server ip
+        """
+        clean_msg = self.list_clean(msg0.split(' '))
+        if len(clean_msg) != 2:
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
+        ret = ''
+        serv = serv.lower()
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
+        ip = clean_msg[1]
+        port = 27690
+
+        if re.match(re_ip, ip):
+            ip = clean_msg[1]
+        elif re.match(full_re_ip, ip):
+            ip = clean_msg[1].split(':')[0]
+            port = int(clean_msg[1].split(':')[1])
+        else:
+            self.privmsg(nick, "Invalid IP addr.")
+            return None
+
+        try:
+            sv = Sv(ip, port, '', self.debug)
+        except:
+            return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
+            
+    if not sv:
+        return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
+
+        if sv.clientsList == -1:
+            nbClients = 0
+        else:
+            nbClients = len(sv.clientsList)
+        if int(sv.authNotoriety) >= 10:
+            sv.authNotoriety = COLOR['boldgreen']+'ON'+COLOR['rewind']
+        else:
+            sv.authNotoriety = COLOR['boldred']+'OFF'+COLOR['rewind']
+        if sv.allowVote == '1':
+            sv.allowVote = COLOR['boldgreen']+'ON'+COLOR['rewind']
+        elif sv.allowVote == '0':
+            sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
+
+        ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ' : Playing: ' +\
+            COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
+            str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
+            re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
+            ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
+            COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
+            ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
+    return ret
+
     # -------------------------------------------------------------------------------------------------------------------------------------
     # -------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1457,6 +1512,9 @@ class Risc():
             self.cmd_say(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["google"]:
+            self.cmd_google(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             self.cmd_google(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
