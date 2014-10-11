@@ -86,11 +86,11 @@
 # ------- v1.4.4 - Pr3acher - 09/07/2014
 #       - fix minor dbg code [OK]
 #       - fixed Sv failling -> crash [OK]
+#       - cmd 'say' for admins [OK]
 #       - cmd google
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
 #       - ability to use st & p with any server IP
-#       - cmd 'say' for admins
 #       - anti-spam
 
 
@@ -408,7 +408,8 @@ class Risc():
         CMDS_list = CMDS.split(',')
         for cmd in CMDS_list:
             HELP += self.cmd_prefix+cmd+', '
-        HELP += ". Type "+self.cmd_prefix+"help <cmd> for more info. Report bugs/suggestions at pr3acher777h@gmail.com."
+        HELP = HELP[:-2]
+        HELP += " . Type "+self.cmd_prefix+"help <cmd> for more info. Report bugs/suggestions at pr3acher777h@gmail.com."
         return None
 
     def get_sv_aliases(self):
@@ -978,7 +979,7 @@ class Risc():
 
         elif command in self.commands["say"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
-                    ". Makes "+self.nick+ " say <str>. You need to be registered s admin["+str(self.commandLevels['say'])+\
+                    ". Makes "+self.nick+ " say <str>. You need to be registered as admin["+str(self.commandLevels['say'])+\
                     "] with "+self.nick+"."
 
         elif command in self.commands["hello"]:
