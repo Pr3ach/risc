@@ -1799,7 +1799,6 @@ class Risc():
         global is_global_msg
         if is_global_msg:
             target = self.channel
-            is_global_msg = 0
         self._send('PRIVMSG %s :%s' % (target, msg))
         return None
 
