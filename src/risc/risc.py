@@ -1334,7 +1334,7 @@ class Risc():
         elif sv.allowVote == '0':
             sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
-        ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ' : Playing: ' +\
+        ret = COLOR['boldgreen'] + ip+':'+port + COLOR['rewind'] + ' : Playing: ' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
             str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
             re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
