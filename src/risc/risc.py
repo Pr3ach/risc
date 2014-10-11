@@ -1297,15 +1297,14 @@ class Risc():
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
             return None
         ret = ''
-        serv = serv.lower()
         re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
         re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
-        ip = clean_msg[1]
+        ip = ""
         port = 27690
 
-        if re.match(re_ip, ip):
+        if re.match(re_ip, clean_msg[1]):
             ip = clean_msg[1]
-        elif re.match(re_full_ip, ip):
+        elif re.match(re_full_ip, clean_msg[1]):
             ip = clean_msg[1].split(':')[0]
             port = int(clean_msg[1].split(':')[1])
         else:
