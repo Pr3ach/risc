@@ -89,6 +89,9 @@
 #       - cmd google
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
+#       - ability to use st & p with any server IP
+#       - cmd 'say' for 60+ admins
+#       - anti-spam
 
 
 __author__ = 'Pr3acher'
@@ -111,10 +114,11 @@ import unicodedata
 import json
 
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set"
-is_global_msg = 0  # Set if the command starts with '@' instead of '!'
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say"
 chat_set = {}
 INIPATH = "risc.ini"
+is_global_msg = 0  # Set if the command starts with '@' instead of '!'
+debug_mode = 0
 
 # IRC color codes
 COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
@@ -361,6 +365,7 @@ class Risc():
                          "chat": ["chat"],
                          "seen": ["seen"],
                          "set": ["set"],
+                         "say": ["say"],
                          "google": ["google"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
@@ -424,6 +429,7 @@ class Risc():
                "iputgroup": 100,
                "chat": 80,
                "set": 80,
+               "say": 60,
                "ileveltest": 60}
 
         for cmd in ret:
@@ -948,7 +954,7 @@ class Risc():
             elif sv.allowVote == '0':
                 sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
-            ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ' : Players: ' +\
+            ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ' : Playing: ' +\
                 COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
                 str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
                 re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
@@ -1072,7 +1078,7 @@ class Risc():
 
         ret.sort()
         # For some reason, sv.clients is innacurate here ...
-        return 'Players on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'): '+', '.join(ret)
+        return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'): '+', '.join(ret)
 
     def cmd_seen(self, msg0, sourceNick):
         """
@@ -1231,6 +1237,16 @@ class Risc():
 
         self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+
                          ': Setting the Cvar for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
+        return None
+
+    def cmd_say(self, msg0, nick):
+        auth, level = self.irc_is_admin(nick)
+
+        if not auth or level < self.commandLevels['say']:
+            self.privmsg(nick, "You must be at least in the admin["+self.commandLevels['say']+"] group to access this command.")
+            return None
+
+        self.privmsg(self.channel, " ".join(msg0.split(' ')[1:]))
         return None
 
     def cmd_google(self, msg0, nick):
@@ -1413,6 +1429,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["ikick"]:
             self.cmd_ikick(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["say"]:
+            self.cmd_say(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["google"]:
             self.cmd_google(msg[0], sourceNick)
@@ -1798,7 +1817,6 @@ class Risc():
             url_dump = urllib.urlopen(is_url[0]).read()
             print "dump: "
             print url_dump
-        print "no url"
 
         return None
 
@@ -1870,6 +1888,9 @@ class Risc():
 
                 if not line:
                     continue
+
+                if debug_mode:
+                    print line
 
                 if re.search('PRIVMSG', line):
                     self._on_privmsg(line)
