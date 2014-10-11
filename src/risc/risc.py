@@ -1305,7 +1305,7 @@ class Risc():
 
         if re.match(re_ip, ip):
             ip = clean_msg[1]
-        elif re.match(full_re_ip, ip):
+        elif re.match(re_full_ip, ip):
             ip = clean_msg[1].split(':')[0]
             port = int(clean_msg[1].split(':')[1])
         else:
@@ -1341,9 +1341,6 @@ class Risc():
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
         return ret
-
-    # -------------------------------------------------------------------------------------------------------------------------------------
-    # -------------------------------------------------------------------------------------------------------------------------------------
 
     def search_accurate(self, p, serv):
         """
