@@ -1516,6 +1516,7 @@ class Risc():
         elif msg[0].lower().strip() in self.commands["quit"]:
             self.cmd_quit(msg[0], sourceNick)
 
+        is_global_msg = 0
         return None
 
     # <client> <reason>
