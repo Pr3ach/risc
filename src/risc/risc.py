@@ -87,6 +87,8 @@
 #       - fix minor dbg code [OK]
 #       - fixed Sv failling -> crash [OK]
 #       - cmd 'say' for admins [OK]
+#       - fix typo in help & help say [OK]
+#       - fix typo in cmd_status [OK]
 #       - cmd google
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
@@ -409,7 +411,7 @@ class Risc():
         for cmd in CMDS_list:
             HELP += self.cmd_prefix+cmd+', '
         HELP = HELP[:-2]
-        HELP += " . Type "+self.cmd_prefix+"help <cmd> for more info. Report bugs/suggestions at pr3acher777h@gmail.com."
+        HELP += ". Type "+self.cmd_prefix+"help <cmd> for more info. Report bugs/suggestions at pr3acher777h@gmail.com."
         return None
 
     def get_sv_aliases(self):
@@ -923,7 +925,7 @@ class Risc():
                 else:
                     nbClients = len(sv.clientsList)
 
-                ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Playining: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
+                ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Playing: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
                              '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
                 del sv
             ret = ret[:-3]
