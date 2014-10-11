@@ -977,7 +977,7 @@ class Risc():
                          ". Return the last time a player was seen in the server set."
 
         elif command in self.commands["say"]:
-            return COLOR['boldgreen'] + comma"+self.nick+" + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
                     ". Makes "+self.nick+ " say <str>. You need to be registered s admin["+str(self.commandLevels['say'])+\
                     "] with "+self.nick+"."
 
