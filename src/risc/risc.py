@@ -1317,8 +1317,8 @@ class Risc():
         except:
             return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
             
-    if not sv:
-        return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
+        if not sv:
+            return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
 
         if sv.clientsList == -1:
             nbClients = 0
