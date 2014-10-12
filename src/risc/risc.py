@@ -95,11 +95,12 @@
 #       - small changes in cmd hello [OK]
 #       - minor bug fixes [OK]
 #       - add cmd 'uptime' [OK]
-#       - anti-spam [testing]
+#       - add cmd 'version' [OK]
+#       - anti-spam [OK]
 # ------- v1.4.5 - Pr3acher - MM/DD/YYYY
-#       - fix the whole 'set' cmd
+#       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
-#       - add commands to set/get Cvars
+#       - add/fix commands to set/get Cvars
 
 
 __author__ = 'Pr3acher'
@@ -125,7 +126,7 @@ import datetime
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -381,6 +382,7 @@ class Risc():
                          "google": ["google", "g"],
                          "server": ["server", "sv"],
                          "uptime": ["uptime"],
+                         "version": ["version", "v"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -1549,6 +1551,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             self.privmsg(sourceNick, self.cmd_server(msg[0], sourceNick))
+
+        elif msg[0].lower().split(' ')[0] in self.commands["version"]:
+            self.privmsg(sourceNick, "risc v"+__version__" by "+__author__)
 
         elif msg[0].lower().split(' ')[0] in self.commands["uptime"]:
             self.privmsg(sourceNick, self.cmd_uptime(msg[0], sourceNick))
