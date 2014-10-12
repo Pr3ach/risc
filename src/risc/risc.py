@@ -93,6 +93,7 @@
 #       - fix bug for is_global_cmd [OK]
 #       - add cmd 'server' [OK]
 #       - small changes in cmd hello [OK]
+#       - fix the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
 #       - anti-spam
@@ -852,7 +853,7 @@ class Risc():
 
         if not sv or sv not in self.sv_running:
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+
-                         ": Invalid arguments, target server either doesn't exist or is not running riscb3")
+                         ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
             return None
 
         if len_cmd == 2:
@@ -1001,7 +1002,7 @@ class Risc():
 
         elif command in self.commands["players"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <serverName>: Aliases: "+", ".join(self.commands["players"])+\
-                         ". Shows all players on the <serverName> server. Available args/server-name: "+', '.join(self.args["players"])
+                         ". Shows all players on the <serverName> server. Available args/server-name: "+', '.join(self.args["players"])+'.'
 
         elif command in self.commands["search"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <playerNick> <server> Aliases: " + ', '.join(self.commands["search"])+\
@@ -1018,19 +1019,19 @@ class Risc():
 
         elif command in self.commands["base64"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <utf8String>: Aliases: "+', '.join(self.commands["base64"])+\
-                         ". Returns a base64 encoded string from the utf-8 string <utf8_String>."
+                         ". Returns a base64 encoded string from the utf-8 string <utf8String>."
 
         elif command in self.commands["sha1"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + " <string>: Aliases: " + ', '.join(self.commands["sha1"])+\
                          ". Returns the sha1 of the string <string>."
 
         elif command in self.commands["set"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind'] + " <cvar> <value>: Aliases: " + ', '.join(self.commands["set"])+\
-                         ". Set a value for the specified cvar."
+            return COLOR['boldgreen'] + command + COLOR['rewind'] + " <server> <cvar> <value>: Aliases: " + ', '.join(self.commands["set"])+\
+                         ". Set a value for the specified cvar and server."
 
         elif command in self.commands["chat"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + " <server> <on|off>: Aliases: " + ', '.join(self.commands["chat"])+\
-                         ". Enable or disable the chat feature betwen IRC and the server <server>. Return the state of the chat feature"+\
+                         ". Enable or disable the chat feature betwen IRC and the game server <server>. Return the state of the chat feature"+\
                          " in the servers when no arg are specified, or the state of the chat feature in the specified server if any."+\
                          " You need to be admin["+str(self.commandLevels['chat'])+'] to access this command.'
 
@@ -1044,7 +1045,7 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> Aliases: " + ', '.join(self.commands["ileveltest"]) +\
                          ". Returns the level of the user <user> if he's registered as admin with risc. If you don't specify a <user> parameter,"+\
                          " the command will return your level. You're required to be registered as admin[" +\
-                         str(self.commandLevels['ileveltest'])+"] with PerBot to access this command."
+                         str(self.commandLevels['ileveltest'])+"] with "+self.nick+" to access this command."
 
         elif command in self.commands["md5"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <string>: Aliases: "+', '.join(self.commands["md5"])+\
@@ -1105,7 +1106,7 @@ class Risc():
 
     def cmd_seen(self, msg0, sourceNick):
         """
-        Return the last time a user was seen in the specified server
+        Return the last time a user was seen in the server set
         """
         cleanCmd = self.list_clean(msg0.split(' '))
 
@@ -1115,7 +1116,7 @@ class Risc():
         
         # b3 uses 32 chars to store names
         if len(cleanCmd[1]) > 31:
-            self.privmsg(sourceNick, "User nick too long, max length: 31 chars")
+            self.privmsg(sourceNick, "User nick too long, max length: 31 chars.")
 
         try:
             last_seen = (0, 0)
@@ -1149,7 +1150,7 @@ class Risc():
             self.debug.error('cmd_seen: Caught exception: %s - Passing' % e)
             pass
 
-        self.privmsg(sourceNick, "No such player")
+        self.privmsg(sourceNick, "No such player.")
         return None
 
     def cmd_search(self, player, rawRet=0):
@@ -1225,7 +1226,7 @@ class Risc():
         
         if not sv or sv not in self.sv_running:
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+
-                         ": Invalid arguments, target server either doesn't exist or is not running riscb3")
+                         ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
             return None
 
         auth, level = self.irc_is_admin(sourceNick)
