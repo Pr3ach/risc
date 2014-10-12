@@ -98,7 +98,8 @@
 #       - anti-spam [OK]
 #       - add cmd 'version' [OK]
 # ------- v1.4.5 - Pr3acher - 10/12/2014
-#       - added server hostname for cmd 'server' [testing]
+#       - added server hostname for cmd 'server' [OK]
+#       - added player list to cmd 'server' [testing]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -1320,7 +1321,7 @@ class Risc():
             if i >= 4:
                 break
         return None
-
+    
     def cmd_server(self, msg0, nick):
         """
         Return info about the specified game server ip
@@ -1365,14 +1366,30 @@ class Risc():
         elif sv.allowVote == '0':
             sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
-        ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ' : Playing:' +\
+        if sv.clients == 0 or sv.clientsList == -1:
+            ret2 = 'Server is currently empty.'
+        else:
+            usePings = False
+            if len(sv.clientsPings) == len(sv.clientsList):
+                usePings = True
+
+            players = []
+            for i in range(len(sv.clientsList)):
+                if usePings and sv.clientsPings[i] == '0':
+                    ping = COLOR['rewind']+' ('+COLOR['boldblue']+'BOT'+COLOR['rewind']+')'
+                else:
+                    ping = ''
+                players.append(COLOR['boldgreen']+sv.clientsList[i]+COLOR['rewind']+ping)
+            ret2 = "Playing: "+", ".join(players)
+        
+        ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ': Playing:' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
             str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
             re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
             ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
-        return ret
+        return ret, ret2
     
     def cmd_uptime(self, msg0, nick):
         cmd = self.list_clean(msg0.split(' '))
