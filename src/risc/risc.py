@@ -94,8 +94,8 @@
 #       - add cmd 'server' [OK]
 #       - small changes in cmd hello [OK]
 #       - minor bug fixes [OK]
-#       - add cmd 'uptime' [testing]
-#       - anti-spam
+#       - add cmd 'uptime' [OK]
+#       - anti-spam [testing]
 # ------- v1.4.5 - Pr3acher - MM/DD/YYYY
 #       - fix the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -123,6 +123,7 @@ import urllib
 import datetime
 
 init_time = int(time.time())
+last_cmd_time = 0
 HELP = None
 CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime"
 chat_set = {}
@@ -1502,10 +1503,17 @@ class Risc():
 
     def on_pubmsg(self, rawMsg):
         """
-        Channel messages starting with the char '!' or '@' are processed here
+        Channel messages starting with the char self.cmd_prefix/_global are processed here
         """
         global is_global_msg
-        cmdTime = time.time()
+        global last_cmd_time
+
+        # Basic Anti-Spam stuff
+        cur_time = time.time()
+        if int(cur_time) - last_cmd_time <= self.anti_spam_threshold:
+            return None
+        last_cmd_time = int(cur_time)
+
         sourceNick = rawMsg[0].split('!')[0][1:]
         msg = []
         msg.append((' '.join(rawMsg[0].split(' ')[3:])[1:]))  # User full command
