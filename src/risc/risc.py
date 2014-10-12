@@ -997,6 +997,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
                          ". Return the last time a player was seen in the server set."
 
+        elif command in self.commands["version"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["version"])+\
+                         ". Return the bot version."
+
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
                          ". Display info from an game server IP address. If no port is specified, assume 27960."
