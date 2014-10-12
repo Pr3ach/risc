@@ -98,6 +98,7 @@
 #       - anti-spam [OK]
 #       - add cmd 'version' [OK]
 # ------- v1.4.5 - Pr3acher - 10/12/2014
+#       - added server hostname for cmd 'server' [testing]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -272,6 +273,8 @@ class Sv():
             self.maxClients = COLOR['boldmagenta']+'Not set'+COLOR['rewind']
         if self.mapName == -1:
             self.mapName = COLOR['boldmagenta']+'Not set'+COLOR['rewind']
+        if self.hostname == -1:
+            self.hostname = COLOR['boldmagenta']+'Not set'+COLOR['rewind']
         return None
 
     def getstatus(self):
@@ -287,6 +290,7 @@ class Sv():
         self.gameType = self.get_var(listStatus, 'g_gametype')
         self.nextMap = self.get_var(listStatus, 'g_NextMap')
         self.clientsList = self.get_clients_list(listStatus)
+        self.hostname = self.get_var(listStatus, 'sv_hostname')
         return 1
 
     def getinfo(self):
@@ -1361,7 +1365,7 @@ class Risc():
         elif sv.allowVote == '0':
             sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
-        ret = COLOR['boldgreen'] + " " + ip + ':' + str(port) + COLOR['rewind'] + ' : Playing:' +\
+        ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ' : Playing:' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
             str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
             re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
