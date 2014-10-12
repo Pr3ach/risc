@@ -1342,8 +1342,7 @@ class Risc():
             ip = clean_msg[1].split(':')[0]
             port = int(clean_msg[1].split(':')[1])
         else:
-            self.privmsg(nick, "Invalid IP addr.")
-            return None
+            return "Invalid IP addr."
 
         try:
             sv = Sv(ip, port, '', self.debug)
@@ -1576,8 +1575,11 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
-            self.privmsg(sourceNick, ret_cmd[0])
-            self.privmsg(sourceNick, ret_cmd[1])
+            if isinstance(ret_cmd, list):
+                self.privmsg(sourceNick, ret_cmd[0])
+                self.privmsg(sourceNick, ret_cmd[1])
+            else:
+                self.privmsg(sourceNick, ret_cmd)
 
         elif msg[0].lower().split(' ')[0] in self.commands["version"]:
             self.privmsg(sourceNick, "risc v"+__version__+" by "+__author__)
