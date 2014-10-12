@@ -1512,6 +1512,7 @@ class Risc():
         # Basic Anti-Spam stuff
         cur_time = time.time()
         if int(cur_time) - last_cmd_time <= self.anti_spam_threshold:
+            last_cmd_time = int(cur_time)
             return None
         last_cmd_time = int(cur_time)
 
