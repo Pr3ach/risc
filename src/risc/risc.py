@@ -324,6 +324,7 @@ class Risc():
             self.db_user = self.cfg.get('db', 'user')
             self.db_passwd = self.cfg.get('db', 'passwd')
             self.db_name = self.cfg.get('db', 'self_db')  # db for risc settings (admins etc)
+            self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
 
             # get servers, their dbs
             self.svs = self.cfg.get('var', 'servers').split(',')
