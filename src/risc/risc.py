@@ -1575,7 +1575,9 @@ class Risc():
             self.cmd_google(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
-            self.privmsg(sourceNick, self.cmd_server(msg[0], sourceNick))
+            ret_cmd = self.cmd_server(msg[0], sourceNick)
+            self.privmsg(sourceNick, ret_cmd[0])
+            self.privmsg(sourceNick, ret_cmd[1])
 
         elif msg[0].lower().split(' ')[0] in self.commands["version"]:
             self.privmsg(sourceNick, "risc v"+__version__+" by "+__author__)
