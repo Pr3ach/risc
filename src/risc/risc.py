@@ -91,7 +91,7 @@
 #       - fix typo in cmd_status [OK]
 #       - cmd google [OK]
 #       - fix bug for is_global_cmd [OK]
-#       - ability to use st & p with any server IP
+#       - add cmd 'server'
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
 #       - anti-spam
@@ -982,6 +982,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
                          ". Return the last time a player was seen in the server set."
 
+        elif command in self.commands["server"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
+                         ". Display info from an IP address. If no port is specified, assume 27960."
+
         elif command in self.commands["say"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
                     ". Makes "+self.nick+ " say <str>. You need to be registered as admin["+str(self.commandLevels['say'])+\
@@ -1277,8 +1281,9 @@ class Risc():
         search_results = search_response.read()
         results = json.loads(search_results)
         data = results['responseData']
-        self.privmsg(nick, "Top hits: ")
         hits = data['results']
+        if len(hits):
+            self.privmsg(nick, "Top hits: ")
         if not len(hits):
             self.privmsg(nick, "No results.")
         for h in hits: 
@@ -1332,15 +1337,13 @@ class Risc():
         elif sv.allowVote == '0':
             sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
-        ret = COLOR['boldgreen'] + " " + ip + ':' + str(port) +" " + COLOR['rewind'] + ' : Playing: ' +\
+        ret = COLOR['boldgreen'] + " " + ip + ':' + str(port) + COLOR['rewind'] + ' : Playing:' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
             str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
             re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
             ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
-        print ret
-        self.privmsg(nick, ret)
         return ret
 
     def search_accurate(self, p, serv):
@@ -1513,7 +1516,7 @@ class Risc():
             self.cmd_google(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
-            self.cmd_server(msg[0], sourceNick)
+            self.privmsg(sourceNick, self.cmd_server(msg[0], sourceNick))
 
         elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
             self.cmd_ileveltest(msg[0], sourceNick)
