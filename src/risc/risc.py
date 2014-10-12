@@ -93,10 +93,13 @@
 #       - fix bug for is_global_cmd [OK]
 #       - add cmd 'server' [OK]
 #       - small changes in cmd hello [OK]
+#       - minor bug fixes [OK]
+#       - add cmd 'uptime' [testing]
+#       - anti-spam
+# ------- v1.4.5 - Pr3acher - MM/DD/YYYY
 #       - fix the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
-#       - anti-spam
 
 
 __author__ = 'Pr3acher'
@@ -117,9 +120,11 @@ from warnings import filterwarnings
 import unicodedata
 import json
 import urllib
+import datetime
 
+init_time = int(time.time())
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -373,6 +378,7 @@ class Risc():
                          "say": ["say"],
                          "google": ["google", "g"],
                          "server": ["server", "sv"],
+                         "uptime": ["uptime"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -477,7 +483,7 @@ class Risc():
             self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + formatTime + "\001")
 
         elif msg[0].lower() == "userinfo":
-            self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + "risc v" + __version__ + " by Pr3acher @__Pr3__" + "\001")
+            self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + "stalk much?" + "\001")
 
         elif msg[0].lower() == "ping":
             self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + "PONG " + "\001")
@@ -1000,6 +1006,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> Aliases: " + ', '.join(self.commands["hello"])+\
                          ". Simply says hi to user <user>. Use without <user> argument to target the channel."
 
+        elif command in self.commands["uptime"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["uptime"])+". "+\
+                    "Show "+self.nick+"'s uptime."
+
         elif command in self.commands["players"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <serverName>: Aliases: "+", ".join(self.commands["players"])+\
                          ". Shows all players on the <serverName> server. Available args/server-name: "+', '.join(self.args["players"])+'.'
@@ -1010,8 +1020,9 @@ class Risc():
                          " else it performs the search in the <server> server."
 
         elif command in self.commands["ishowadmins"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["ishowadmins"])+". Shows all "+\
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["ishowadmins"])+". Show all "+\
                          self.nick+" admins."
+
 
         elif command in self.commands["google"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["google"])+". Perform a"+\
@@ -1350,6 +1361,12 @@ class Risc():
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
         return ret
+    
+    def cmd_uptime(self, msg0, nick):
+        cmd = self.list_clean(msg0.split(' '))
+        if len(cmd) != 1:
+            return "Invalid usage, check "+self.cmd_prefix+"help uptime."
+        return str(datetime.timedelta(seconds=int(time.time())-init_time))
 
     def search_accurate(self, p, serv):
         """
@@ -1522,6 +1539,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             self.privmsg(sourceNick, self.cmd_server(msg[0], sourceNick))
+
+        elif msg[0].lower().split(' ')[0] in self.commands["uptime"]:
+            self.privmsg(sourceNick, self.cmd_uptime(msg[0], sourceNick))
 
         elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
             self.cmd_ileveltest(msg[0], sourceNick)
@@ -1847,7 +1867,7 @@ class Risc():
         self._send('JOIN '+self.channel)
         return None
 
-    def disconnect(self, message="ducks"):
+    def disconnect(self, message="Off"):
         """
         Disconnect from the current channel
         """
