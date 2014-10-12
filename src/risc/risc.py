@@ -1557,7 +1557,7 @@ class Risc():
             self.privmsg(sourceNick, self.cmd_server(msg[0], sourceNick))
 
         elif msg[0].lower().split(' ')[0] in self.commands["version"]:
-            self.privmsg(sourceNick, "risc v"+__version__" by "+__author__)
+            self.privmsg(sourceNick, "risc v"+__version__+" by "+__author__)
 
         elif msg[0].lower().split(' ')[0] in self.commands["uptime"]:
             self.privmsg(sourceNick, self.cmd_uptime(msg[0], sourceNick))
