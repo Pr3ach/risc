@@ -99,7 +99,7 @@
 #       - add cmd 'version' [OK]
 # ------- v1.4.5 - Pr3acher - 10/12/2014
 #       - added server hostname for cmd 'server' [OK]
-#       - added player list to cmd 'server' [testing]
+#       - added player list to cmd 'server' [OK]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
