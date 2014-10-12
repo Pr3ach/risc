@@ -91,7 +91,8 @@
 #       - fix typo in cmd_status [OK]
 #       - cmd google [OK]
 #       - fix bug for is_global_cmd [OK]
-#       - add cmd 'server'
+#       - add cmd 'server' [OK]
+#       - small changes in cmd hello [OK]
 #       - Add cmd: playerinfo/pi
 #       - add commands to set/get Cvars
 #       - anti-spam
@@ -726,16 +727,19 @@ class Risc():
 
         else:
             if len(helloClean[1]) > 28:
-                self.privmsg(sourceNick, 'Nick has too many chars')
+                self.privmsg(sourceNick, 'Nick has too many chars.')
                 return None
             elif sourceNick.lower() == helloClean[1].lower():
                 self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" is feeling alone ...")
+                return None
+            elif self.nick.lower() == helloClean[1].lower():
+                self.privmsg(self.channel, "Know you're talking to a bot? :')")
                 return None
             else:
                 if self.irc_is_on_channel(helloClean[1]) or helloClean[1].lower() == 'q':
                     self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" says hi to "+helloClean[1])
                 else:
-                    self.privmsg(sourceNick, "No such nick")
+                    self.privmsg(sourceNick, "No such nick.")
         return None
 
     def cmd_ikick(self, msg0, sourceNick):
@@ -984,7 +988,7 @@ class Risc():
 
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
-                         ". Display info from an IP address. If no port is specified, assume 27960."
+                         ". Display info from an game server IP address. If no port is specified, assume 27960."
 
         elif command in self.commands["say"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
