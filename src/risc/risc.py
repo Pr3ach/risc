@@ -95,16 +95,16 @@
 #       - small changes in cmd hello [OK]
 #       - minor bug fixes [OK]
 #       - add cmd 'uptime' [OK]
-#       - add cmd 'version' [OK]
 #       - anti-spam [OK]
-# ------- v1.4.5 - Pr3acher - MM/DD/YYYY
+#       - add cmd 'version' [OK]
+# ------- v1.4.5 - Pr3acher - 10/12/2014
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
 
 
 __author__ = 'Pr3acher'
-__version__ = '1.4.4'
+__version__ = '1.4.5'
 
 
 import socket
