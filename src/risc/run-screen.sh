@@ -2,4 +2,4 @@
 
 # runs risc inside a screen session - Pr3acher
 
-screen -S risc -d -m ./risc
+screen -S risc -d -m ./risc.py
