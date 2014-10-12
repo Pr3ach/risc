@@ -7,7 +7,8 @@ risc makes use of its own db to store several things, like keeping an admin list
 Thus you need to create a db, and report it later in the config file. The best is to create a new user 
 for risc, and grant it basic privileges to b3 / server dbs, and of course, its config db.
 
-Now you also need to setup the configuration. The config file is named "risc.ini". Be careful using 
+Now you also need to setup the configuration. The config file is named "risc.example.ini". Rename it to 'risc.ini',
+remove the comments and set it up. Be careful using 
 it: let a space where there is one and let no space where there isn't, this is very important. 
 Take a look at risc.example.ini to get you started. Copy it, rename to "risc.ini", and change whatever you need to.
 
