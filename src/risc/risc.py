@@ -1957,7 +1957,7 @@ class Risc():
     def process_irc(self, raw_msg):
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
-        msg = raw_msg[0].split(':')[2]
+        msg = ':'.join(raw_msg[0].split(':')[2:])
         nick = raw_msg[0].split('!')[0][1:]
         url_re = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)$', re.IGNORECASE)
 
