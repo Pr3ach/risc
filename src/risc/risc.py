@@ -1955,7 +1955,7 @@ class Risc():
         return ''.join(l)
 
     def process_irc(self, raw_msg):
-        if not re.search(' PRIVMSG ', raw_msg):
+        if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
         msg = raw_msg[0].split(':')[2]
         nick = raw_msg[0].split('!')[0][1:]
