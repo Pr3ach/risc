@@ -1964,7 +1964,11 @@ class Risc():
 
         check_url = re.match(re_url, msg)
         if check_url:
-            url = urllib.urlopen(check_url.group(0))
+            try:
+                url = urllib.urlopen(check_url.group(0))
+            except Exception, e:
+                self.debug.error('process_irc: Exception: %s - Ret' %e)
+                return None
             soup = BeautifulSoup(url.read())
             self.privmsg(self.channel, str(soup.title))
 
