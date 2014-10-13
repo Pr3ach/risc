@@ -1964,7 +1964,8 @@ class Risc():
         check_url = re.match(re_url, msg)
         if check_url:
             url = urllib.urlopen(check_url.group(0))
-            print url.read()
+            soup = BeautifulSoup(url.read())
+            self.privmsg(self.channel, soup.title)
 
         return None
 
