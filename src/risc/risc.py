@@ -125,7 +125,7 @@ import unicodedata
 import json
 import urllib
 import datetime
-from bs4 import BeautifulSoup
+import lxml.html
 
 init_time = int(time.time())
 last_cmd_time = 0
@@ -1963,14 +1963,13 @@ class Risc():
         re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)$', re.IGNORECASE)
 
         check_url = re.match(re_url, msg)
+
         if check_url:
             try:
-                url = urllib.urlopen(check_url.group(0))
+                self.privmsg(self.channel, lxml.html.parse(urllib.urlopen(check_url.group(0)).find(".//title").text)
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' %e)
                 return None
-            soup = BeautifulSoup(url.read())
-            self.privmsg(self.channel, str(soup.title))
 
         return None
 
