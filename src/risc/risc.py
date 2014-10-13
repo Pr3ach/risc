@@ -1956,14 +1956,10 @@ class Risc():
 
     def process_irc(self, raw_msg):
         msg = raw_msg[0].split(':')[2]
-        print "msg= "+msg
         nick = raw_msg[0].split('!')[0][1:]
         url_re = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-        is_url = re.match(url_re, msg)
-
-        if is_url:
-            self.privmsg(self.channel, "url")
+        print str(re.match(url_re, msg))
 
         return None
 
