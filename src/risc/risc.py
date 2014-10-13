@@ -126,6 +126,7 @@ import json
 import urllib
 import datetime
 import lxml.html
+import tld
 
 init_time = int(time.time())
 last_cmd_time = 0
