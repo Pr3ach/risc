@@ -1966,7 +1966,6 @@ class Risc():
         if check_url:
             url = urllib.urlopen(check_url.group(0))
             soup = BeautifulSoup(url.read())
-            print str(soup.title)
             self.privmsg(self.channel, str(soup.title))
 
         return None
