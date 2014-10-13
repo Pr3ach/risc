@@ -125,6 +125,7 @@ import unicodedata
 import json
 import urllib
 import datetime
+from bs4 import BeautifulSoup
 
 init_time = int(time.time())
 last_cmd_time = 0
@@ -1965,7 +1966,7 @@ class Risc():
         if check_url:
             url = urllib.urlopen(check_url.group(0))
             soup = BeautifulSoup(url.read())
-            self.privmsg(self.channel, soup.title)
+            self.privmsg(self.channel, str(soup.title))
 
         return None
 
