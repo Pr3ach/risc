@@ -100,6 +100,7 @@
 # ------- v1.4.5 - Pr3acher - 10/12/2014
 #       - added server hostname for cmd 'server' [OK]
 #       - added player list to cmd 'server' [OK]
+#       - info on link posting [testing]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -1965,9 +1966,7 @@ class Risc():
         is_url = re.match(url_re, msg)
 
         if is_url:
-            url_dump = urllib.urlopen(is_url[0]).read()
-            print "dump: "
-            print url_dump
+            self.privmsg(self.channel, "url")
 
         return None
 
