@@ -188,14 +188,14 @@ class Debug:
 
 class Sv():
     """
-    Gather info about a specific UrT 4.2 server
+    Gather info about a specific UrT 4.2 server (ioq3 engine)
     """
     def __init__(self, ip, port, name, debug):
         self.debug = debug
         # Match a "valid" ip
-        if re.match('([0-9]{1,3}\.){3}[0-9]{1,3}', ip) is None:
-            self.debug.warning('Sv.__init__: IP seems invalid - Returning 0')
-            return 0
+        if re.match('^([0-9]{1,3}\.){3}[0-9]{1,3}$', ip) is None:
+            self.debug.warning('Sv.__init__(): IP seems invalid.')
+            raise Exception('Sv.__init__(): Invalid IP.')
         self.ip = ip
         self.port = port
         self.name = name
@@ -208,22 +208,19 @@ class Sv():
         except Exception, e:
             if self.sock:
                 self.sock.close()
-            self.debug.error("Sv.__init__: Couldn't connect to the given ip,port: %s - Ret 0" % e)
-            return 0
+            self.debug.error("Sv.__init__(): Couldn't connect to the given ip,port: %s" % e)
+            raise Exception("Sv.__init__(): Couldn't connect to the given ip,port: %s" % e)
         if not self.getstatus():
-            raise Exception("Sv.getstatus()")
             if self.sock:
                 self.sock.close()
-            return 0
+            raise Exception("Sv.getstatus() failure.")
         if not self.getinfo():
-            raise Exception("Sv.getinfo()")
             if self.sock:
                 self.sock.close()
-            return 0
+            raise Exception("Sv.getinfo() failure.")
         self.check_vars()
         if self.sock:
             self.sock.close()
-        return None
 
     def list_clean(self, l):
         retList = []
@@ -288,7 +285,7 @@ class Sv():
             rawStatus = str(self.sock.recv(4096))
             listStatus = self.list_clean(rawStatus.split('\\'))
         except Exception, e:
-            print 'Sv.getstatus: Exception: %s - Returning 0' % e
+            self.debug.error('Sv.getstatus: Exception: %s - Returning 0' % e)
             return 0
         self.allowVote = self.get_var(listStatus, 'g_allowvote')
         self.version = self.get_var(listStatus, 'version')
@@ -304,7 +301,7 @@ class Sv():
             rawInfo = str(self.sock.recv(2048))
             listInfo = self.list_clean(rawInfo.split('\\'))
         except Exception, e:
-            print 'Sv.getinfo: Exception: %s - Returning 0' % e
+            self.debug.error('Sv.getinfo: Exception: %s - Returning 0' % e)
             return 0
         self.clients = self.get_var(listInfo, 'clients')
         self.authNotoriety = self.get_var(listInfo, 'auth_notoriety')
@@ -1350,14 +1347,9 @@ class Risc():
 
         try:
             sv = Sv(ip, port, '', self.debug)
-        except:
-            return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
+        except Exception, e:
+            return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+": %s"+COLOR['rewind'] % e
             
-        print "sv = " +str(sv)
-        print "type(sv)="+str(type(sv))
-        if not sv:
-            return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
-
         if sv.clientsList == -1:
             nbClients = 0
         else:
