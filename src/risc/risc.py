@@ -101,6 +101,7 @@
 #       - added server hostname for cmd 'server' [OK]
 #       - added player list to cmd 'server' [OK]
 #       - info on link posting [OK]
+#       - fix cmd 'sv' crashing on invalid game IP
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -1352,6 +1353,8 @@ class Risc():
         except:
             return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
             
+        print "sv = " +str(sv)
+        print "type(sv)="+str(type(sv))
         if not sv:
             return COLOR['boldred']+"Error: Couldn't get server status from "+ip+":"+port+" "+COLOR['rewind']
 
