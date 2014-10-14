@@ -1984,7 +1984,7 @@ class Risc():
         for url in url_list:
             try:
                 self.privmsg(self.channel, "Title: " + lxml.html.parse(urllib.urlopen(url)).find(".//title")\
-                        .text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(check_url.group(0))+')'))
+                        .text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url)+')'))
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' % e)
 
