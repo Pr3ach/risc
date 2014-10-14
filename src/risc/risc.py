@@ -1402,11 +1402,12 @@ class Risc():
             return "Invalid usage, check "+self.cmd_prefix+"help roulette."
         global roulette_shot
         global roulette_progress
+
         if roulette_progress == roulette_shot:
             self.privmsg(self.channel, "Chamber "+str(roulette_progress)+" of 6 : "+COLOR['boldred'] + nick + " is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
             roulette_progress = 1
-            # KICK
+            self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n')
         else:
             self.privmsg(self.channel, "Chamber "+str(roulette_progress)+" of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
             roulette_progress += 1
