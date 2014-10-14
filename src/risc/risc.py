@@ -1408,12 +1408,14 @@ class Risc():
         global roulette_progress
 
         if roulette_progress == roulette_shot:
-            self.privmsg(self.channel, "Chamber "+str(roulette_progress)+" of 6 : "+COLOR['boldred'] + nick + " is no more ..."+COLOR['rewind'])
+            self.privmsg(self.channel, "Chamber"+COLOR['boldwhite']+' '+str(roulette_progress)+' '+\
+                        COLOR['rewind']+"of 6 : "+COLOR['boldred'] + nick + " is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
             roulette_progress = 1
             self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n')
         else:
-            self.privmsg(self.channel, "Chamber "+str(roulette_progress)+" of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
+            self.privmsg(self.channel, "Chamber"+COLOR['boldwhite']+' '+str(roulette_progress)+\
+                        ' '+COLOR['rewind']+"of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
             roulette_progress += 1
         return None
 
