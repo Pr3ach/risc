@@ -1956,22 +1956,37 @@ class Risc():
                 l.append(ch)
         return ''.join(l)
 
+    def process_irc_url(self, raw_msg):
+        """
+        Return a list of URLs from IRC msg.
+        """
+        raw_msg = self.list_clean(raw_msg.split(' '))
+        re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)$', re.IGNORECASE)
+        ret = []
+
+        for s in raw_msg:
+            if re.match(re_url, s):
+                ret.append(s)
+
+        return ret
+
     def process_irc(self, raw_msg):
+        """
+        Handle IRC messages if needed.
+        """
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
         msg = ':'.join(raw_msg[0].split(':')[2:])
         nick = raw_msg[0].split('!')[0][1:]
-        re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)\s*$', re.IGNORECASE)
 
-        check_url = re.match(re_url, msg)
-
-        if check_url:
+        # Process URLs posting
+        url_list = self.process_irc_url(raw_msg)
+        for url in url_list:
             try:
-                self.privmsg(self.channel, lxml.html.parse(urllib.urlopen(check_url.group(0))).find(".//title")\
+                self.privmsg(self.channel, "Title: " + lxml.html.parse(urllib.urlopen(url)).find(".//title")\
                         .text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(check_url.group(0))+')'))
             except Exception, e:
-                self.debug.error('process_irc: Exception: %s - Ret' %e)
-                return None
+                self.debug.error('process_irc: Exception: %s - Ret' % e)
 
         return None
 
