@@ -1348,7 +1348,7 @@ class Risc():
         try:
             sv = Sv(ip, port, '', self.debug)
         except Exception, e:
-            return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+": "+e+COLOR['rewind']
+            return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+": "+str(e)+COLOR['rewind']
             
         if sv.clientsList == -1:
             nbClients = 0
