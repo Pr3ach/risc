@@ -1405,11 +1405,11 @@ class Risc():
         if roulette_progress == roulette_shot:
             roulette_shot = random.randint(1, 6)
             roulette_progress = 1
-            self.privmsg(self.channel, COLOR['boldmagenta'] + nick + COLOR['rewind'] + " is no more ...")
+            self.privmsg(self.channel, "Chamber "+str(roulette_progress)+" of 6 : "+COLOR['boldred'] + nick + " is no more ..."+COLOR['rewind'])
             # KICK
         else:
             roulette_progress += 1
-            self.privmsg(self.channel, COLOR['boldgreen'] + nick + COLOR['rewind'] + " is safe.")
+            self.privmsg(self.channel, "Chamber "+str(roulette_progress)+" of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
         return None
 
     def search_accurate(self, p, serv):
