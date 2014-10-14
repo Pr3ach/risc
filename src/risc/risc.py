@@ -103,6 +103,7 @@
 #       - info on link posting [OK]
 #       - fix error handling for Sv class [OK]
 #       - fixed: "status all" was failling even if not all serv failed querying [OK]
+#       - do not start game_watcher callback when risb3 ain't running [OK]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -1845,7 +1846,6 @@ class Risc():
         self.debug.info("[+] Setting and starting event callbacks")
 
         # game_watcher event callback
-        print self.sv_running
         if len(self.sv_running) >= 2:
             th = threading.Thread(None, self.game_watcher, None, (), None)
             th.daemon = True  # So that the prog doesn't wait for the threads to exit
