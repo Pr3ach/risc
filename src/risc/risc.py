@@ -101,7 +101,7 @@
 #       - added server hostname for cmd 'server' [OK]
 #       - added player list to cmd 'server' [OK]
 #       - info on link posting [OK]
-#       - fix cmd 'sv' crashing on invalid game IP
+#       - fix error handling for Sv class [OK]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -940,7 +940,8 @@ class Risc():
                 try:
                     sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
                 except Exception, e:
-                    return COLOR['boldred']+"Exception for server '"+i+"': %s" % e +COLOR['rewind']
+                    self.debug.warning("cmd_status: Failure for server '"+i+"'. Ignoring.")
+                    continue
 
                 if sv.clientsList == -1:
                     nbClients = 0
@@ -950,7 +951,8 @@ class Risc():
                 ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Playing: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
                              '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
                 del sv
-            ret = ret[:-3]
+            if ret != '':
+                ret = ret[:-3]
 
         else:
             keyFromValue = self.get_dict_key(self.argAliases['servers'], serv)
