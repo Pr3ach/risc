@@ -213,7 +213,6 @@ class Sv():
         if not self.getstatus():
             if self.sock:
                 self.sock.close()
-            print "raise ex"
             raise Exception("Sv.getstatus() failure.")
         if not self.getinfo():
             if self.sock:
@@ -1349,6 +1348,7 @@ class Risc():
         try:
             sv = Sv(ip, port, '', self.debug)
         except Exception, e:
+            print "exc caught"
             return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+": %s"+COLOR['rewind'] % e
             
         if sv.clientsList == -1:
