@@ -414,8 +414,8 @@ class Risc():
         self.init_irc_admins()
         self.connect()
         self.debug.info('[+] Connected on '+self.host+' port '+str(self.port))
-        self.dispatcher()
         self.set_evt_callbacks()
+        self.dispatcher()
         return None
 
     def exit_process(self, msg="exit_process: Exiting"):
