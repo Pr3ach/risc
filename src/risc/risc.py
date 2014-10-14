@@ -414,8 +414,8 @@ class Risc():
         self.init_irc_admins()
         self.connect()
         self.debug.info('[+] Connected on '+self.host+' port '+str(self.port))
-        self.set_evt_callbacks()
         self.dispatcher()
+        self.set_evt_callbacks()
         return None
 
     def exit_process(self, msg="exit_process: Exiting"):
@@ -1845,7 +1845,8 @@ class Risc():
         self.debug.info("[+] Setting and starting event callbacks")
 
         # game_watcher event callback
-        if len(self.sv_running) >= 1:
+        print self.sv_running
+        if len(self.sv_running) >= 2:
             th = threading.Thread(None, self.game_watcher, None, (), None)
             th.daemon = True  # So that the prog doesn't wait for the threads to exit
             th.start()
