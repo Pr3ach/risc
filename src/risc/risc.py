@@ -213,6 +213,7 @@ class Sv():
         if not self.getstatus():
             if self.sock:
                 self.sock.close()
+            print "raise ex"
             raise Exception("Sv.getstatus() failure.")
         if not self.getinfo():
             if self.sock:
