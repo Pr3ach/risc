@@ -1980,7 +1980,7 @@ class Risc():
         nick = raw_msg[0].split('!')[0][1:]
 
         # Process URLs posting
-        url_list = self.process_irc_url(raw_msg)
+        url_list = self.process_irc_url(raw_msg[0])
         for url in url_list:
             try:
                 self.privmsg(self.channel, "Title: " + lxml.html.parse(urllib.urlopen(url)).find(".//title")\
