@@ -104,6 +104,7 @@
 #       - fix error handling for Sv class [OK]
 #       - fixed: "status all" was failling even if not all serv failed querying [OK]
 #       - do not start game_watcher callback when risb3 ain't running [OK]
+#       - add "roulette" cmd
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -130,11 +131,14 @@ import urllib
 import datetime
 import lxml.html
 import tld
+import random
 
 init_time = int(time.time())
 last_cmd_time = 0
+roulette_shot = random.randint(1, 6)
+roulette_progress = 1
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -391,6 +395,7 @@ class Risc():
                          "server": ["server", "sv"],
                          "uptime": ["uptime"],
                          "version": ["version", "v"],
+                         "roulette": ["roulette", 'r'],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -1388,6 +1393,25 @@ class Risc():
             return "Invalid usage, check "+self.cmd_prefix+"help uptime."
         return str(datetime.timedelta(seconds=int(time.time())-init_time))
 
+    def cmd_roulette(self, msg0, nick):
+        """
+        Roulette game 6 chambers
+        """
+        cmd = self.list_clean(msg0.split(' '))
+        if len(cmd) != 1:
+            return "Invalid usage, check "+self.cmd_prefix+"help roulette."
+        global roulette_shot
+        global roulette_progress
+        if roulette_progress == roulette_shot:
+            roulette_shot = random.randint(1, 6)
+            roulette_progress = 1
+            self.privmsg(self.channel, COLOR['boldmagenta'] + nick + COLOR['rewind'] + " is no more ...")
+            # KICK
+        else:
+            roulette_progress += 1
+            self.privmsg(self.channel, COLOR['boldgreen'] + nick + COLOR['rewind'] + " is safe.")
+        return None
+
     def search_accurate(self, p, serv):
         """
         Search for a player in the specified server
@@ -1564,6 +1588,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["google"]:
             self.cmd_google(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["roulette"]:
+            self.cmd_roulette(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
