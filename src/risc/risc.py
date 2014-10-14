@@ -1967,7 +1967,7 @@ class Risc():
 
         if check_url:
             try:
-                self.privmsg(self.channel, str(lxml.html.parse(urllib.urlopen(check_url.group(0))).find(".//title").text)+\
+                self.privmsg(self.channel, unicode(lxml.html.parse(urllib.urlopen(check_url.group(0))).find(".//title").text, errors="ignore")+\
                             " (at "+str(tld.get_tld(check_url.group(0))+')'))
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' %e)
