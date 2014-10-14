@@ -1348,7 +1348,6 @@ class Risc():
         try:
             sv = Sv(ip, port, '', self.debug)
         except Exception, e:
-            print "exc caught"
             return COLOR['boldred']+"Error: Exception raised: Couldn't get server status from "+ip+":"+port+": %s"+COLOR['rewind'] % e
             
         if sv.clientsList == -1:
@@ -1574,6 +1573,7 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
+            self.privmsg(sourceNick, ret_cmd)
             if isinstance(ret_cmd, tuple):
                 self.privmsg(sourceNick, ret_cmd[0])
                 self.privmsg(sourceNick, ret_cmd[1])
