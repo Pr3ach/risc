@@ -102,6 +102,7 @@
 #       - added player list to cmd 'server' [OK]
 #       - info on link posting [OK]
 #       - fix error handling for Sv class [OK]
+#       - fixed: "status all" was failling even if not all serv failed querying [OK]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -951,7 +952,7 @@ class Risc():
                 ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Playing: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
                              '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
                 del sv
-            if ret != '':
+            if len(ret) >= 3:
                 ret = ret[:-3]
 
         else:
