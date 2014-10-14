@@ -939,11 +939,9 @@ class Risc():
                 fullIp = self.cfg.get('var', i).split(':')
                 try:
                     sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
-                except:
-                    return COLOR['boldred']+"Error: Exception raised: Couldn't get "+i+" server status"+COLOR['rewind']
+                except Exception, e:
+                    return COLOR['boldred']+"Exception for server '"+i+"': %s" % e +COLOR['rewind']
 
-                if not sv:
-                    return COLOR['boldred']+"Error: Couldn't get "+i+" server status"+COLOR['rewind']
                 if sv.clientsList == -1:
                     nbClients = 0
                 else:
@@ -962,12 +960,9 @@ class Risc():
             fullIp = self.cfg.get('var', keyFromValue).split(':')
             try:
                 sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
-            except:
-                return COLOR['boldred']+"Error: Exception raised: Couldn't get "+keyFromValue+" server status"+COLOR['rewind']
+            except Exception, e:
+                return COLOR['boldred']+"Exception for server '"+keyFromValue+"': %s" % e +COLOR['rewind']
                 
-            if not sv:
-                return COLOR['boldred']+"Error: Couldn't get "+keyFromValue+" server status"+COLOR['rewind']
-
             if sv.clientsList == -1:
                 nbClients = 0
             else:
@@ -1101,11 +1096,8 @@ class Risc():
         fullIp = self.cfg.get('var', serverName).split(":")
         try:
             sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
-        except:
-            return COLOR['boldred']+"Error: Exception raised: Couldn't get "+serverName+" server status"+COLOR['rewind']
-
-        if not sv:
-            return COLOR['boldred']+'Error retrieving '+serverName+' players'+COLOR['rewind']
+        except Exception, e:
+            return COLOR['boldred']+"Exception for server '"+serverName+"': %s" % e +COLOR['rewind']
 
         if sv.clients == 0 or sv.clientsList == -1:
             return serverName + ' server is currently empty.'
@@ -1195,10 +1187,8 @@ class Risc():
             fullIp = self.cfg.get('var', server).split(':')
             try:
                 sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
-            except:
-                return COLOR['boldred']+"Error: Exception raised: Couldn't get "+server+" server status"+COLOR['rewind']
-            if not sv:
-                return COLOR['boldred']+'An error occured while processing your command: could not get '+server+' server status'+COLOR['rewind']
+            except Exception, e:
+                return COLOR['boldred']+"Exception for server '"+server+"' %s" % e +COLOR['rewind']
             if sv.clientsList != -1:
                 clients.setdefault(server, sv.clientsList)
                 pings.setdefault(server, sv.clientsPings)
@@ -1348,7 +1338,7 @@ class Risc():
         try:
             sv = Sv(ip, port, '', self.debug)
         except Exception, e:
-            return COLOR["boldred"]+"Exception for server '"+ip+':'+str(port)+"' : %s" % e + COLOR["rewind"]
+            return COLOR["boldred"]+"Exception for server '"+ip+':'+str(port)+"': %s" % e + COLOR["rewind"]
             
         if sv.clientsList == -1:
             nbClients = 0
