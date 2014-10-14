@@ -1573,7 +1573,8 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
-            self.privmsg(sourceNick, ret_cmd)
+            print str(type(ret_cmd))
+            print ret_cmd
             if isinstance(ret_cmd, tuple):
                 self.privmsg(sourceNick, ret_cmd[0])
                 self.privmsg(sourceNick, ret_cmd[1])
