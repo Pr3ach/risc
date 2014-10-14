@@ -104,7 +104,7 @@
 #       - fix error handling for Sv class [OK]
 #       - fixed: "status all" was failling even if not all serv failed querying [OK]
 #       - do not start game_watcher callback when risb3 ain't running [OK]
-#       - add "roulette" cmd
+#       - add "roulette" cmd [testing]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -1010,6 +1010,10 @@ class Risc():
         elif command in self.commands["version"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["version"])+\
                          ". Return the bot version."
+
+        elif command in self.commands["roulette"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["roulette"])+\
+                         ". Russian roulette game."
 
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
