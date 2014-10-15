@@ -2100,7 +2100,11 @@ class Risc():
                 if not line:
                     continue
 
-                sv_data = line.split(':')[1]
+                sv_data = line.split(':')
+                if len(sv_data) >= 2:
+                    sv_data = sv_data[1]
+                else:
+                    sv_data = line
 
                 if debug_mode:
                     print line
