@@ -105,8 +105,8 @@
 #       - fixed: "status all" was failling even if not all serv failed querying [OK]
 #       - do not start game_watcher callback when risb3 ain't running [OK]
 #       - add "roulette" cmd [OK]
-#       - improved server data parsing: prevent some possible 'exploit' by user msgs
-#       - implement on_kick
+#       - improved server data parsing: prevent some possible 'exploit' by user msgs [OK]
+#       - implement on_kick & auto join on kick [OK]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
