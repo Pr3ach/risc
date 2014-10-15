@@ -104,7 +104,9 @@
 #       - fix error handling for Sv class [OK]
 #       - fixed: "status all" was failling even if not all serv failed querying [OK]
 #       - do not start game_watcher callback when risb3 ain't running [OK]
-#       - add "roulette" cmd [testing]
+#       - add "roulette" cmd [OK]
+#       - improved server data parsing: prevent some possible 'exploit' by user msgs
+#       - implement on_kick
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -135,14 +137,16 @@ import random
 
 init_time = int(time.time())
 last_cmd_time = 0
-roulette_shot = random.randint(1, 6)
-roulette_progress = 1
 HELP = None
 CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
 debug_mode = 0
+
+# used by cmd_roulette()
+roulette_shot = random.randint(1, 6)
+roulette_progress = 1
 
 # IRC color codes
 COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
@@ -2017,6 +2021,17 @@ class Risc():
 
         return None
 
+    def on_kick(self, raw_msg):
+        kicker = raw_msg.split('!')[0][1:]
+        target = raw_msg.split(' ')[3]
+        reason = raw_msg.split(':')[2]
+
+        if target == self.nick:
+            self.warning.info("on_kick: Got kicked by '%s' for '%s'" % (kicker, reason))
+        else:
+            self.debug.info("on_kick: '%s' kicked '%s' for '%s'" % (kicker, target, reason))
+        return None
+
     def _on_privmsg(self, msg):
         """
         Disptach PRIVMSG messages to the right functions
@@ -2076,7 +2091,6 @@ class Risc():
         """
         Main and general event dispatcher
         """
-        onWelcome = 0
         while 1:
             res = self.sock.recv(512)
 
@@ -2086,21 +2100,24 @@ class Risc():
                 if not line:
                     continue
 
+                sv_data = line.split(':')[1]
+
                 if debug_mode:
                     print line
 
-                if re.search('PRIVMSG', line):
+                if re.search(' PRIVMSG ', sv_data):
                     self._on_privmsg(line)
 
                 # Reply back to the server
-                if re.search('PING :', line):
-                    self._send('PONG :' + line.split(':')[1])
+                if re.search('^PING :', line):
+                    self._send('PONG :' + sv_data)
+
+                if re.search(" KICK ", sv_data):
+                    self.on_kick(line)
 
                 # Indicate we're connected, we can now join the channel
-                if re.search(':Welcome', line):
-                    if not onWelcome:
-                        self.on_welcome()
-                        onWelcome = 1 
+                if re.search(':Welcome', sv_data):
+                    self.on_welcome()
 
 if __name__ == '__main__':
     print "[+] Running ..."
