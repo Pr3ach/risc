@@ -342,6 +342,7 @@ class Risc():
             self.db_passwd = self.cfg.get('db', 'passwd')
             self.db_name = self.cfg.get('db', 'self_db')  # db for risc settings (admins etc)
             self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
+            self.on_kick_threshold = int(self.cfg.get("risc", "on_kick_threshold"))
 
             # get servers, their dbs
             self.svs = self.cfg.get('var', 'servers').split(',')
@@ -2027,8 +2028,8 @@ class Risc():
         reason = ':'.join(raw_msg.split(':')[2:])
 
         if target == self.nick:
-            self.debug.warning("on_kick: Got kicked by '%s' for '%s' - Joining again in 30s ..." % (kicker, reason))
-            time.sleep(30)
+            self.debug.warning("on_kick: Got kicked by '%s' for '%s' - Joining again in %ss ..." % (kicker, reason, str(self.on_kick_threshold)))
+            time.sleep(self.on_kick_threshold)
             self.join()
         else:
             self.debug.info("on_kick: '%s' kicked '%s' for '%s'" % (kicker, target, reason))
