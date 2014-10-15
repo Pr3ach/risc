@@ -2027,7 +2027,7 @@ class Risc():
         reason = raw_msg.split(':')[2]
 
         if target == self.nick:
-            self.warning.info("on_kick: Got kicked by '%s' for '%s'" % (kicker, reason))
+            self.debug.warning("on_kick: Got kicked by '%s' for '%s'" % (kicker, reason))
         else:
             self.debug.info("on_kick: '%s' kicked '%s' for '%s'" % (kicker, target, reason))
         return None
