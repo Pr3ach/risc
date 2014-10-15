@@ -2100,27 +2100,21 @@ class Risc():
                 if not line:
                     continue
 
-                sv_data = line.split(':')
-                if len(sv_data) >= 2:
-                    sv_data = sv_data[1]
-                else:
-                    sv_data = line
-
                 if debug_mode:
                     print line
 
-                if re.search(' PRIVMSG ', sv_data):
+                if re.search(' PRIVMSG ', line):
                     self._on_privmsg(line)
 
                 # Reply back to the server
-                if re.search('^PING :', line):
-                    self._send('PONG :' + sv_data)
+                elif re.search('^PING :', line):
+                    self._send('PONG :' + line.split(':')[1])
 
-                if re.search(" KICK ", sv_data):
+                elif re.search(" KICK ", line):
                     self.on_kick(line)
 
                 # Indicate we're connected, we can now join the channel
-                if re.search(':Welcome', sv_data):
+                elif re.search(':Welcome', line):
                     self.on_welcome()
 
 if __name__ == '__main__':
