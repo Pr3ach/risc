@@ -2024,7 +2024,7 @@ class Risc():
     def on_kick(self, raw_msg):
         kicker = raw_msg.split('!')[0][1:]
         target = raw_msg.split(' ')[3]
-        reason = raw_msg.split(':')[2]
+        reason = ':'.join(raw_msg.split(':')[2:])
 
         if target == self.nick:
             self.debug.warning("on_kick: Got kicked by '%s' for '%s'" % (kicker, reason))
