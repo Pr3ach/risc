@@ -107,9 +107,9 @@
 #       - add "roulette" cmd [OK]
 #       - improved server data parsing: prevent some possible 'exploit' by user msgs [OK]
 #       - implement on_kick & auto join on kick [OK]
-#       - fix for 'sv' cmd when no port specified [testing]
-#       - fix for reason param. in cmd "ikick" [testing]
-#       - fix cmd 'search' with server specified [testing]
+#       - fix cmd 'search' with server specified [OK]
+#       - fix for 'sv' cmd when no port specified [OK]
+#       - fix for reason param. in cmd "ikick" [OK]
 #       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
