@@ -107,6 +107,10 @@
 #       - add "roulette" cmd [OK]
 #       - improved server data parsing: prevent some possible 'exploit' by user msgs [OK]
 #       - implement on_kick & auto join on kick [OK]
+#       - fix for 'sv' cmd when no port specified [testing]
+#       - fix for reason param. in cmd "ikick" [testing]
+#       - fix cmd 'search' with server specified [testing]
+#       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -784,7 +788,7 @@ class Risc():
             return None
 
         if lenKick >= 3:
-            reason = ''.join(cleanKick[2:])
+            reason = ' '.join(cleanKick[2:])
 
         sourceAuth, sourceLevel = self.irc_is_admin(sourceNick)
         targetAuth, targetLevel = self.irc_is_admin(cleanKick[1])
@@ -1343,7 +1347,7 @@ class Risc():
         re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
         re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
         ip = ""
-        port = 27690
+        port = 27960
 
         if re.match(re_ip, clean_msg[1]):
             ip = clean_msg[1]
@@ -1438,7 +1442,7 @@ class Risc():
 
         p = re.escape(p)
 
-        if cl[servKey][0] == '' and len(cl[servKey][0]) == 1:
+        if cl[servKey] == ['']:
             return COLOR['boldmagenta'] + 'No such player in the specified server.' + COLOR['rewind']
 
         usePings = 0
@@ -1448,7 +1452,7 @@ class Risc():
             usePings = 1
 
         for i in range(len(cl[servKey])):
-            if re.search(p.lower(), cl[servKey][i].lower()):
+            if p.lower() in cl[servKey][i].lower():
                 count += 1
                 if usePings:
                     if pings[servKey][i] == '0':
@@ -1458,7 +1462,6 @@ class Risc():
                 else:
                     ret.append(COLOR['boldgreen'] + cl[servKey][i] + COLOR['rewind'])
 
-        # 'not count' not giving the expecting result? ...
         if count == 0:
             return COLOR['boldmagenta']+'No such player in the specified server.'+COLOR['rewind']
         elif count == 1:
