@@ -110,7 +110,10 @@
 #       - fix cmd 'search' with server specified [OK]
 #       - fix for 'sv' cmd when no port specified [OK]
 #       - fix for reason param. in cmd "ikick" [OK]
+#       - use lib 'requests' [testing]
+#       - add some headers for http req [testing]
 #       - add option 'add' & 'remove' to cmd 'sv'
+#       - use lib 'requests' for cmd google
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -138,6 +141,7 @@ import datetime
 import lxml.html
 import tld
 import random
+import requests
 
 init_time = int(time.time())
 last_cmd_time = 0
@@ -2018,7 +2022,8 @@ class Risc():
         url_list = self.xurls(msg)
         for url in url_list:
             try:
-                self.privmsg(self.channel, "Title: " + lxml.html.parse(urllib.urlopen(url)).find(".//title")\
+                self.privmsg(self.channel, "Title: " + lxml.html.fromstring(requests.get(url, headers=\
+                        {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"}).text).find(".//title")\
                         .text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url)+')'))
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' % e)
