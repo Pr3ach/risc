@@ -113,6 +113,7 @@
 #       - use lib 'requests' [OK]
 #       - add some headers for http req [OK]
 #       - use lib 'requests' for cmd google [OK]
+#       - add server IP for cmd 'st <sv>' [testing]
 #       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -1003,7 +1004,8 @@ class Risc():
                 re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
                 ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
                 COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
-                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
+                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote+', IP: '+COLOR['boldblue']+fullIp[0]+':'+\
+                str(fullIp[1])+COLOR['rewind']
             del sv
         return ret
 
