@@ -112,7 +112,7 @@
 #       - fix for reason param. in cmd "ikick" [OK]
 #       - use lib 'requests' [OK]
 #       - add some headers for http req [OK]
-#       - use lib 'requests' for cmd google [testing]
+#       - use lib 'requests' for cmd google [OK]
 #       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
