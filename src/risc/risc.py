@@ -110,10 +110,10 @@
 #       - fix cmd 'search' with server specified [OK]
 #       - fix for 'sv' cmd when no port specified [OK]
 #       - fix for reason param. in cmd "ikick" [OK]
-#       - use lib 'requests' [testing]
-#       - add some headers for http req [testing]
+#       - use lib 'requests' [OK]
+#       - add some headers for http req [OK]
+#       - use lib 'requests' for cmd google [testing]
 #       - add option 'add' & 'remove' to cmd 'sv'
-#       - use lib 'requests' for cmd google
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -136,7 +136,6 @@ import MySQLdb as mysql
 from warnings import filterwarnings
 import unicodedata
 import json
-import urllib
 import datetime
 import lxml.html
 import tld
@@ -1321,19 +1320,15 @@ class Risc():
             self.privmsg(nick, "Input too long.")
             return None
 
-        query = urllib.urlencode({'q': search_str})
-        url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % query
-        search_response = urllib.urlopen(url)
-        search_results = search_response.read()
-        results = json.loads(search_results)
-        data = results['responseData']
-        hits = data['results']
-        if len(hits):
+        url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % query
+        res = requests.get(url)
+        if len(json.loads(res.text))['responseData']['results']:
             self.privmsg(nick, "Top hits: ")
-        if not len(hits):
+        else:
             self.privmsg(nick, "No results.")
-        for h in hits: 
-            self.privmsg(nick, h["url"])
+            return None
+        for hit in json.loads(res.text)['responseData']['results']:
+            self.privmsg(nick, hit["url"])
             i+=1
             if i >= 4:
                 break
