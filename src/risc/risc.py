@@ -1004,7 +1004,7 @@ class Risc():
                 re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
                 ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
                 COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
-                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote+', IP: '+COLOR['boldblue']+fullIp[0]+':'+\
+                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote+', IP:'+COLOR['boldblue']+' '+fullIp[0]+':'+\
                 str(fullIp[1])+COLOR['rewind']
             del sv
         return ret
