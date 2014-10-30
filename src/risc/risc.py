@@ -1327,6 +1327,7 @@ class Risc():
         else:
             self.privmsg(nick, "No results.")
             return None
+        print "dbg"
         for hit in json.loads(res.text)['responseData']['results']:
             self.privmsg(nick, hit["url"])
             i+=1
