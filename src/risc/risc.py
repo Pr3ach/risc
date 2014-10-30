@@ -1322,12 +1322,12 @@ class Risc():
 
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % search_str
         res = requests.get(url)
+        print "dbg"
         if len(json.loads(res.text))['responseData']['results']:
             self.privmsg(nick, "Top hits: ")
         else:
             self.privmsg(nick, "No results.")
             return None
-        print "dbg"
         for hit in json.loads(res.text)['responseData']['results']:
             self.privmsg(nick, hit["url"])
             i+=1
