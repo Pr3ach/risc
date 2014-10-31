@@ -47,7 +47,7 @@ class Riscb3Plugin(b3.plugin.Plugin):
             self.db_user = self.config.get('db','user')
             self.db_passwd = self.config.get('db','passwd')
             self.db_name = self.config.get('db','name')
-            self.db_table = 'risc_'+(self.config.get('db','table'))
+            self.db_table = 'risc_'+(self.config.get('riscb3','server_name'))
             self.calladmin_level = int(self.config.get('calladmin','level'))
             self.calladmin_bypass_level = int(self.config.get('calladmin','bypassthresholdlevel'))
             self.calladmin_min_players = int(self.config.get('calladmin','minplayers'))

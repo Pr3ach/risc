@@ -114,7 +114,7 @@
 #       - add some headers for http req [OK]
 #       - use lib 'requests' for cmd google [OK]
 #       - add server IP for cmd 'st <sv>' [OK]
-#       - minor changes for cmd_status() [testing]
+#       - minor changes for cmd_status() [OK]
 #       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -349,7 +349,7 @@ class Risc():
             self.db_host = self.cfg.get('db', 'host')
             self.db_user = self.cfg.get('db', 'user')
             self.db_passwd = self.cfg.get('db', 'passwd')
-            self.db_name = self.cfg.get('db', 'self_db')  # db for risc settings (admins etc)
+            self.db_name = self.cfg.get('db', 'self_db')    # db for risc settings (admins etc)
             self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
             self.on_kick_threshold = int(self.cfg.get("risc", "on_kick_threshold"))
 
@@ -1059,7 +1059,6 @@ class Risc():
         elif command in self.commands["ishowadmins"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["ishowadmins"])+". Show all "+\
                          self.nick+" admins."
-
 
         elif command in self.commands["google"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["google"])+". Perform a"+\
@@ -1848,7 +1847,7 @@ class Risc():
                 con.close()
 
             while 1:
-                time.sleep(0.5)
+                time.sleep(0.3)
 
                 for sv in self.sv_running:
                     db = self.get_db(sv)
