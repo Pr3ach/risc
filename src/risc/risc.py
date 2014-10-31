@@ -1032,7 +1032,7 @@ class Risc():
 
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
-                         ". Display info from an game server IP address. If no port is specified, assume 27960."
+                         ". Display info about the specified server. If no port is specified, assume 27960."
 
         elif command in self.commands["say"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
@@ -1951,7 +1951,7 @@ class Risc():
         self._send('JOIN '+self.channel)
         return None
 
-    def disconnect(self, message="Off"):
+    def disconnect(self, message="Be right back."):
         """
         Disconnect from the current channel
         """
