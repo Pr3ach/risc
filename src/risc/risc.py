@@ -114,6 +114,7 @@
 #       - add some headers for http req [OK]
 #       - use lib 'requests' for cmd google [OK]
 #       - add server IP for cmd 'st <sv>' [OK]
+#       - minor changes for cmd_status() [testing]
 #       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -968,7 +969,7 @@ class Risc():
                 else:
                     nbClients = len(sv.clientsList)
 
-                ret += COLOR['boldgreen']+i+COLOR['rewind']+' : Playing: '+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
+                ret += COLOR['boldgreen']+i+COLOR['rewind']+': Playing:'+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
                              '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
                 del sv
             if len(ret) >= 3:
@@ -998,7 +999,7 @@ class Risc():
             elif sv.allowVote == '0':
                 sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
-            ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ' : Playing: ' +\
+            ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ': Playing:' +\
                 COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
                 str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
                 re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
