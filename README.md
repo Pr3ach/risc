@@ -1,7 +1,7 @@
 # b3-risc
 
 risc is an IRC bot providing interaction with the UrbanTerror (ioq3) game through
-the BigBrotherBot (b3) API.
+the [BigBrotherBot](http://www.bigbrotherbot.net/) (b3) API.
 
 ## Installation - risc standalone
 
