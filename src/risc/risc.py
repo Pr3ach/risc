@@ -121,7 +121,6 @@
 #       - add server IP for cmd 'st <sv>' [OK]
 #       - minor changes for cmd_status() [OK]
 #       - minor fix to set_evt_callbacks() [OK]
-#       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars

@@ -36,6 +36,7 @@ __version__ = '1.2.2-dev'
 
 class Riscb3Plugin(b3.plugin.Plugin):
     requiresConfigFile = True
+    default_settings = {"calladmin_threshold": 2
 
     def onLoadConfig(self):
         """
