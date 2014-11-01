@@ -26,6 +26,7 @@ Follow these instructions for each server you want riscb3 to run:
 * Set up the `b3-risc/src/extplugins/conf/riscb3.example.ini` and rename it to `riscb3.ini`
 * Copy `b3-risc/src/extplugins/riscb3.py` to `@b3/extplugins`
 * Copy `b3-risc/src/extplugins/conf/riscb3.ini` to `@b3/extplugins/conf`
+* Add `<plugin name="riscb3" config="@b3/extplugins/conf/riscb3.ini" />` to your `@b3/conf/b3.xml`
 
 ## Support
 Simply mail me at Pr3acher777h@gmail.com for anything related to this project.

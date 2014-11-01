@@ -120,6 +120,7 @@
 #       - use lib 'requests' for cmd google [OK]
 #       - add server IP for cmd 'st <sv>' [OK]
 #       - minor changes for cmd_status() [OK]
+#       - minor fix to set_evt_callbacks() [OK]
 #       - add option 'add' & 'remove' to cmd 'sv'
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -1894,10 +1895,9 @@ class Risc():
         self.debug.info("[+] Setting and starting event callbacks")
 
         # game_watcher event callback
-        if len(self.sv_running) >= 2:
-            th = threading.Thread(None, self.game_watcher, None, (), None)
-            th.daemon = True  # So that the prog doesn't wait for the threads to exit
-            th.start()
+        th = threading.Thread(None, self.game_watcher, None, (), None)
+        th.daemon = True  # So that the prog doesn't wait for the threads to exit
+        th.start()
         return None
 
     def get_init_admins(self):
