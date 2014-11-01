@@ -31,7 +31,7 @@ import MySQLdb as mysql
 import threading
 
 __author__ = 'Pr3acher'
-__version__ = '1.2.2'
+__version__ = '1.2.2-dev'
 
 
 class Riscb3Plugin(b3.plugin.Plugin):

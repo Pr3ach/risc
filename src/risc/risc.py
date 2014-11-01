@@ -128,7 +128,7 @@
 
 
 __author__ = 'Pr3acher'
-__version__ = '1.4.5'
+__version__ = '1.4.5-dev'
 
 
 import socket
