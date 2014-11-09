@@ -20,6 +20,7 @@
 # 08/18/2014 - 1.2.1 - Pr3acher
 # * Slightly updated for risc v1.4.4
 # 09/07/2014 - 1.2.2 - Pr3acher
+# * fixed bug in on_map_change()
 # * add possibility to set/get Cvar (TODO)
 # * handle wrong settings using defaults (TODO)
 
@@ -36,7 +37,7 @@ __version__ = '1.2.2-dev'
 
 class Riscb3Plugin(b3.plugin.Plugin):
     requiresConfigFile = True
-    default_settings = {"calladmin_threshold": 2
+    default_settings = {"calladmin_threshold": 2}
 
     def onLoadConfig(self):
         """
@@ -254,8 +255,8 @@ class Riscb3Plugin(b3.plugin.Plugin):
         cl_count = len(self.console.clients.getList())
         try:
             max_cl_count = self.console.getCvar("sv_maxclients").getInt()
-        except TypeError:
-            max_cl_count = 0
+        except:
+            max_cl_count = '?'
 
         # <map_name> <cl_count> <max_cl_count>
         self._store_event('EVT_GAME_MAP_CHANGE',event.data['new']+'\r\n'+str(cl_count)+'\r\n'+str(max_cl_count),event.time)

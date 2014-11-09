@@ -121,6 +121,8 @@
 #       - add server IP for cmd 'st <sv>' [OK]
 #       - minor changes for cmd_status() [OK]
 #       - minor fix to set_evt_callbacks() [OK]
+#       - removed some useless libs [OK]
+#       - cmd_duck [testing]
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -134,14 +136,12 @@ import socket
 import threading
 import time
 import sys
-import os
 import ConfigParser
 import re
 import base64
 import hashlib
 import MySQLdb as mysql
 from warnings import filterwarnings
-import unicodedata
 import json
 import datetime
 import lxml.html
@@ -152,7 +152,7 @@ import requests
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -415,6 +415,7 @@ class Risc():
                          "uptime": ["uptime"],
                          "version": ["version", "v"],
                          "roulette": ["roulette", 'r'],
+                         "duck": ["duck"],
                          "ileveltest": ['ileveltest', 'ilt']}
 
         # Valid argument for each commands
@@ -1035,6 +1036,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["roulette"])+\
                          ". Russian roulette game."
 
+        elif command in self.commands["duck"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["duck"])+\
+                         ". Sometimes, words ain't enough."
+
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
                          ". Display info about the specified server. If no port is specified, assume 27960."
@@ -1433,6 +1438,15 @@ class Risc():
                         ' '+COLOR['rewind']+"of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
             roulette_progress += 1
         return None
+    
+    def cmd_duck(self):
+        duck_s = ["....................../??/)", "....................,/?../", ".................../..../",\
+                  "............./??/'...'/???`??", "........../'/.../..../......./??\\", "........('(...?...?.... ?~/'...')",\
+                  ".........\.................'...../", "..........''...\.......... _.??", "............\..............(",\
+                  "..............\.............\..."]
+        for s in duck_s:
+            self.privmsg(self.channel, s)
+        return None
 
     def search_accurate(self, p, serv):
         """
@@ -1612,6 +1626,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["roulette"]:
             self.cmd_roulette(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["duck"]:
+            self.cmd_duck()
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
