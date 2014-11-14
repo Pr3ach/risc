@@ -69,8 +69,7 @@
 #       - fix (again) crash for unicode chars [OK]
 #       - temp. disabled cmds until fixed: st, players, search [OK]
 #       - typo fixed for help cmds [OK]
-#       - v1.4 - Pr3acher - 08/18/2014
-# -------
+# ------- v1.4 - Pr3acher - 08/18/2014
 #       - removed bot cred. from risc.ini [OK]
 #       - make sh added [OK]
 # ------- v1.4.1 - Pr3acher - 08/19/2014
@@ -122,7 +121,10 @@
 #       - minor changes for cmd_status() [OK]
 #       - minor fix to set_evt_callbacks() [OK]
 #       - removed some useless libs [OK]
-#       - cmd_duck [testing]
+#       - cmd_duck [OK]
+#       - fix 'search <cl> <sv>' when <sv> is down -> crash [testing]
+# ------- 1.5 - Pr3acher - xx/xx/xxxx
+#       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - add/fix commands to set/get Cvars
@@ -156,7 +158,7 @@ CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
-debug_mode = 0
+debug_mode = 1
 
 # used by cmd_roulette()
 roulette_shot = random.randint(1, 6)
@@ -1452,7 +1454,11 @@ class Risc():
         """
         Search for a player in the specified server
         """
-        (cl, pings) = self.cmd_search(p, 1)
+        try:
+            (cl, pings) = self.cmd_search(p, 1)
+        except:
+            return COLOR['boldred']+"Error - Server may be unreachable."+COLOR['rewind']
+
         servKey = self.get_dict_key(self.argAliases["servers"], serv.lower())
         ret = []
         count = 0
@@ -1911,9 +1917,10 @@ class Risc():
         self.debug.info("[+] Setting and starting event callbacks")
 
         # game_watcher event callback
-        th = threading.Thread(None, self.game_watcher, None, (), None)
-        th.daemon = True  # So that the prog doesn't wait for the threads to exit
-        th.start()
+        if self.sv_running[0] != '':
+            th = threading.Thread(None, self.game_watcher, None, (), None)
+            th.daemon = True  # So that the prog doesn't wait for the threads to exit
+            th.start()
         return None
 
     def get_init_admins(self):
