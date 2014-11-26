@@ -122,7 +122,7 @@
 #       - minor fix to set_evt_callbacks() [OK]
 #       - removed some useless libs [OK]
 #       - cmd_duck [OK]
-#       - fix 'search <cl> <sv>' when <sv> is down -> crash [testing]
+#       - fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
 # ------- 1.5 - Pr3acher - xx/xx/xxxx
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
