@@ -1,28 +1,25 @@
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-
 # CHANGELOG
 #
-# 01/08/2014 - 1.0 - Pr3acher
-# * init 
-# 03/08/2014 - 1.1 - Pr3acher
-# * fix color for '/' in evt_game_map_change
-# * added event notification for kick / ban / tban / map change
-# * bug fix: get_last_calladmin
-# * added possibility to skip calladmin threshold
-# * minor bug fixes
-# * added chat ability (game to IRC) 
-# * set b3 name in config file
-# 08/12/2014 - 1.2 - Pr3acher
-# * Disable calladmin cmd when client count is < ini_var 
-# 08/18/2014 - 1.2.1 - Pr3acher
-# * Slightly updated for risc v1.4.4
-# 09/07/2014 - 1.2.2 - Pr3acher
-# * fixed bug in on_map_change()
-# * add possibility to set/get Cvar (TODO)
-# * handle wrong settings using defaults (TODO)
+#       - init
+# ------- v1.0 - Pr3acher - 01/08/2014
+#       - fix color for '/' in evt_game_map_change [OK]
+#       - added event notification for kick / ban / tban / map change [OK]
+#       - bug fix: get_last_calladmin [OK]
+#       - added possibility to skip calladmin threshold [OK]
+#       - minor bug fixes [OK]
+#       - added chat ability (game to IRC) [OK]
+#       - set b3 name in config file [OK]
+# ------- v1.1 - Pr3acher - 03/08/2014
+#       - Disable calladmin cmd when client count is < ini_var [OK]
+# ------- v1.2 - Pr3acher - 08/12/2014
+#       - Slightly updated for risc v1.4.4 [OK]
+# ------- v1.2.1 - Pr3acher - 08/18/2014
+#       - Fixed bug in on_map_change() [OK]
+# ------- v1.2.2 - Pr3acher - 09/07/2014
+#       - handle wrong settings using defaults [OK]
+#       - Updated for risc 1.5 [OK]
+# ------- v1.3 - Pr3acher - 12/04/2014
+#       - add possibility to set/get Cvar
 
 import b3
 import b3.events
@@ -32,12 +29,14 @@ import MySQLdb as mysql
 import threading
 
 __author__ = 'Pr3acher'
-__version__ = '1.2.2-dev'
-
+__version__ = '1.3'
 
 class Riscb3Plugin(b3.plugin.Plugin):
     requiresConfigFile = True
-    default_settings = {"calladmin_threshold": 2}
+    default_settings = {"calladmin_threshold": 600,
+            "calladmin_level": 1,
+            "calladmin_bypassth": 2,
+            "calladmin_min_players": 2}
 
     def onLoadConfig(self):
         """
@@ -45,17 +44,36 @@ class Riscb3Plugin(b3.plugin.Plugin):
         """
         try:
             self.calladmin_threshold = int(self.config.get('calladmin','threshold'))
+        except Exception, e:
+            self.error("onLoadConfig: Error while loading config for\
+                    'calladmin threshold': %s - Using default: %d" % (e, default_settings["calladmin_threshold"]))
+
+        try:
+            self.calladmin_level = int(self.config.get('calladmin','level'))
+        except Exception, e:
+            self.error("onLoadConfig: Error while loading config for\
+                    'calladmin level': %s - Using default: %d" % (e, default_settings["calladmin_level"]))
+        try:
+            self.calladmin_bypass_level = int(self.config.get('calladmin','bypassthresholdlevel'))
+        except Exception, e:
+            self.error("onLoadConfig: Error while loading config for\
+                    'calladmin bypassthresholdlevel': %s - Using default: %d" % (e, default_settings["calladmin_bypass"]))
+
+        try:
+            self.calladmin_min_players = int(self.config.get('calladmin','minplayers'))
+        except Exception, e:
+            self.error("onLoadConfig: Error while loading config for\
+                    'calladmin minplayers': %s - Using default: %d" % (e, default_settings["calladmin_min_players"]))
+
+        try:
             self.db_host = self.config.get('db','host')
             self.db_user = self.config.get('db','user')
             self.db_passwd = self.config.get('db','passwd')
             self.db_name = self.config.get('db','name')
             self.db_table = 'risc_'+(self.config.get('riscb3','server_name'))
-            self.calladmin_level = int(self.config.get('calladmin','level'))
-            self.calladmin_bypass_level = int(self.config.get('calladmin','bypassthresholdlevel'))
-            self.calladmin_min_players = int(self.config.get('calladmin','minplayers'))
             self.b3_name = self.config.get('b3','name')
         except Exception, e:
-            self.error('onLoadConfig: Error while loading config - Make sure all options are set and using a proper type: %s' % e)
+            self.error('onLoadConfig: Error while loading config: %s - Make sure all options are set and use an appropriate type' % e)
         return None
 
     # <user> <msg>
@@ -176,7 +194,7 @@ class Riscb3Plugin(b3.plugin.Plugin):
             con.close()
         except Exception, e:
             self.error('_store_event: Error storing event %s: %s - Passing' % (evt,e))
-            if con: 
+            if con:
                 con.close()
                 pass
         return None

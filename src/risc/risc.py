@@ -1,10 +1,5 @@
 #!/usr/bin/python2
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-
 # CHANGELOG
 #
 #       - add !status/!st command [OK]
@@ -123,7 +118,7 @@
 #       - removed some useless libs [OK]
 #       - cmd_duck [OK]
 #       - fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
-# ------- 1.5 - Pr3acher - xx/xx/xxxx
+# ------- 1.5 - Pr3acher - 12/04/2014
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -131,7 +126,7 @@
 
 
 __author__ = 'Pr3acher'
-__version__ = '1.4.5-dev'
+__version__ = '1.5'
 
 
 import socket
@@ -184,7 +179,6 @@ class Debug:
         t = time.time()
         if not use__stdout__:
             sys.stdout = open("risc_"+str(int(t))+'.log', "w+", 0)
-        return None
 
     def info(self, info_msg):
         t = time.localtime()
@@ -433,7 +427,6 @@ class Risc():
 
         # Commands arguments aliases
         self.argAliases = {'servers': self.get_sv_aliases()}
-        return None
 
     def start(self):
         """
@@ -916,7 +909,7 @@ class Risc():
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You need to be admin["+
                          str(self.commandLevels['chat'])+'] to access this command.')
             return None
-        
+
 
         try:
             state = '0'
@@ -993,7 +986,7 @@ class Risc():
                 sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
             except Exception, e:
                 return COLOR['boldred']+"Exception for server '"+keyFromValue+"': %s" % e +COLOR['rewind']
-                
+
             if sv.clientsList == -1:
                 nbClients = 0
             else:
@@ -1169,7 +1162,7 @@ class Risc():
         if len(cleanCmd) != 2:
             self.privmsg(sourceNick, "Invalid arguments, check "+self.cmd_prefix+"help seen.")
             return None
-        
+
         # b3 uses 32 chars to store names
         if len(cleanCmd[1]) > 31:
             self.privmsg(sourceNick, "User nick too long, max length: 31 chars.")
@@ -1277,7 +1270,7 @@ class Risc():
             return None
 
         sv = self.get_dict_key(self.argAliases['servers'], cmd_clean[1])
-        
+
         if not sv or sv not in self.sv_running:
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+
                          ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
@@ -1347,7 +1340,7 @@ class Risc():
             if i >= 4:
                 break
         return None
-    
+
     def cmd_server(self, msg0, nick):
         """
         Return info about the specified game server ip
@@ -1374,7 +1367,7 @@ class Risc():
             sv = Sv(ip, port, '', self.debug)
         except Exception, e:
             return COLOR["boldred"]+"Exception for server '"+ip+':'+str(port)+"': %s" % e + COLOR["rewind"]
-            
+
         if sv.clientsList == -1:
             nbClients = 0
         else:
@@ -1403,7 +1396,7 @@ class Risc():
                     ping = ''
                 players.append(COLOR['boldgreen']+sv.clientsList[i]+COLOR['rewind']+ping)
             ret2 = "Playing: "+", ".join(players)
-        
+
         ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ': Playing:' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
             str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
@@ -1412,7 +1405,7 @@ class Risc():
             COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
             ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
         return ret, ret2
-    
+
     def cmd_uptime(self, msg0, nick):
         cmd = self.list_clean(msg0.split(' '))
         if len(cmd) != 1:
@@ -1440,7 +1433,7 @@ class Risc():
                         ' '+COLOR['rewind']+"of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
             roulette_progress += 1
         return None
-    
+
     def cmd_duck(self):
         duck_s = ["....................../??/)", "....................,/?../", ".................../..../",\
                   "............./??/'...'/???`??", "........../'/.../..../......./??\\", "........('(...?...?.... ?~/'...')",\
@@ -1724,9 +1717,9 @@ class Risc():
         player = data_list[0]
         reason = data_list[1]
 
-        self.privmsg(self.channel, COLOR['boldwhite'] + '[' + COLOR['rewind'] + COLOR['boldgreen'] 
-                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + COLOR['boldblue'] 
-                     + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue'] 
+        self.privmsg(self.channel, COLOR['boldwhite'] + '[' + COLOR['rewind'] + COLOR['boldgreen']
+                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + COLOR['boldblue']
+                     + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue']
                      + reason + COLOR['rewind'])
         return None
 
@@ -1740,9 +1733,9 @@ class Risc():
         cl_count = data_list[1]
         max_cl_count = data_list[2]
 
-        self.privmsg(self.channel, COLOR['boldwhite'] + '['+COLOR['rewind'] + COLOR['boldgreen'] 
-                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + ' map: ' 
-                     + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue'] 
+        self.privmsg(self.channel, COLOR['boldwhite'] + '['+COLOR['rewind'] + COLOR['boldgreen']
+                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + ' map: '
+                     + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue']
                      + ' ' + cl_count + COLOR['rewind'] + '/' + str(max_cl_count))
         return None
 
@@ -1762,7 +1755,7 @@ class Risc():
         else:
             reason = COLOR['boldblue']+data_list[4]+COLOR['rewind']
 
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] + sv 
+        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] + sv
                     + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind']+COLOR['boldyellow']
                     +' '+admin+' @' + admin_id + COLOR['rewind'] + ' kicked' + COLOR['boldyellow'] +
                     ' '+client+' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
@@ -1787,7 +1780,7 @@ class Risc():
 
         self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']
                     +COLOR['boldwhite']+']' + COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id
-                    +COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' + client_id 
+                    +COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' + client_id
                     + COLOR['rewind'] + ' for' + duration + ': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
