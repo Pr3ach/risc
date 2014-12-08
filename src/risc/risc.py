@@ -120,6 +120,7 @@
 #       - fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
 # ------- 1.5 - Pr3acher - 12/04/2014
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
+#       - Fix for russian roulette [OK]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -1418,7 +1419,8 @@ class Risc():
         """
         cmd = self.list_clean(msg0.split(' '))
         if len(cmd) != 1:
-            return "Invalid usage, check "+self.cmd_prefix+"help roulette."
+            self.privmsg(self.channel, "Invalid usage, check "+self.cmd_prefix+"help roulette.")
+            return None
         global roulette_shot
 
         cur = random.randint(1, 6)
