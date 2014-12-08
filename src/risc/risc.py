@@ -119,6 +119,7 @@
 #       - cmd_duck [OK]
 #       - fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
 # ------- 1.5 - Pr3acher - 12/04/2014
+#       - Slightly updated russian roulette game (thx @MrYay) [test]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -157,7 +158,6 @@ debug_mode = 1
 
 # used by cmd_roulette()
 roulette_shot = random.randint(1, 6)
-roulette_progress = 1
 
 # IRC color codes
 COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
@@ -1420,18 +1420,15 @@ class Risc():
         if len(cmd) != 1:
             return "Invalid usage, check "+self.cmd_prefix+"help roulette."
         global roulette_shot
-        global roulette_progress
 
-        if roulette_progress == roulette_shot:
-            self.privmsg(self.channel, "Chamber"+COLOR['boldwhite']+' '+str(roulette_progress)+' '+\
-                        COLOR['rewind']+"of 6 : "+COLOR['boldred'] + nick + " is no more ..."+COLOR['rewind'])
+        cur = random.randint(1, 6)
+
+        if cur == roulette_shot:
+            self.privmsg(self.channel,COLOR['boldred']+" *BANG*"+COLOR['rewind']+" -"+COLOR['boldred']+' '+nick+" is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
-            roulette_progress = 1
             self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n')
         else:
-            self.privmsg(self.channel, "Chamber"+COLOR['boldwhite']+' '+str(roulette_progress)+\
-                        ' '+COLOR['rewind']+"of 6 : "+COLOR['boldgreen'] + nick + " is safe."+COLOR['rewind'])
-            roulette_progress += 1
+            self.privmsg(self.channel, COLOR['boldgreen']+" +click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
         return None
 
     def cmd_duck(self):
