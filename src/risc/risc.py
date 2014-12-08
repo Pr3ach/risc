@@ -119,7 +119,7 @@
 #       - cmd_duck [OK]
 #       - fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
 # ------- 1.5 - Pr3acher - 12/04/2014
-#       - Slightly updated russian roulette game (thx @MrYay) [test]
+#       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -1424,11 +1424,11 @@ class Risc():
         cur = random.randint(1, 6)
 
         if cur == roulette_shot:
-            self.privmsg(self.channel,COLOR['boldred']+" *BANG*"+COLOR['rewind']+" -"+COLOR['boldred']+' '+nick+" is no more ..."+COLOR['rewind'])
+            self.privmsg(self.channel,COLOR['boldred']+"*BANG*"+COLOR['rewind']+" -"+COLOR['boldred']+' '+nick+" is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
             self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n')
         else:
-            self.privmsg(self.channel, COLOR['boldgreen']+" +click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
+            self.privmsg(self.channel, COLOR['boldgreen']+"+click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
         return None
 
     def cmd_duck(self):
