@@ -121,6 +121,7 @@
 # ------- 1.5 - Pr3acher - 12/04/2014
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - Fix for russian roulette [OK]
+#       - Fix bug with some player colored names in cmd_players
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -155,7 +156,7 @@ CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
-debug_mode = 1
+debug_mode = 0
 
 # used by cmd_roulette()
 roulette_shot = random.randint(1, 6)
