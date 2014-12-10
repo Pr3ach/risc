@@ -121,7 +121,7 @@
 # ------- 1.5 - Pr3acher - 12/04/2014
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - Fix for russian roulette [OK]
-#       - Fix bug with some player colored names in cmd_players [test]
+#       - Fix bug with some player colored names in cmd_players [OK]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
