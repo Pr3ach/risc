@@ -121,7 +121,7 @@
 # ------- 1.5 - Pr3acher - 12/04/2014
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - Fix for russian roulette [OK]
-#       - Fix bug with some player colored names in cmd_players
+#       - Fix bug with some player colored names in cmd_players [test]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -129,7 +129,7 @@
 
 
 __author__ = 'Pr3acher'
-__version__ = '1.5'
+__version__ = '1.5-dev'
 
 
 import socket
@@ -1146,14 +1146,14 @@ class Risc():
             else:
                 ping = ''
 
-            ret.append(COLOR['boldgreen']+sv.clientsList[i]+COLOR['rewind']+ping)
+            ret.append(COLOR['boldgreen']+' '+sv.clientsList[i]+COLOR['rewind']+ping)
 
         if rawRet:
             return ret
 
         ret.sort()
         # For some reason, sv.clients is innacurate here ...
-        return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'): '+', '.join(ret)
+        return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'): '+','.join(ret)
 
     def cmd_seen(self, msg0, sourceNick):
         """
