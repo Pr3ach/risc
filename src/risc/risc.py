@@ -34,8 +34,8 @@
 #       - fixed time response in TIME ctcp [OK]
 #       - fixed unicode char causing crash [OK]
 #       - improved debug info [OK]
-#       - irc_is_on_channel() [OK] XXX: NEED FIX (too slow)
-#       - irc_is_authed() [OK] XXX: NEED FIX (too slow)
+#       - irc_is_on_channel() [OK] FIXME: too slow
+#       - irc_is_authed() [OK] FIXME: too slow
 #       - set cmd output in pm [OK]
 #       - add support for pm cmds [OK]
 #       - add support for @ prefixed cmd's [OK]
@@ -122,6 +122,7 @@
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - Fix for russian roulette [OK]
 #       - Fix bug with some player colored names in cmd_players [OK]
+#       - Applied & fixed @MrYay patch cmd_kill [testing]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -152,7 +153,7 @@ import requests
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -414,7 +415,8 @@ class Risc():
                          "version": ["version", "v"],
                          "roulette": ["roulette", 'r'],
                          "duck": ["duck"],
-                         "ileveltest": ['ileveltest', 'ilt']}
+                         "ileveltest": ['ileveltest', 'ilt'],
+                         "kill": ['kill', 'k']}
 
         # Valid argument for each commands
         tmp = ["all"]
@@ -1114,6 +1116,9 @@ class Risc():
                          ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['iputgroup'])+\
                          "] with risc. <user> must have a quakenet account. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+'.'
 
+         elif command in self.commands["kill"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <weapon> Alias(es): " + ', '.join(self.commands["kill"])+\
+                         ". Performs a kill on the specified <user> with the desired <weapon>. Can be used without <weapon> argument."
         else:
             return "Command not found: " + COLOR['boldmagenta']+command+COLOR['rewind']
 
@@ -1429,7 +1434,7 @@ class Risc():
         if cur == roulette_shot:
             self.privmsg(self.channel,COLOR['boldred']+"*BANG*"+COLOR['rewind']+" -"+COLOR['boldred']+' '+nick+" is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
-            self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n')
+            self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n') # FIXME: write a safe kick function ...
         else:
             self.privmsg(self.channel, COLOR['boldgreen']+"+click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
         return None
@@ -1441,6 +1446,75 @@ class Risc():
                   "..............\.............\..."]
         for s in duck_s:
             self.privmsg(self.channel, s)
+        return None
+
+    def cmd_kill(self, msg0, sourceNick):
+        """
+        kill <opt_user> <opt_weapon>
+        """
+        killClean = self.list_clean(msg0.split(' '))
+        lenKill = len(killClean)
+        weapons = {"colt": [" was given a new breathing hole by ", "'s Colt 1911."],
+				   "spas": [" was turned into peppered steak by ", "'s SPAS blast."],
+                   "ump45": [" danced the ump tango to ", "'s sweet sweet music."],
+                   "mp5": [" was MP5K spammed without mercy by ", "'s MP5K."],
+                   "mac11": [" was minced to death by ", "'s Mac 11."],
+                   "lr300": [" played 'catch the shiny bullet with ", " LR-300 rounds."],
+                   "g36": [" was on the wrong end of ", "'s G36."],
+                   "ak103": [" was torn asunder by ", "'s crass AK103."],
+                   "m4": [" got a lead enema from ", "'s retro M4."],
+                   "psg1": [" was taken out by ", "'s PSG1. Plink!"],
+                   "hk69": [" HEARD ", "'s HK69 gren... didn't AVOID it. Sucka."],
+                   "boot": [" git himself some lovin' from ", "'s boot o' passion."],
+                   "sr8": [" managed to slow down ", "'s SR-8 round just a little."],
+                   "bleed": [" bled to death from ", "'s attacks."],
+                   "negev": [" got shredded to pieces by ", "'s Negev."],
+                   "knife": [" was sliced a new orifice by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']"."],
+                   "knife_throw": [" managed to sheath ", "'s flying knife in their flesh."],
+                   "beretta": [" was pistol whipped by ", "."],
+                   "g18": [" got a whole plastic surery with ", "'s Glock"],
+                   "de": [" got a whole lot of hole from ", "'s DE round."],
+                   "nuke": [" has been nuked by ", "."],
+                   "bfg": [" has been blasted by ", "'s BFG."],
+                   "rpg": [" ate ", "'s rockets."],
+                   "lightning": [" has been deep fried by ", "."],
+                   "slap": [" has been slapped to death by ", "."]}
+
+	if killClean[1].lower() in ('all', 'everyone', 'channel', 'everybody'):
+		rnd_all = random.randint(1, 3)
+		if rnd_all == 1:
+			killClean[1] = 'The whole channel'
+		elif rnd_all == 2:
+			killClean[1] = 'Everyone'
+        else:
+			killClean[1] = 'Everybody'
+
+        if lenKill > 3:
+            self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
+
+        elif lenKill == 1:
+            self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" has an urge to kill...")
+
+        elif lenKill == 2:
+            if len(killClean[1]) > 28:
+                self.privmsg(sourceNick, 'Nick has too many chars.')
+            elif sourceNick.lower() == killClean[1].lower():
+                self.privmsg(self.channel, COLOR["boldred"]+sourceNick+COLOR['rewind']+" went an hero.")
+            elif self.nick.lower() == killClean[1].lower(): # FIXME: write a safe kick function ...
+                self.privmsg(self.channel, "You cannot kill me, "+COLOR['boldred']+"I KILL YOU!")
+                self.sock.send('KICK '+self.channel+' '+sourceNick+' :'+"killed by risc"+'\r\n')
+            elif killClean[1].lower() in ('the whole channel', 'everyone', 'everybody'):
+                self.self.privmsg(self.channel, COLRO["boldred"]+killClean[1]+COLOR['rewind']+" has been murdered by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+".")
+            elif self.irc_is_on_channel(killClean[1]) or killClean[1].lower() == 'q':
+                self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" killed "+killClean[1]+".")
+            else:
+                self.privmsg(sourceNick, "This person doesn't exist.")
+
+        else:
+            if killClean[2].lower() in weapons:
+                self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+weapons[killClean[2][0]]]+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+weapons[killClean[2][1]])
+            else:
+                self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+" has been creatively killed by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" using a "+killClean[2]+".")
         return None
 
     def search_accurate(self, p, serv):
