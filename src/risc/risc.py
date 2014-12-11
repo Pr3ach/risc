@@ -1481,7 +1481,7 @@ class Risc():
                    "lightning": [" has been deep fried by ", "."],
                    "slap": [" has been slapped to death by ", "."]}
 
-        elif lenKill == 1:
+        if lenKill == 1:
             self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" has an urge to kill...")
 
         elif lenKill == 2:
