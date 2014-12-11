@@ -123,7 +123,7 @@
 #       - Fix for russian roulette [OK]
 #       - Fix bug with some player colored names in cmd_players [OK]
 #       - Applied & fixed @MrYay patch cmd_kill [OK]
-#       - Fixed (again) cmd_kill [test]
+#       - Fixed (again) cmd_kill [OK]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
