@@ -1116,7 +1116,7 @@ class Risc():
                          ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['iputgroup'])+\
                          "] with risc. <user> must have a quakenet account. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+'.'
 
-         elif command in self.commands["kill"]:
+        elif command in self.commands["kill"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <weapon> Alias(es): " + ', '.join(self.commands["kill"])+\
                          ". Performs a kill on the specified <user> with the desired <weapon>. Can be used without <weapon> argument."
         else:
