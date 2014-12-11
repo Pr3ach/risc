@@ -123,6 +123,7 @@
 #       - Fix for russian roulette [OK]
 #       - Fix bug with some player colored names in cmd_players [OK]
 #       - Applied & fixed @MrYay patch cmd_kill [OK]
+#       - Fixed (again) cmd_kill [test]
 #       - keep a irc userlist & update it as users join/leave
 #       - fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -1469,7 +1470,7 @@ class Risc():
                    "sr8": [" managed to slow down ", "'s SR-8 round just a little."],
                    "bleed": [" bled to death from ", "'s attacks."],
                    "negev": [" got shredded to pieces by ", "'s Negev."],
-                   "knife": [" was sliced a new orifice by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+"."],
+                   "knife": [" was sliced a new orifice by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind'], "."],
                    "knife_throw": [" managed to sheath ", "'s flying knife in their flesh."],
                    "beretta": [" was pistol whipped by ", "."],
                    "g18": [" got a whole plastic surery with ", "'s Glock"],
