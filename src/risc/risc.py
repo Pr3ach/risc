@@ -1491,7 +1491,7 @@ class Risc():
                 self.privmsg(sourceNick, 'Nick has too many chars.')
 
             elif killClean[1].lower() in ('all', 'everyone', 'channel', 'everybody'): # FIXME: what if sm1 is named "all", "everyone" etc?
-                self.self.privmsg(self.channel, COLOR["boldred"]+random.choice(["The whole channel", "Everyone", "Everybody"])\
+                self.privmsg(self.channel, COLOR["boldred"]+random.choice(["The whole channel", "Everyone", "Everybody"])\
                                   +COLOR['rewind']+" has been murdered by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+".")
 
             elif sourceNick.lower() == killClean[1].lower():
