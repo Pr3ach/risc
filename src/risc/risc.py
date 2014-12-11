@@ -1512,7 +1512,7 @@ class Risc():
 
         else:
             if killClean[2].lower() in weapons:
-                self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+weapons[killClean[2][0]]]+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+weapons[killClean[2][1]])
+                self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+weapons[killClean[2]][0]+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+weapons[killClean[2][1]])
             else:
                 self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+" has been creatively killed by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" using a "+killClean[2]+".")
         return None
@@ -1693,6 +1693,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["say"]:
             self.cmd_say(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["kill"]:
+            self.cmd_kill(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["google"]:
             self.cmd_google(msg[0], sourceNick)
