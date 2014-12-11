@@ -1514,8 +1514,8 @@ class Risc():
             else:
                 self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+" has been creatively killed by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" using a "+killClean[2]+".")
 
-            else:
-                self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
+        else:
+            self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
         return None
 
     def search_accurate(self, p, serv):
