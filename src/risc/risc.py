@@ -1480,15 +1480,6 @@ class Risc():
                    "lightning": [" has been deep fried by ", "."],
                    "slap": [" has been slapped to death by ", "."]}
 
-	if killClean[1].lower() in ('all', 'everyone', 'channel', 'everybody'):
-		rnd_all = random.randint(1, 3)
-		if rnd_all == 1:
-			killClean[1] = 'The whole channel'
-		elif rnd_all == 2:
-			killClean[1] = 'Everyone'
-        else:
-			killClean[1] = 'Everybody'
-
         if lenKill > 3:
             self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
 
@@ -1498,21 +1489,33 @@ class Risc():
         elif lenKill == 2:
             if len(killClean[1]) > 28:
                 self.privmsg(sourceNick, 'Nick has too many chars.')
+
+            elif killClean[1].lower() in ('all', 'everyone', 'channel', 'everybody'): # FIXME: what if sm1 is named "all", "everyone" etc?
+                rnd_all = random.randint(1, 3)
+                if rnd_all == 1:
+                    killClean[1] = 'The whole channel'
+                elif rnd_all == 2:
+                    killClean[1] = 'Everyone'
+                else:
+                    killClean[1] = 'Everybody'
+                self.self.privmsg(self.channel, COLRO["boldred"]+killClean[1]+COLOR['rewind']+" has been murdered by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+".")
+
             elif sourceNick.lower() == killClean[1].lower():
                 self.privmsg(self.channel, COLOR["boldred"]+sourceNick+COLOR['rewind']+" went an hero.")
+
             elif self.nick.lower() == killClean[1].lower(): # FIXME: write a safe kick function ...
                 self.privmsg(self.channel, "You cannot kill me, "+COLOR['boldred']+"I KILL YOU!")
                 self.sock.send('KICK '+self.channel+' '+sourceNick+' :'+"killed by risc"+'\r\n')
-            elif killClean[1].lower() in ('the whole channel', 'everyone', 'everybody'):
-                self.self.privmsg(self.channel, COLRO["boldred"]+killClean[1]+COLOR['rewind']+" has been murdered by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+".")
+
             elif self.irc_is_on_channel(killClean[1]) or killClean[1].lower() == 'q':
                 self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" killed "+killClean[1]+".")
+
             else:
                 self.privmsg(sourceNick, "This person doesn't exist.")
 
         else:
             if killClean[2].lower() in weapons:
-                self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+weapons[killClean[2]][0]+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+weapons[killClean[2][1]])
+                self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+weapons[killClean[2]][0]+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+weapons[killClean[2]][1])
             else:
                 self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+" has been creatively killed by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" using a "+killClean[2]+".")
         return None
