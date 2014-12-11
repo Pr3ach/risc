@@ -1481,9 +1481,6 @@ class Risc():
                    "lightning": [" has been deep fried by ", "."],
                    "slap": [" has been slapped to death by ", "."]}
 
-        if lenKill > 3:
-            self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
-
         elif lenKill == 1:
             self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" has an urge to kill...")
 
@@ -1508,11 +1505,17 @@ class Risc():
             else:
                 self.privmsg(sourceNick, "This person doesn't exist.")
 
-        else:
-            if killClean[2].lower() in weapons:
+        elif lenKill == 3:
+            if not self.irc_is_on_channel(killClean[1]):
+                self.privmsg(sourceNick, "This person doesn't exist.")
+
+            elif killClean[2].lower() in weapons:
                 self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+weapons[killClean[2]][0]+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+weapons[killClean[2]][1])
             else:
                 self.privmsg(self.channel, COLOR["boldred"]+killClean[1]+COLOR['rewind']+" has been creatively killed by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" using a "+killClean[2]+".")
+
+            else:
+                self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
         return None
 
     def search_accurate(self, p, serv):
