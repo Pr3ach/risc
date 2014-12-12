@@ -832,7 +832,7 @@ class Risc():
                 self.privmsg(self.channel, "Know you're talking to a bot? :')")
                 return None
             else:
-                if self.irc_is_on_channel(helloClean[1]) or helloClean[1].lower() == 'q':
+                if self.is_on_channel(helloClean[1]):
                     self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" says hi to "+helloClean[1])
                 else:
                     self.privmsg(sourceNick, "No such nick.")
@@ -1551,14 +1551,14 @@ class Risc():
                 self.privmsg(self.channel, "You cannot kill me, "+COLOR['boldred']+"I KILL YOU!")
                 self.sock.send('KICK '+self.channel+' '+sourceNick+' :'+"killed by risc"+'\r\n')
 
-            elif self.irc_is_on_channel(killClean[1]) or killClean[1].lower() == 'q':
+            elif self.is_on_channel(killClean[1]):
                 self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" killed "+killClean[1]+".")
 
             else:
                 self.privmsg(sourceNick, "This person doesn't exist.")
 
         elif lenKill == 3:
-            if not self.irc_is_on_channel(killClean[1]):
+            if not self.is_on_channel(killClean[1]):
                 self.privmsg(sourceNick, "This person doesn't exist.")
 
             elif killClean[2].lower() in weapons:
@@ -2299,7 +2299,7 @@ class Risc():
                     continue
 
                 if debug_mode:
-                    print "in: "+res
+                    print line
 
                 if re.search(' PRIVMSG ', line):
                     self._on_privmsg(line)
