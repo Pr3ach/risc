@@ -2299,7 +2299,7 @@ class Risc():
                     continue
 
                 if debug_mode:
-                    print res
+                    print "in: "+res
 
                 if re.search(' PRIVMSG ', line):
                     self._on_privmsg(line)
