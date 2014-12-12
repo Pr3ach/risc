@@ -570,10 +570,16 @@ class Risc():
         Called on namereply - Init IRC user list
         """
         line = self.list_clean(line.split(" :")[1].split(' '))
-        print line
         for user in line:
             self.user_add(user)
-        print users
+        return None
+
+    def is_on_channel(self, user):
+        global users
+        if not user:
+            return None
+        elif user.lower() in users:
+            return True
         return None
 
     def set_option(self, section, option, value):
@@ -2183,6 +2189,34 @@ class Risc():
             self.join()
         else:
             self.debug.info("on_kick: '%s' kicked '%s' for '%s'" % (kicker, target, reason))
+            self.user_remove(target)
+        return None
+
+    def on_namereply(self, line):
+        """
+        Called on NAMES reply
+        """
+        self.init_users(line)
+        return None
+
+    def on_join(self, line):
+        """
+        Called when someone joins the channel
+        """
+        if not line:
+            return None
+        user = line.split('!')[0][1:]
+        self.user_add(user)
+        return None
+
+    def on_part(self, line):
+        """
+        Called when someone leaves the channel
+        """
+        if not line:
+            return None
+        user = line.split('!')[0][1:]
+        self.user_remove(user)
         return None
 
     def _on_privmsg(self, msg):
@@ -2249,7 +2283,6 @@ class Risc():
 
             # Split the buffer into lines, way more accurate, since the IRC protocol uses crlf separator
             for line in res.split('\r\n'):
-
                 if not line:
                     continue
 
@@ -2266,12 +2299,18 @@ class Risc():
                 elif re.search(" KICK ", line):
                     self.on_kick(line)
 
+                elif re.search(" PART ", line):
+                    self.on_part(line)
+
+                elif re.search(" JOIN ", line):
+                    self.on_join(line)
+
                 # Indicate we're connected, we can now join the channel
                 elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
                     self.on_welcome()
 
                 elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
-                    self.init_users(line)
+                    self.on_namereply(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
