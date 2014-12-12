@@ -32,7 +32,7 @@
 #       - Fixed time response in TIME ctcp [OK]
 #       - Fixed unicode char causing crash [OK]
 #       - Improved debug info [OK]
-#       - irc_is_on_channel() [OK] FIXME: too slow
+#       - irc_is_on_channel() [OK]
 #       - irc_is_authed() [OK] FIXME: too slow
 #       - Set cmd output in pm [OK]
 #       - Add support for pm cmds [OK]
@@ -572,6 +572,7 @@ class Risc():
         line = self.list_clean(line.split(" :")[1].split(' '))
         for user in line:
             self.user_add(user)
+        print users
         return None
 
     def is_on_channel(self, user):
@@ -596,27 +597,12 @@ class Risc():
         return None
 
     # XXX: FIX NEEDED: too slow
-    def irc_is_on_channel(self, nick):
-        """
-        Checks whether a user-nick is on the channel, return 0 if not, otherwise return 1
-        """
-        try:
-            self.sock.send('WHOIS ' + nick + '\r\n')
-            res = str(self.sock.recv(1024))
-        except:
-            self.debug.error('irc_is_on_channel: Exception caught')
-            return 0
-        if re.search(self.channel, res) is None or re.search(":No such nick", res):
-            return 0
-        return 1
-
-    # XXX: FIX NEEDED: too slow
     def irc_is_authed(self, nick):
         """
         Check whether a user-nick is registered / has an account with quakenet, return 0 if not, otherwise return the account name
         """
         try:
-            if not self.irc_is_on_channel(nick):
+            if not self.is_on_channel(nick):
                 return 0
             self.sock.send('WHOIS ' + nick + '\r\n')
             res = str(self.sock.recv(1024))
@@ -2301,12 +2287,12 @@ class Risc():
                 if debug_mode:
                     print line
 
-                if re.search(' PRIVMSG ', line):
+                if re.search(" PRIVMSG ", line):
                     self._on_privmsg(line)
 
                 # Reply back to the server
-                elif re.search('^PING :', line):
-                    self._send('PONG :' + line.split(':')[1])
+                elif re.search("^PING :", line):
+                    self._send("PONG :" + line.split(':')[1])
 
                 elif re.search(" KICK ", line):
                     self.on_kick(line)
