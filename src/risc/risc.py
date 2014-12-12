@@ -2273,7 +2273,7 @@ class Risc():
                     self.on_welcome()
 
                 elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
-                    self.init_users()
+                    self.init_users(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
