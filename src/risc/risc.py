@@ -2,50 +2,50 @@
 
 # CHANGELOG
 #
-#       - add !status/!st command [OK]
-#       - fix update_hist() [OK]
-#       - add !players <serverName> command [OK]
-#       - minor bug fixed [OK]
-#       - add colors [OK]
-#       - fix colors not working on non-console client [OK]
-#       - remove ^1 etc from map names [OK]
-#       - add aliases for args [OK]
-#       - add !base64 / !sha1 / !md5 [OK]
-#       - change lastposts to lastthreads / lt [OK]
-#       - add bold colors [OK]
-#       - add thread author [OK]
+#       - Add !status/!st command [OK]
+#       - Fix update_hist() [OK]
+#       - Add !players <serverName> command [OK]
+#       - Minor bug fixed [OK]
+#       - Add colors [OK]
+#       - Fix colors not working on non-console client [OK]
+#       - Remove ^1 etc from map names [ok]
+#       - Add aliases for args [ok]
+#       - Add !base64 / !sha1 / !md5 [OK]
+#       - Change lastposts to lastthreads / lt [OK]
+#       - Add bold colors [OK]
+#       - Add thread author [OK]
 #       - v1.1 - Pr3acher
 # -------
-#       - use UDP instead of qstat stuff [OK]
-#       - add !search <player> [OK]
-#       - add !disasm [OK]
-#       - add !hi <user> [OK]
-#       - add <server> optional arg to !search && add limit of user output to !search [OK]
-#       - make the distinction between players & bots [OK]
-#       - fix server auth stuff [OK]
+#       - Use UDP instead of qstat stuff [OK]
+#       - Add !search <player> [OK]
+#       - Add !disasm [OK]
+#       - Add !hi <user> [OK]
+#       - Add <server> optional arg to !search && add limit of user output to !search [OK]
+#       - Make the distinction between players & bots [OK]
+#       - Fix server auth stuff [OK]
 #       - v1.2 - Pr3acher
 # -------
-#       - add !ikick (in irc kick) [OK]
+#       - Add !ikick (in irc kick) [OK]
 #       - !lt now returns a link to the last post in the thread [OK]
-#       - write irc_is_admin(): returns auth + level from *nick* [OK]
-#       - add required rights to help command [OK]
-#       - add !ilt / ileveltest command [OK]
-#       - updated irc_is_admin [OK]
-#       - fixed time response in TIME ctcp [OK]
-#       - fixed unicode char causing crash [OK]
-#       - improved debug info [OK]
+#       - Write irc_is_admin(): returns auth + level from *nick* [OK]
+#       - Add required rights to help command [OK]
+#       - Add !ilt / ileveltest command [OK]
+#       - Updated irc_is_admin [OK]
+#       - Fixed time response in TIME ctcp [OK]
+#       - Fixed unicode char causing crash [OK]
+#       - Improved debug info [OK]
 #       - irc_is_on_channel() [OK] FIXME: too slow
 #       - irc_is_authed() [OK] FIXME: too slow
-#       - set cmd output in pm [OK]
-#       - add support for pm cmds [OK]
-#       - add support for @ prefixed cmd's [OK]
-#       - add support for in-game calladmin cmd [OK]
-#       - removed disasm [OK]
-#       - add threading support for game events [OK]
+#       - Set cmd output in pm [OK]
+#       - Add support for pm cmds [OK]
+#       - Add support for @ prefixed cmd's [OK]
+#       - Add support for in-game calladmin cmd [OK]
+#       - Removed disasm [OK]
+#       - Add threading support for game events [OK]
 #       - v1.3 - Pr3acher
 # -------
-#       - minor change in colors [OK]
-#       - added chat ability (IRC to game, other side implemented in riscb3 plugin) [OK]
+#       - Minor change in colors [OK]
+#       - Added chat ability (IRC to game, other side implemented in riscb3 plugin) [OK]
 #       - q3_to_IRC_color() [OK]
 #       - PEP8: LF between functions and classes [OK]
 #       - PEP8: Removed file encoding [OK]
@@ -53,81 +53,83 @@
 #       - PEP8: Multiple fixes (comments, functions) [OK]
 #       - PEP8: Global var, constant [OK]
 #       - PEP8: Fixed all (except 79 chars standard) [OK]
-#       - fix reason chars on game events (^[0-9]) [OK]
-#       - set th.daemon = True for game_watcher thread [OK]
-#       - more accurate time for ban [OK]
+#       - Fix reason chars on game events (^[0-9]) [OK]
+#       - Set th.daemon = True for game_watcher thread [OK]
+#       - More accurate time for ban [OK]
 #       - Added cmd description for !chat [OK]
-#       - add seen cmd - 10/08/2014: fixed exception [OK]
-#       - cleaned up very long lines [OK]
-#       - fix version field for !st cmd (rm "\^[0-9]") [OK]
-#       - removed mysql warnings output [OK]
-#       - fix (again) crash for unicode chars [OK]
-#       - temp. disabled cmds until fixed: st, players, search [OK]
-#       - typo fixed for help cmds [OK]
+#       - Add seen cmd - 10/08/2014: fixed exception [OK]
+#       - Cleaned up very long lines [OK]
+#       - Fix version field for !st cmd (rm "\^[0-9]") [OK]
+#       - Removed mysql warnings output [OK]
+#       - Fix (again) crash for unicode chars [OK]
+#       - Temp. disabled cmds until fixed: st, players, search [OK]
+#       - Typo fixed for help cmds [OK]
 # ------- v1.4 - Pr3acher - 08/18/2014
-#       - removed bot cred. from risc.ini [OK]
-#       - make sh added [OK]
+#       - Removed bot cred. from risc.ini [OK]
+#       - Make sh added [OK]
 # ------- v1.4.1 - Pr3acher - 08/19/2014
-#       - fixed 'make-nix.sh' [OK]
+#       - Fixed 'make-nix.sh' [OK]
 # ------- v1.4.2 - Pr3acher - 08/20/2014
-#       - fixed major bug in Sv [OK]
-#       - fix: use only one db & table for risc_irc_admins [OK]
-#       - bot auth credentials in risc.ini [OK]
-#       - remove !lt cmd from help <cmd> cmd [OK]
-#       - section in risc.ini for server alias [OK]
+#       - Fixed major bug in Sv [OK]
+#       - Fix: use only one db & table for risc_irc_admins [OK]
+#       - Bot auth credentials in risc.ini [OK]
+#       - Remove !lt cmd from help <cmd> cmd [OK]
+#       - Section in risc.ini for server alias [OK]
 # ------- v1.4.3 - Pr3acher - 09/04/2014
-#       - add cmd levels to ini conf file [OK]
-#       - add admin init list to ini conf file [OK]
-#       - add ability to use custom cmd prefixes [OK]
-#       - allow chat in one server at a time only [OK]
-#       - dynamic help msg [OK]
-#       - update README file [OK]
+#       - Add cmd levels to ini conf file [OK]
+#       - Add admin init list to ini conf file [OK]
+#       - Add ability to use custom cmd prefixes [OK]
+#       - Allow chat in one server at a time only [OK]
+#       - Dynamic help msg [OK]
+#       - Update README file [OK]
 # ------- v1.4.4 - Pr3acher - 09/07/2014
-#       - fix minor dbg code [OK]
-#       - fixed Sv failling -> crash [OK]
-#       - cmd 'say' for admins [OK]
-#       - fix typo in help & help say [OK]
-#       - fix typo in cmd_status [OK]
-#       - cmd google [OK]
-#       - fix bug for is_global_cmd [OK]
-#       - add cmd 'server' [OK]
-#       - small changes in cmd hello [OK]
-#       - minor bug fixes [OK]
-#       - add cmd 'uptime' [OK]
-#       - anti-spam [OK]
-#       - add cmd 'version' [OK]
+#       - Fix minor dbg code [OK]
+#       - Fixed Sv failling -> crash [OK]
+#       - Added cmd 'say' for admins [OK]
+#       - Fix typo in help & help say [OK]
+#       - Fix typo in cmd_status [OK]
+#       - Added cmd google [OK]
+#       - Fix bug for is_global_cmd [OK]
+#       - Add cmd 'server' [OK]
+#       - Small changes in cmd hello [OK]
+#       - Minor bug fixes [OK]
+#       - Add cmd 'uptime' [OK]
+#       - Anti-spam [OK]
+#       - Add cmd 'version' [OK]
 # ------- v1.4.5 - Pr3acher - 10/12/2014
-#       - added server hostname for cmd 'server' [OK]
-#       - added player list to cmd 'server' [OK]
-#       - info on link posting [OK]
-#       - fix error handling for Sv class [OK]
-#       - fixed: "status all" was failling even if not all serv failed querying [OK]
-#       - do not start game_watcher callback when risb3 ain't running [OK]
-#       - add "roulette" cmd [OK]
-#       - improved server data parsing: prevent some possible 'exploit' by user msgs [OK]
-#       - implement on_kick & auto join on kick [OK]
-#       - fix cmd 'search' with server specified [OK]
-#       - fix for 'sv' cmd when no port specified [OK]
-#       - fix for reason param. in cmd "ikick" [OK]
-#       - use lib 'requests' [OK]
-#       - add some headers for http req [OK]
-#       - use lib 'requests' for cmd google [OK]
-#       - add server IP for cmd 'st <sv>' [OK]
-#       - minor changes for cmd_status() [OK]
-#       - minor fix to set_evt_callbacks() [OK]
-#       - removed some useless libs [OK]
-#       - cmd_duck [OK]
-#       - fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
+#       - Added server hostname for cmd 'server' [OK]
+#       - Added player list to cmd 'server' [OK]
+#       - Info on link posting [OK]
+#       - Fix error handling for Sv class [OK]
+#       - Fixed: "status all" was failling even if not all serv failed querying [OK]
+#       - Do not start game_watcher callback when risb3 ain't running [OK]
+#       - Add "roulette" cmd [OK]
+#       - Improved server data parsing: prevent some possible 'exploit' by user msgs [OK]
+#       - Implement on_kick & auto join on kick [OK]
+#       - Fix cmd 'search' with server specified [OK]
+#       - Fix for 'sv' cmd when no port specified [OK]
+#       - Fix for reason param. in cmd "ikick" [OK]
+#       - Use lib 'requests' [OK]
+#       - Add some headers for http req [OK]
+#       - Use lib 'requests' for cmd google [OK]
+#       - Add server IP for cmd 'st <sv>' [OK]
+#       - Minor changes for cmd_status() [OK]
+#       - Minor fix to set_evt_callbacks() [OK]
+#       - Removed some useless libs [OK]
+#       - Added cmd_duck [OK]
+#       - Fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
 # ------- 1.5 - Pr3acher - 12/04/2014
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - Fix for russian roulette [OK]
 #       - Fix bug with some player colored names in cmd_players [OK]
 #       - Applied & fixed @MrYay patch cmd_kill [OK]
 #       - Fixed (again) cmd_kill [OK]
-#       - keep a irc userlist & update it as users join/leave
-#       - fix/test the whole 'set' cmd
+#       - Updated cmd_players [test]
+#       - Updated cmd_server [test]
+#       - Keep a irc userlist & update it as users join/leave
+#       - Fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
-#       - add/fix commands to set/get Cvars
+#       - Add/fix commands to set/get Cvars
 
 
 __author__ = 'Pr3acher'
@@ -1159,7 +1161,7 @@ class Risc():
 
         ret.sort()
         # For some reason, sv.clients is innacurate here ...
-        return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'): '+','.join(ret)
+        return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'):'+','.join(ret)
 
     def cmd_seen(self, msg0, sourceNick):
         """
@@ -1402,8 +1404,8 @@ class Risc():
                     ping = COLOR['rewind']+' ('+COLOR['boldblue']+'BOT'+COLOR['rewind']+')'
                 else:
                     ping = ''
-                players.append(COLOR['boldgreen']+sv.clientsList[i]+COLOR['rewind']+ping)
-            ret2 = "Playing: "+", ".join(players)
+                players.append(COLOR['boldgreen']+' '+sv.clientsList[i]+COLOR['rewind']+ping)
+            ret2 = "Playing:"+",".join(players)
 
         ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ': Playing:' +\
             COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
