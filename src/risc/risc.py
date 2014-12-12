@@ -151,7 +151,7 @@ import lxml.html
 import tld
 import random
 import requests
-import * from .irc_rpl
+from .irc_rpl import *
 
 init_time = int(time.time())
 last_cmd_time = 0
