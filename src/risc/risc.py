@@ -569,12 +569,10 @@ class Risc():
         """
         Called on namereply - Init IRC user list
         """
-        print "dbg"
         line = self.list_clean(line.split(" :")[1].split(' '))
-        print "dbg"
+        print line
         for user in line:
             self.user_add(user)
-        print "dbg"
         print users
         return None
 
