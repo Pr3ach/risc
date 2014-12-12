@@ -123,7 +123,7 @@
 #       - Fixed (again) cmd_kill [OK]
 #       - Updated cmd_players [OK]
 #       - Updated cmd_server [OK]
-#       - Keep an irc userlist & update it as users join/leave
+#       - Keep an irc userlist & update it as users join/leave/nick/kick [test]
 #       - Add auto join back when timeout
 #       - Auto change nick on nick in use
 #       - Fix/test the whole 'set' cmd
