@@ -151,6 +151,7 @@ import lxml.html
 import tld
 import random
 import requests
+import * from .irc_rpl
 
 init_time = int(time.time())
 last_cmd_time = 0
@@ -159,6 +160,7 @@ CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
+users = {}         # {"user.lower()" :{"chan_lvl": "operator|voice"}}
 debug_mode = 1
 
 # used by cmd_roulette()
@@ -529,6 +531,48 @@ class Risc():
         else:
             self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + "Error: " + msg[0] + " CTCP command is not supported." + "\001")
 
+        return None
+
+    def user_add(self, user):
+        """
+        Add a user to the IRC user list
+        """
+        if not user:
+            return None
+        elif user[0] == '@':
+            user = user[1:]
+            level = "operator"
+        elif user[0] == '+':
+            user = user[1:]
+            level = "voice"
+        else:
+            level = "none"
+        if not user:
+            return None
+        user = user.lower()
+        global users
+        if user not in users:
+            users[user] = {"chan_lvl": level}
+        return None
+
+    def user_remove(self, user):
+        """
+        Remove a user from the IRC user list
+        """
+        if not user:
+            return None
+        elif user.lower() in users:
+            users.pop(user.lower())
+        return None
+
+    def init_users(self, line):
+        """
+        Called on namereply - Init IRC user list
+        """
+        line = self.list_clean(line.split(" :")[1].split(' '))
+        for user in line:
+            self.user_add(user)
+        print users
         return None
 
     def set_option(self, section, option, value):
@@ -2222,8 +2266,11 @@ class Risc():
                     self.on_kick(line)
 
                 # Indicate we're connected, we can now join the channel
-                elif re.search(':Welcome', line):
+                elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
                     self.on_welcome()
+
+                elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
+                    self.init_user_list()
 
 if __name__ == '__main__':
     print "[+] Running ..."
