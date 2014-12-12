@@ -2219,6 +2219,18 @@ class Risc():
         self.user_remove(user)
         return None
 
+    def on_nick(self, line):
+        """
+        Called when someone renames
+        """
+        if not line:
+            return None
+        old = line.split('!')[0][1:]
+        new = line.split(' ')[2][1:]
+        self.user_remove(old)
+        self.user_add(new)
+        return None
+
     def _on_privmsg(self, msg):
         """
         Disptach PRIVMSG messages to the right functions
@@ -2287,7 +2299,7 @@ class Risc():
                     continue
 
                 if debug_mode:
-                    print line
+                    print res
 
                 if re.search(' PRIVMSG ', line):
                     self._on_privmsg(line)
@@ -2304,6 +2316,9 @@ class Risc():
 
                 elif re.search(" JOIN ", line):
                     self.on_join(line)
+
+                elif re.search(" NICK ", line):
+                    self.on_nick(line)
 
                 # Indicate we're connected, we can now join the channel
                 elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
