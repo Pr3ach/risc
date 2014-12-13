@@ -2308,7 +2308,7 @@ class Risc():
                 # Unfinished server message
                 if res[-1] != '\n' and res[-2] != '\r' and not last_chunk and line == lines[-1]:
                     last_chunk = lines[-1]
-                    continue
+                    continue # Only treat unfinished msgs after rebuild
 
                 if debug_mode:
                     print line
@@ -2322,13 +2322,18 @@ class Risc():
 
                 elif re.search(" KICK ", line):
                     self.on_kick(line)
-                    print users
 
                 elif re.search(" PART ", line):
                     self.on_part(line)
+                    print
+                    print users
+                    print
 
                 elif re.search(" JOIN ", line):
                     self.on_join(line)
+                    print
+                    print users
+                    print
 
                 elif re.search(" NICK ", line):
                     self.on_nick(line)
