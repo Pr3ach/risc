@@ -123,8 +123,8 @@
 #       - Fixed (again) cmd_kill [OK]
 #       - Updated cmd_players [OK]
 #       - Updated cmd_server [OK]
+#       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [test]
-#       - Improved server-client data processing [test]
 #       - Add auto join back when timeout
 #       - Auto change nick on nick in use
 #       - Fix/test the whole 'set' cmd
@@ -161,7 +161,7 @@ CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
-users = {}         # {"user.lower()" :{"chan_lvl": "operator|voice"}}
+users = {}         # {"user.lower()" :{"chan_lvl": "operator|voice"}} # Can't rely on chan_lvl: 'bug' on rename ...
 debug_mode = 1
 
 # used by cmd_roulette()
@@ -2308,7 +2308,7 @@ class Risc():
                 # Unfinished server message
                 if res[-1] != '\n' and res[-2] != '\r' and not last_chunk and line == lines[-1]:
                     last_chunk = lines[-1]
-                    continue # Only treat unfinished msgs after rebuild
+                    continue # Only treat unfinished msgs after they've been rebuilt
 
                 if debug_mode:
                     print line
@@ -2325,15 +2325,9 @@ class Risc():
 
                 elif re.search(" PART ", line):
                     self.on_part(line)
-                    print
-                    print users
-                    print
 
                 elif re.search(" JOIN ", line):
                     self.on_join(line)
-                    print
-                    print users
-                    print
 
                 elif re.search(" NICK ", line):
                     self.on_nick(line)
