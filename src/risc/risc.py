@@ -124,7 +124,7 @@
 #       - Updated cmd_players [OK]
 #       - Updated cmd_server [OK]
 #       - Improved server-client data processing [OK]
-#       - Keep an irc userlist & update it as users join/leave/nick/kick [test]
+#       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
 #       - Add auto join back when timeout
 #       - Auto change nick on nick in use
 #       - Fix/test the whole 'set' cmd
@@ -395,7 +395,7 @@ class Risc():
             for sv in self.sv_running:
                 chat_set[sv] = 0
         except:
-            self.debug.critical("Risc.__init__: Exception caugth while loading config settings - Make sure there's no missing field")
+            self.debug.critical("Risc.__init__: Exception caught while loading config settings - Make sure there's no missing field")
             raise SystemExit
 
         # Commands and their aliases
