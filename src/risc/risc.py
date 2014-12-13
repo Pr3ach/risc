@@ -2227,7 +2227,7 @@ class Risc():
 
     def on_nicknameinuse(self, line):
         self.debug.warning("Nick '%s' already in use - renaming to '%s'" %(self.nick, self.nick+'_'))
-        self.set_option("irc", "nick", self.nick+'_')
+        self.nick = self.nick+'_'
         self.start()
         return None
 
