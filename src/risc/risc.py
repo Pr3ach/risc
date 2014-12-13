@@ -125,7 +125,7 @@
 #       - Updated cmd_server [OK]
 #       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
-#       - Auto change nick on nick in use
+#       - Auto change nick on nick in use [test]
 #       - Add auto join back when timeout
 #       - Fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
@@ -2225,6 +2225,10 @@ class Risc():
         self.user_add(new)
         return None
 
+    def on_nicknameinuse(self, line):
+        self.nick = self.nick+'_'
+        return None
+
     def _on_privmsg(self, msg):
         """
         Disptach PRIVMSG messages to the right functions
@@ -2338,6 +2342,9 @@ class Risc():
 
                 elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
                     self.on_namereply(line)
+
+                elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
+                    self.on_nicknameinuse(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
