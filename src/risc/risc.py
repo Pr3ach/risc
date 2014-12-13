@@ -2309,7 +2309,7 @@ class Risc():
                 if res[-1] != '\n' and res[-2] != '\r' and not last_chunk:
                     last_chunk = lines[-1]
 
-                if debug_mode and not last_chunk:
+                if debug_mode:
                     print line
 
                 if re.search(" PRIVMSG ", line):
@@ -2321,6 +2321,7 @@ class Risc():
 
                 elif re.search(" KICK ", line):
                     self.on_kick(line)
+                    print users
 
                 elif re.search(" PART ", line):
                     self.on_part(line)
