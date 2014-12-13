@@ -125,7 +125,7 @@
 #       - Updated cmd_server [OK]
 #       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
-#       - Auto change nick on nick in use [test]
+#       - Auto change nick on nick in use [OK]
 #       - Add auto join back when timeout
 #       - Fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
