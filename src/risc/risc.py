@@ -2287,26 +2287,30 @@ class Risc():
         """
         global debug_mode
         last_chunk = ''
+
         while 1:
             res = self.sock.recv(512)
 
+            if not res:
+                continue
+
+            lines = res.split("\r\n")
+
+            if last_chunk:
+                lines[0] = last_chunk + lines[0]
+                last_chunk = ''
+
             # Split the buffer into lines, way more accurate, since the IRC protocol uses crlf separator
-            for line in res.split('\r\n'):
+            for line in lines:
                 if not line:
                     continue
 
                 if debug_mode:
-                    print
-                    print res
-                    print
-
-                if last_chunk:
-                    line = last_chunk+line
-                    last_chunk = ''
+                    print line
 
                 # Unfinished server message
-                if line[-1] != '\n' and line[-2] != '\r':
-                    last_chunk = line
+                if res[-1] != '\n' and res[-2] != '\r' and not last_chunk:
+                    last_chunk = lines[-1]
 
                 if re.search(" PRIVMSG ", line):
                     self._on_privmsg(line)
