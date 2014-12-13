@@ -124,6 +124,7 @@
 #       - Updated cmd_players [OK]
 #       - Updated cmd_server [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [test]
+#       - Improved server-client data processing [test]
 #       - Add auto join back when timeout
 #       - Auto change nick on nick in use
 #       - Fix/test the whole 'set' cmd
@@ -2285,6 +2286,7 @@ class Risc():
         Main and general event dispatcher
         """
         global debug_mode
+        last_chunk = ''
         while 1:
             res = self.sock.recv(512)
 
@@ -2297,6 +2299,14 @@ class Risc():
                     print
                     print res
                     print
+
+                if last_chunk:
+                    line = last_chunk+line
+                    last_chunk = ''
+
+                # Unfinished server message
+                if line[-1] != '\n' and line[-2] != '\r':
+                    last_chunk = line
 
                 if re.search(" PRIVMSG ", line):
                     self._on_privmsg(line)
