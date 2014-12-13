@@ -2294,21 +2294,21 @@ class Risc():
             if not res:
                 continue
 
+            # Split the buffer into lines, way more accurate, since the IRC protocol uses crlf separator
             lines = res.split("\r\n")
 
             if last_chunk:
                 lines[0] = last_chunk + lines[0]
                 last_chunk = ''
 
-            # Split the buffer into lines, way more accurate, since the IRC protocol uses crlf separator
             for line in lines:
                 if not line:
                     continue
 
                 # Unfinished server message
-                if res[-1] != '\n' and res[-2] != '\r' and not last_chunk:
+                if res[-1] != '\n' and res[-2] != '\r' and not last_chunk and line == lines[-1]:
                     last_chunk = lines[-1]
-                    break
+                    continue
 
                 if debug_mode:
                     print line
