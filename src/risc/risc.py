@@ -2308,6 +2308,7 @@ class Risc():
                 # Unfinished server message
                 if res[-1] != '\n' and res[-2] != '\r' and not last_chunk:
                     last_chunk = lines[-1]
+                    continue
 
                 if debug_mode:
                     print line
