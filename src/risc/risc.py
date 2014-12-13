@@ -2305,12 +2305,12 @@ class Risc():
                 if not line:
                     continue
 
-                if debug_mode:
-                    print line
-
                 # Unfinished server message
                 if res[-1] != '\n' and res[-2] != '\r' and not last_chunk:
                     last_chunk = lines[-1]
+
+                if debug_mode:
+                    print line
 
                 if re.search(" PRIVMSG ", line):
                     self._on_privmsg(line)
