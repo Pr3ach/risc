@@ -463,7 +463,7 @@ class Risc():
         for cmd in CMDS_list:
             HELP += self.cmd_prefix+cmd+', '
         HELP = HELP[:-2]
-        HELP += ". Type "+self.cmd_prefix+"help <cmd> for more info. Report bugs/suggestions at pr3acher777h@gmail.com."
+        HELP += ". Type "+self.cmd_prefix+"help <cmd> for more info."
         return None
 
     def get_sv_aliases(self):
