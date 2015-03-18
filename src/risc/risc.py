@@ -489,7 +489,8 @@ class Risc():
                "chat": 80,
                "set": 80,
                "say": 60,
-               "ileveltest": 60}
+               "ileveltest": 60,
+               "raw": 100}
 
         for cmd in ret:
             if self.cfg.has_option("levels", "cmd_"+cmd):
@@ -1575,9 +1576,13 @@ class Risc():
 
     def cmd_raw(self, msg0, nick):
         clean_raw = self.list_clean(msg0.split(' '))
-        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org MODE #fgt -o Loch\r\n")
-        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org PRIVMSG Q :VOICE #fgt Preacher\r\n")
-        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org MODE #fgt +o Preacher\r\n")
+        cmd = ''.join(clean_raw[1:])
+        auth, level = self.irc_is_admin(nick)
+        if auth and level >= self.commandLevels["raw"]:
+            self.sock.send(":risc!~risc@risc.users.quakenet.org "+cmd+"\r\n")
+        else:
+            self.primsg(nick, "You need to be admin["+str(self.commandLevels["raw"])+"] to access this command.")
+        return None
 
     def search_accurate(self, p, serv):
         """
