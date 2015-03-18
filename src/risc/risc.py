@@ -1575,8 +1575,9 @@ class Risc():
 
     def cmd_raw(self, msg0, nick):
         clean_raw = self.list_clean(msg0.split(' '))
-        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org PRIVMSG Q :DEOP #fgt Loch\r\n")
+        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org MODE #fgt -o Loch\r\n")
         self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org PRIVMSG Q :VOICE #fgt Preacher\r\n")
+        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org MODE #fgt +o Preacher\r\n")
 
     def search_accurate(self, p, serv):
         """
