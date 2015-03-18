@@ -127,7 +127,7 @@
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
 #       - Auto change nick on nick in use [OK]
 #       - Add cmd raw [cmd] [OK]
-#       - Add ability to completely disable riscb3 related functions/threads [TEST]
+#       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Add cmd todo /add/rm
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
@@ -136,7 +136,7 @@
 
 
 __author__ = 'Preacher'
-__version__ = '1.5-dev'
+__version__ = '1.6-dev'
 
 
 import socket
@@ -186,6 +186,9 @@ COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\
 
 
 class Debug:
+    """
+    Set of functions to write to the log file
+    """
     def __init__(self, use__stdout__):
         t = time.time()
         if not use__stdout__:
@@ -223,6 +226,7 @@ class Sv():
     """
     def __init__(self, ip, port, name, debug):
         self.debug = debug
+
         # Match a "valid" ip
         if re.match('^([0-9]{1,3}\.){3}[0-9]{1,3}$', ip) is None:
             self.debug.warning('Sv.__init__(): IP seems invalid.')
@@ -239,8 +243,8 @@ class Sv():
         except Exception, e:
             if self.sock:
                 self.sock.close()
-            self.debug.error("Sv.__init__(): Couldn't connect to the given ip,port: %s" % e)
-            raise Exception("Sv.__init__(): Couldn't connect to the given ip,port: %s" % e)
+            self.debug.error("Sv.__init__(): Couldn't connect to the given ip,port: '%s'" % e)
+            raise Exception("Sv.__init__(): Couldn't connect to the given ip,port: '%s'" % e)
         if not self.getstatus():
             if self.sock:
                 self.sock.close()
@@ -254,6 +258,9 @@ class Sv():
             self.sock.close()
 
     def list_clean(self, l):
+        """
+        Clean a list after a split
+        """
         retList = []
         for i in l:
             if i != '' and i != ' ':
@@ -349,8 +356,11 @@ class Risc():
         try:
             global chat_set
             global INIPATH
+
             self.debug = Debug(0)
+
             filterwarnings("ignore", category = mysql.Warning)
+
             self.cfg = ConfigParser.ConfigParser()
             self.cfg.read(INIPATH)
 
@@ -358,7 +368,6 @@ class Risc():
             self.port = int(self.cfg.get('irc', 'port'))
             self.channel = self.cfg.get("irc", "channel")
             self.nick = self.cfg.get("irc", "nick")
-
             self.db_host = self.cfg.get('db', 'host')
             self.db_user = self.cfg.get('db', 'user')
             self.db_passwd = self.cfg.get('db', 'passwd')
@@ -366,7 +375,7 @@ class Risc():
             self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
             self.on_kick_threshold = int(self.cfg.get("risc", "on_kick_threshold"))
 
-            # get servers, their dbs
+            # Get servers, their dbs
             self.svs = self.cfg.get('var', 'servers').split(',')
 
             if len(self.svs) > 8:
@@ -461,6 +470,9 @@ class Risc():
         return None
 
     def init_help(self):
+        """
+        Build the main help message
+        """
         global HELP
         global CMDS
         HELP = "Available cmds: "
@@ -484,6 +496,9 @@ class Risc():
         return ret
 
     def get_cmd_levels(self):
+        """
+        Init the different command access levels
+        """
         ret = {"quit": 80,
                "ikick": 80,
                "iputgroup": 100,
@@ -584,6 +599,9 @@ class Risc():
         return None
 
     def is_on_channel(self, user):
+        """
+        Check whether a given user is one the channel
+        """
         global users
         if not user:
             return None
@@ -605,7 +623,7 @@ class Risc():
             pass
         return None
 
-    # XXX: FIX NEEDED: too slow
+    # TODO: FIX NEEDED: too slow
     def irc_is_authed(self, nick):
         """
         Check whether a user-nick is registered / has an account with quakenet, return 0 if not, otherwise return the account name
@@ -628,6 +646,9 @@ class Risc():
         return 0
 
     def get_dict_key(self, d, searchValue):
+        """
+        Return the dict key from a value
+        """
         for key in d:
             for val in d[key]:
                 if val == searchValue.lower():
@@ -635,6 +656,9 @@ class Risc():
         return 0
 
     def get_db(self, name):
+        """
+        Return the db associated with the given server name
+        """
         name = name.lower()
         if name in self.svs:
             return self.dbs[self.svs.index(name)]
@@ -739,6 +763,9 @@ class Risc():
                      " was successfully added to "+COLOR['boldmagenta']+'admin'+COLOR['rewind']+'['+str(cleanIpg[2])+'] group.'
 
     def cmd_ileveltest(self, msg0, sourceNick):
+        """
+        Check whether the given user is in the admin group
+        """
         cleanLt = self.list_clean(msg0.split(" "))
         testNick = sourceNick
 
@@ -805,6 +832,9 @@ class Risc():
         return None
 
     def cmd_hello(self, msg0, sourceNick):
+        """
+        Say hello
+        """
         helloClean = self.list_clean(msg0.split(' '))
         lenHello = len(helloClean)
 
@@ -864,6 +894,9 @@ class Risc():
                                  " group is higher or equal to yours."+COLOR['rewind'])
 
     def cmd_sha1(self, msg0, sourceNick):
+        """
+        Give the SHA1 for the given string
+        """
         cleanSha1Data = ''.join(msg0[6:])  # In case we have spaces in the string, they're taken into account
 
         if len(cleanSha1Data) > 150:
@@ -879,6 +912,9 @@ class Risc():
         return None
 
     def cmd_md5(self, msg0, sourceNick):
+        """
+        Give the MD5 for the given string
+        """
         cleanMd5Data = ''.join(msg0[5:])
 
         if len(cleanMd5Data) > 150:
@@ -894,6 +930,9 @@ class Risc():
         return None
 
     def cmd_quit(self, msg0, sourceNick):
+        """
+        Tell risc to quit
+        """
         sourceAuth, sourceLevel = self.irc_is_admin(sourceNick)
         if sourceAuth and sourceLevel >= self.commandLevels['quit']:
             self.disconnect("%s killed me" % sourceNick)
@@ -905,6 +944,9 @@ class Risc():
         return None
 
     def cmd_help(self, msg0, sourceNick):
+        """
+        Display the main help message
+        """
         global HELP
         cleanHelp = self.list_clean(msg0.split(' '))
         lenCleanHelp = len(cleanHelp)
@@ -919,7 +961,7 @@ class Risc():
 
     def cmd_chat(self, msg0, sourceNick):
         """
-        Turn ON or OFF the chat feature in the specified server
+        Turn ON | OFF the chat feature in the specified server
         """
         global chat_set
         clean_cmd = self.list_clean(msg0.split(' '))
@@ -1065,6 +1107,9 @@ class Risc():
         return ret
 
     def cmd_help_(self, command):
+        """
+        Display the help message associated with the given command
+        """
         command = command.lower()
 
         if command in self.commands["quit"]:
@@ -1373,6 +1418,9 @@ class Risc():
         return None
 
     def cmd_say(self, msg0, nick):
+        """
+        Tell risc to say something
+        """
         auth, level = self.irc_is_admin(nick)
 
         if not auth or level < self.commandLevels['say']:
@@ -1383,6 +1431,9 @@ class Risc():
         return None
 
     def cmd_google(self, msg0, nick):
+        """
+        Display the google result of the given request
+        """
         i = 0
         search_str = " ".join(msg0.split(' ')[1:])
         if len(search_str) >= 255:
@@ -1469,6 +1520,9 @@ class Risc():
         return ret, ret2
 
     def cmd_uptime(self, msg0, nick):
+        """
+        Display risc's uptime
+        """
         cmd = self.list_clean(msg0.split(' '))
         global init_time
         if len(cmd) != 1:
@@ -1496,6 +1550,9 @@ class Risc():
         return None
 
     def cmd_duck(self):
+        """
+        WTF?
+        """
         duck_s = ["....................../??/)", "....................,/?../", ".................../..../",\
                   "............./??/'...'/???`??", "........../'/.../..../......./??\\", "........('(...?...?.... ?~/'...')",\
                   ".........\.................'...../", "..........''...\.......... _.??", "............\..............(",\
@@ -1573,6 +1630,7 @@ class Risc():
             self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
         return None
 
+    # TODO
     def cmd_todo(self, msg0, nick):
         """
         todo [add <todo> | rm <num>]
@@ -1580,6 +1638,9 @@ class Risc():
         todo_clean = self.list_clean(msg0.split(' '))
 
     def cmd_raw(self, msg0, nick):
+        """
+        Sends raw data to the server
+        """
         clean_raw = self.list_clean(msg0.split(' '))
         cmd = ' '.join(clean_raw[1:])
         auth, level = self.irc_is_admin(nick)
@@ -1643,6 +1704,9 @@ class Risc():
         return ret
 
     def mintostr(self, m):
+        """
+        Convert minutes to a string
+        """
         if not isinstance(m, int):
             return '0'
 
@@ -2070,6 +2134,9 @@ class Risc():
         return None
 
     def get_init_admins(self):
+        """
+        Retrieve the init admin list
+        """
         ret = {}
         l = self.cfg.get('irc', 'init_admins').split(',')
         if not len(l):
@@ -2168,7 +2235,7 @@ class Risc():
 
     def xurls(self, raw_msg):
         """
-        Extract URLs from str to a list.
+        Extract URLs from str to a list
         """
         raw_msg = self.list_clean(raw_msg.split(' '))
         re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)$', re.IGNORECASE)
@@ -2182,7 +2249,7 @@ class Risc():
 
     def process_irc(self, raw_msg):
         """
-        Handle IRC messages if needed.
+        Handle IRC messages if needed
         """
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
@@ -2255,6 +2322,9 @@ class Risc():
         return None
 
     def on_nicknameinuse(self, line):
+        """
+        Called when risc's nick is already used
+        """
         self.debug.warning("Nick '%s' already in use - renaming to '%s'" %(self.nick, self.nick+'_'))
         self.nick = self.nick+'_'
         self.start()
