@@ -126,7 +126,8 @@
 #       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
 #       - Auto change nick on nick in use [OK]
-#       - Add ability to completely disable riscb3 related functions/threads [test]
+#       - Add cmd raw [cmd] [TEST]
+#       - Add ability to completely disable riscb3 related functions/threads [TEST]
 #       - Add cmd todo /add/rm
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
@@ -1075,6 +1076,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
                          ". Return the last time a player was seen in the server set."
 
+        elif command in self.commands["raw"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" [cmd]: Aliases: "+', '.join(self.commands["raw"])+\
+                         ". Sends [cmd] data to the irc server."
+
         elif command in self.commands["version"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["version"])+\
                          ". Return the bot version."
@@ -1581,7 +1586,7 @@ class Risc():
         if auth and level >= self.commandLevels["raw"]:
             self.sock.send(":risc!~risc@risc.users.quakenet.org "+cmd+"\r\n")
         else:
-            self.primsg(nick, "You need to be admin["+str(self.commandLevels["raw"])+"] to access this command.")
+            self.privmsg(nick, "You need to be admin["+str(self.commandLevels["raw"])+"] to access this command.")
         return None
 
     def search_accurate(self, p, serv):
