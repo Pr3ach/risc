@@ -128,7 +128,7 @@
 #       - Auto change nick on nick in use [OK]
 #       - Add cmd raw [cmd] [OK]
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
-#       - Don't stop on Exception in cmd_search [TEST]
+#       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
@@ -601,7 +601,7 @@ class Risc():
 
     def is_on_channel(self, user):
         """
-        Check whether a given user is one the channel
+        Check whether a given user is on the channel
         """
         global users
         if not user:
