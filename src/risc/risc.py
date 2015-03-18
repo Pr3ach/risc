@@ -128,6 +128,7 @@
 #       - Auto change nick on nick in use [OK]
 #       - Add cmd raw [cmd] [OK]
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
+#       - Don't stop on Exception in cmd_search [TEST]
 #       - Add cmd todo /add/rm
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
@@ -1327,7 +1328,7 @@ class Risc():
             try:
                 sv = Sv(fullIp[0], int(fullIp[1]), '', self.debug)
             except Exception, e:
-                return COLOR['boldred']+"Exception for server '"+server+"' %s" % e +COLOR['rewind']
+                continue
             if sv.clientsList != -1:
                 clients.setdefault(server, sv.clientsList)
                 pings.setdefault(server, sv.clientsPings)
