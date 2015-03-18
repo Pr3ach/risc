@@ -1767,7 +1767,7 @@ class Risc():
             self.cmd_duck()
 
         elif msg[0].lower().split(' ')[0] in self.commands["raw"]:
-            self.cmd_raw()
+            self.cmd_raw(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
