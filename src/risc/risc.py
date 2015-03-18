@@ -126,12 +126,10 @@
 #       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
 #       - Auto change nick on nick in use [OK]
-#       - Add cmd todo
+#       - Add ability to completely disable riscb3 related functions/threads [test]
+#       - Add cmd todo /add/rm
 #       - Add ability to "sv add <name> <ip>"
-#       - Add ability to completely disable riscb3 related functions/threads
-#       - Write safer kick function (not cmd)
 #       - Add auto join back when timeout
-#       - Fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - Add/fix commands to set/get Cvars
 
@@ -161,7 +159,7 @@ from irc_rpl import *
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill,raw"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -387,6 +385,7 @@ class Risc():
 
             self.cmd_prefix = self.cfg.get('risc', 'cmd_prefix')
             self.cmd_prefix_global = self.cfg.get('risc', 'cmd_prefix_global')
+            self.use_riscb3 = int(self.cfg.get('risc', 'use_riscb3'))
 
             self.init_help()
 
@@ -426,7 +425,8 @@ class Risc():
                          "roulette": ["roulette", 'r'],
                          "duck": ["duck"],
                          "ileveltest": ['ileveltest', 'ilt'],
-                         "kill": ['kill', 'k']}
+                         "kill": ['kill', 'k'],
+                         "raw": ["raw"]}
 
         # Valid argument for each commands
         tmp = ["all"]
@@ -1484,7 +1484,7 @@ class Risc():
         if cur == roulette_shot:
             self.privmsg(self.channel,COLOR['boldred']+"*BANG*"+COLOR['rewind']+" -"+COLOR['boldred']+' '+nick+" is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
-            self.sock.send('KICK '+self.channel+' '+nick+' :'+"fgtmuch"+'\r\n') # FIXME: write a safe kick function ...
+            self.sock.send('KICK '+self.channel+' '+nick+' :'+"got rekt"+'\r\n')
         else:
             self.privmsg(self.channel, COLOR['boldgreen']+"+click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
         return None
@@ -1566,6 +1566,16 @@ class Risc():
         else:
             self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
         return None
+
+    def cmd_todo(self, msg0, nick):
+        """
+        todo [add <todo> | rm <num>]
+        """
+        todo_clean = self.list_clean(msg0.split(' '))
+
+    def cmd_raw(self, msg0, nick):
+        clean_raw = self.list_clean(msg0.split(' '))
+        self.sock.send(":Preacher!~rpi@Pr3acher.users.quakenet.org PRIVMSG #fgt :BLAH\r\n")
 
     def search_accurate(self, p, serv):
         """
@@ -1755,6 +1765,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["duck"]:
             self.cmd_duck()
+
+        elif msg[0].lower().split(' ')[0] in self.commands["raw"]:
+            self.cmd_raw()
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
@@ -2038,7 +2051,7 @@ class Risc():
         self.debug.info("[+] Setting and starting event callbacks")
 
         # game_watcher event callback
-        if self.sv_running[0] != '':
+        if self.use_riscb3:
             th = threading.Thread(None, self.game_watcher, None, (), None)
             th.daemon = True  # So that the prog doesn't wait for the threads to exit
             th.start()
