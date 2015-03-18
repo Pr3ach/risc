@@ -1576,7 +1576,7 @@ class Risc():
 
     def cmd_raw(self, msg0, nick):
         clean_raw = self.list_clean(msg0.split(' '))
-        cmd = ''.join(clean_raw[1:])
+        cmd = ' '.join(clean_raw[1:])
         auth, level = self.irc_is_admin(nick)
         if auth and level >= self.commandLevels["raw"]:
             self.sock.send(":risc!~risc@risc.users.quakenet.org "+cmd+"\r\n")
