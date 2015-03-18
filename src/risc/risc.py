@@ -126,7 +126,7 @@
 #       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
 #       - Auto change nick on nick in use [OK]
-#       - Add cmd raw [cmd] [TEST]
+#       - Add cmd raw [cmd] [OK]
 #       - Add ability to completely disable riscb3 related functions/threads [TEST]
 #       - Add cmd todo /add/rm
 #       - Add ability to "sv add <name> <ip>"
@@ -1078,7 +1078,7 @@ class Risc():
 
         elif command in self.commands["raw"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [cmd]: Aliases: "+', '.join(self.commands["raw"])+\
-                         ". Sends [cmd] data to the irc server."
+                         ". Sends [cmd] data to the irc server. You need to be admin["+str(self.commandLevels["raw"])+"] to access this command."
 
         elif command in self.commands["version"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["version"])+\
