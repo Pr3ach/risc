@@ -1,7 +1,7 @@
 # CHANGELOG
 #
 #       - init
-# ------- v1.0 - Pr3acher - 01/08/2014
+# ------- v1.0 - Preacher - 01/08/2014
 #       - fix color for '/' in evt_game_map_change [OK]
 #       - added event notification for kick / ban / tban / map change [OK]
 #       - bug fix: get_last_calladmin [OK]
@@ -9,16 +9,16 @@
 #       - minor bug fixes [OK]
 #       - added chat ability (game to IRC) [OK]
 #       - set b3 name in config file [OK]
-# ------- v1.1 - Pr3acher - 03/08/2014
+# ------- v1.1 - Preacher - 03/08/2014
 #       - Disable calladmin cmd when client count is < ini_var [OK]
-# ------- v1.2 - Pr3acher - 08/12/2014
+# ------- v1.2 - Preacher - 08/12/2014
 #       - Slightly updated for risc v1.4.4 [OK]
-# ------- v1.2.1 - Pr3acher - 08/18/2014
+# ------- v1.2.1 - Preacher - 08/18/2014
 #       - Fixed bug in on_map_change() [OK]
-# ------- v1.2.2 - Pr3acher - 09/07/2014
+# ------- v1.2.2 - Preacher - 09/07/2014
 #       - handle wrong settings using defaults [OK]
 #       - Updated for risc 1.5 [OK]
-# ------- v1.3 - Pr3acher - 12/04/2014
+# ------- v1.3 - Preacher - 12/04/2014
 #       - add possibility to set/get Cvar
 
 import b3
@@ -28,7 +28,7 @@ import time
 import MySQLdb as mysql
 import threading
 
-__author__ = 'Pr3acher'
+__author__ = 'Preacher'
 __version__ = '1.3'
 
 class Riscb3Plugin(b3.plugin.Plugin):

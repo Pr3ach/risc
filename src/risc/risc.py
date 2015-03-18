@@ -14,7 +14,7 @@
 #       - Change lastposts to lastthreads / lt [OK]
 #       - Add bold colors [OK]
 #       - Add thread author [OK]
-# ------- 1.1 - Pr3acher
+# ------- 1.1 - Preacher
 #       - Use UDP instead of qstat stuff [OK]
 #       - Add !search <player> [OK]
 #       - Add !disasm [OK]
@@ -22,7 +22,7 @@
 #       - Add <server> optional arg to !search && add limit of user output to !search [OK]
 #       - Make the distinction between players & bots [OK]
 #       - Fix server auth stuff [OK]
-# ------- 1.2 - Pr3acher
+# ------- 1.2 - Preacher
 #       - Add !ikick (in irc kick) [OK]
 #       - !lt now returns a link to the last post in the thread [OK]
 #       - Write irc_is_admin(): returns auth + level from *nick* [OK]
@@ -40,7 +40,7 @@
 #       - Add support for in-game calladmin cmd [OK]
 #       - Removed disasm [OK]
 #       - Add threading support for game events [OK]
-# ------- 1.3 - Pr3acher
+# ------- 1.3 - Preacher
 #       - Minor change in colors [OK]
 #       - Added chat ability (IRC to game, other side implemented in riscb3 plugin) [OK]
 #       - q3_to_IRC_color() [OK]
@@ -61,25 +61,25 @@
 #       - Fix (again) crash for unicode chars [OK]
 #       - Temp. disabled cmds until fixed: st, players, search [OK]
 #       - Typo fixed for help cmds [OK]
-# ------- 1.4 - Pr3acher - 08/18/2014
+# ------- 1.4 - Preacher - 08/18/2014
 #       - Removed bot cred. from risc.ini [OK]
 #       - Make sh added [OK]
-# ------- 1.4.1 - Pr3acher - 08/19/2014
+# ------- 1.4.1 - Preacher - 08/19/2014
 #       - Fixed 'make-nix.sh' [OK]
-# ------- 1.4.2 - Pr3acher - 08/20/2014
+# ------- 1.4.2 - Preacher - 08/20/2014
 #       - Fixed major bug in Sv [OK]
 #       - Fix: use only one db & table for risc_irc_admins [OK]
 #       - Bot auth credentials in risc.ini [OK]
 #       - Remove !lt cmd from help <cmd> cmd [OK]
 #       - Section in risc.ini for server alias [OK]
-# ------- 1.4.3 - Pr3acher - 09/04/2014
+# ------- 1.4.3 - Preacher - 09/04/2014
 #       - Add cmd levels to ini conf file [OK]
 #       - Add admin init list to ini conf file [OK]
 #       - Add ability to use custom cmd prefixes [OK]
 #       - Allow chat in one server at a time only [OK]
 #       - Dynamic help msg [OK]
 #       - Update README file [OK]
-# ------- 1.4.4 - Pr3acher - 09/07/2014
+# ------- 1.4.4 - Preacher - 09/07/2014
 #       - Fix minor dbg code [OK]
 #       - Fixed Sv failling -> crash [OK]
 #       - Added cmd 'say' for admins [OK]
@@ -93,7 +93,7 @@
 #       - Add cmd 'uptime' [OK]
 #       - Anti-spam [OK]
 #       - Add cmd 'version' [OK]
-# ------- 1.4.5 - Pr3acher - 10/12/2014
+# ------- 1.4.5 - Preacher - 10/12/2014
 #       - Added server hostname for cmd 'server' [OK]
 #       - Added player list to cmd 'server' [OK]
 #       - Info on link posting [OK]
@@ -115,7 +115,7 @@
 #       - Removed some useless libs [OK]
 #       - Added cmd_duck [OK]
 #       - Fix 'search <cl> <sv>' when <sv> is down -> crash [OK]
-# ------- 1.5 - Pr3acher - 12/04/2014
+# ------- 1.5 - Preacher - 12/04/2014
 #       - Slightly updated russian roulette game (thx @MrYay) [OK]
 #       - Fix for russian roulette [OK]
 #       - Fix bug with some player colored names in cmd_players [OK]
@@ -126,13 +126,17 @@
 #       - Improved server-client data processing [OK]
 #       - Keep an irc userlist & update it as users join/leave/nick/kick [OK]
 #       - Auto change nick on nick in use [OK]
+#       - Add cmd todo
+#       - Add ability to "sv add <name> <ip>"
+#       - Add ability to completely disable riscb3 related functions/threads
+#       - Write safer kick function (not cmd)
 #       - Add auto join back when timeout
 #       - Fix/test the whole 'set' cmd
 #       - Add cmd: playerinfo/pi
 #       - Add/fix commands to set/get Cvars
 
 
-__author__ = 'Pr3acher'
+__author__ = 'Preacher'
 __version__ = '1.5-dev'
 
 
