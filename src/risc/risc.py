@@ -2509,31 +2509,31 @@ class Risc():
                 if re.search(" PRIVMSG ", line):
                     self._on_privmsg(line)
 
-                # Reply back to the server
-            elif re.search("^PING :", line):
-                self._send("PONG :" + line.split(':')[1])
+                    # Reply back to the server
+                elif re.search("^PING :", line):
+                    self._send("PONG :" + line.split(':')[1])
 
-            elif re.search(" KICK ", line):
-                self.on_kick(line)
+                elif re.search(" KICK ", line):
+                    self.on_kick(line)
 
-            elif re.search(" PART ", line):
-                self.on_part(line)
+                elif re.search(" PART ", line):
+                    self.on_part(line)
 
-            elif re.search(" JOIN ", line):
-                self.on_join(line)
+                elif re.search(" JOIN ", line):
+                    self.on_join(line)
 
-            elif re.search(" NICK ", line):
-                self.on_nick(line)
+                elif re.search(" NICK ", line):
+                    self.on_nick(line)
 
-                # Indicate we're connected, we can now join the channel
-            elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
-                self.on_welcome()
+                    # Indicate we're connected, we can now join the channel
+                elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
+                    self.on_welcome()
 
-            elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
-                self.on_namereply(line)
+                elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
+                    self.on_namereply(line)
 
-            elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
-                self.on_nicknameinuse(line)
+                elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
+                    self.on_nicknameinuse(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
