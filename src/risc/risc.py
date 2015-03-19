@@ -1654,9 +1654,9 @@ class Risc():
             return None
 
         if todo_clean[1].lower() == "add":
-        if len(todo_clean) < 3:
-            self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
-            return None
+            if len(todo_clean) < 3:
+                self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+                return None
 
             auth, level = self.irc_is_admin(nick)
 
