@@ -129,7 +129,7 @@
 #       - Add cmd raw [cmd] [OK]
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
-#       - Add cmd todo /add/rm [TEST]
+#       - Add cmd todo /add/rm/list [TEST]
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
 #       - Add cmd: playerinfo/pi
@@ -1695,7 +1695,6 @@ class Risc():
                 con.rollback()
                 con.close()
                 return None
-
         elif todo_clean[1].lower() == "rm":
             if len(todo_clean) != 3:
                 self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
@@ -1707,17 +1706,21 @@ class Risc():
                 self.privmsg(nick, "You need to be admin["+str(self.commandLevels["todo_rm"])+"] to access this command.")
                 return None
 
-            if not self.repr_int(todo_clean[2]):
+            rm_id = todo_clean[2]
+
+            if not self.repr_int(rm_id) and rm_id != '*':
                 self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
                 return None
-
-            rm_id = int(todo_clean[2])
 
             try:
                 con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
                 c = con.cursor()
 
-                c.execute("""DELETE FROM todo WHERE id = %d""" % (rm_id))
+                if rm_id != '*':
+                    c.execute("""DELETE FROM todo WHERE id = %d""" % (int(rm_id)))
+                else:
+                    c.execute("""DELETE FROM todo""")
+
                 con.commit()
                 con.close
             except:
@@ -1725,9 +1728,35 @@ class Risc():
                 con.rollback()
                 con.close()
                 return None
+        elif todo_clean[1].lower() == "list":
+            if len(todo_clean) != 3:
+                self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+                return None
+
+            try:
+                con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+                c = con.cursor()
+
+                c.execute("""SELECT id, todo, author FROM todo LIMIT 10""")
+                res = c.fetchall()
+                con.close()
+            except:
+                self.privmsg(nick, 'Error during DB operations - Trying db rollback ...')
+                con.rollback()
+                con.close()
+                return None
+
+            if not c.rowcount:
+                self.privmsg(nick, "Todo list is empty.")
+                return None
+
+            for record in res:
+                self.privmsg(nick, COLOR["boldgreen"]+'#'+str(record[0])+COLOR["rewind"]+' '+
+                            record[1]+" (by "+COLOR["boldgreen"]+record[2]+COLOR["rewind"]+')')
         else:
             self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
 
+        self.privmsg(nick, "Operation successful")
         return None
 
     def cmd_raw(self, msg0, nick):
