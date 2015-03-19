@@ -508,7 +508,9 @@ class Risc():
                "set": 80,
                "say": 60,
                "ileveltest": 60,
-               "raw": 100}
+               "raw": 100,
+               "todo_add": 80,
+               "todo_rm": 100}
 
         for cmd in ret:
             if self.cfg.has_option("levels", "cmd_"+cmd):
@@ -1647,15 +1649,15 @@ class Risc():
         todo_clean = self.list_clean(msg0.split(' '))
         t = int(time.time())
 
+        if len(todo_clean) < 3:
+            self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+            return None
+
         if todo_clean[1].lower() == "add":
             auth, level = self.irc_is_admin(nick)
 
             if not auth or level < self.commandLevels["todo_add"]:
                 self.privmsg(nick, "You need to be admin["+str(self.commandLevels["todo_add"])+"] to access this command.")
-                return None
-
-            if len(todo_clean) < 3:
-                self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
                 return None
 
             todo_str = ' '.join(todo_clean[3:]).encode("string_escape")
@@ -1693,6 +1695,12 @@ class Risc():
                 return None
 
         elif todo_clean[1].lower() == "rm":
+            if len(todo_clean) != 3:
+                self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+                return None
+
+            auth, level = self.irc_is_admin(nick)
+
             if not auth or level < self.commandLevels["todo_rm"]:
                 self.privmsg(nick, "You need to be admin["+str(self.commandLevels["todo_rm"])+"] to access this command.")
                 return None
