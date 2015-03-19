@@ -523,7 +523,7 @@ class Risc():
         if not s:
             return 0
         for ch in s:
-            if ch < 0x30 or ch > 0x39:
+            if ord(ch) < 0x30 or ord(ch) > 0x39:
                 return 0
         return 1
 
@@ -1660,11 +1660,11 @@ class Risc():
                 self.privmsg(nick, "You need to be admin["+str(self.commandLevels["todo_add"])+"] to access this command.")
                 return None
 
-            todo_str = ' '.join(todo_clean[3:]).encode("string_escape")
+            todo_str = ' '.join(todo_clean[2:]).encode("string_escape")
             author = nick.encode("string_escape")
 
-            if len(todo_str) > 255:
-                self.privmsg(nick, 'Todo string too large (Max. 255 chars).')
+            if len(todo_str) > 255 or len(author) > 31:
+                self.privmsg(nick, 'Input too large.')
                 return None
 
             try:
@@ -1672,6 +1672,8 @@ class Risc():
                 c = con.cursor()
 
                 c.execute("""SELECT * FROM todo WHERE todo = '%s'""" % (todo_str))
+
+                self.debug.debug("%s"  % c.fetchall())
 
                 if len(c.fetchall()):
                     self.privmsg(nick, 'Todo already exists.')
