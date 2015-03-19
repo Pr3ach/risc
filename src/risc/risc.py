@@ -161,7 +161,7 @@ from irc_rpl import *
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill,raw"
+CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill,raw,todo"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -437,7 +437,8 @@ class Risc():
                          "duck": ["duck"],
                          "ileveltest": ['ileveltest', 'ilt'],
                          "kill": ['kill', 'k'],
-                         "raw": ["raw"]}
+                         "raw": ["raw"],
+                         "todo": ["todo"]}
 
         # Valid argument for each commands
         tmp = ["all"]
@@ -1926,6 +1927,9 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["raw"]:
             self.cmd_raw(msg[0], sourceNick)
+
+        elif msg[0].lower().split(' ')[0] in self.commands["todo"]:
+            self.cmd_todo(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
