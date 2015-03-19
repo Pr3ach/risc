@@ -1673,7 +1673,7 @@ class Risc():
 
                 c.execute("""SELECT * FROM todo WHERE todo = '%s'""" % (todo_str))
 
-                self.debug.debug("%s"  % str(c.fetchall()))
+                self.debug.debug("%s len = %d"  % (str(c.fetchall()), len(c.fetchall())))
 
                 if len(c.fetchall()):
                     self.privmsg(nick, 'Todo already exists.')
