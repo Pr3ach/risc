@@ -129,7 +129,7 @@
 #       - Add cmd raw [cmd] [OK]
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
-#       - Add cmd todo /add/rm
+#       - Add cmd todo /add/rm [TEST]
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
 #       - Add cmd: playerinfo/pi
@@ -457,7 +457,7 @@ class Risc():
         """
         Launch the bot: connect, start event dispatcher, join
         """
-        self.init_irc_admins()
+        self.init_db()
         self.connect()
         self.debug.info('[+] Connected on '+self.host+' port '+str(self.port))
         self.set_evt_callbacks()
@@ -515,6 +515,14 @@ class Risc():
                 if lvl in self.args["iputgroup"] or lvl == 100:
                     ret[cmd] = lvl
         return ret
+
+    def repr_int(self, s):
+        if not s:
+            return 0
+        for ch in s:
+            if ch < 0x30 or ch > 0x39:
+                return 0
+        return 1
 
     def on_welcome(self):
         """
@@ -1631,12 +1639,85 @@ class Risc():
             self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help kill.')
         return None
 
-    # TODO
     def cmd_todo(self, msg0, nick):
         """
         todo [add <todo> | rm <num>]
         """
         todo_clean = self.list_clean(msg0.split(' '))
+        t = int(time.time())
+
+        if todo_clean[1].lower() == "add":
+            auth, level = self.irc_is_admin(nick)
+
+            if not auth or level < self.commandLevels["todo_add"]:
+                self.privmsg(nick, "You need to be admin["+str(self.commandLevels["todo_add"])+"] to access this command.")
+                return None
+
+            if len(todo_clean) < 3:
+                self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+                return None
+
+            todo_str = ' '.join(todo_clean[3:]).encode("string_escape")
+            author = nick.encode("string_escape")
+
+            if len(todo_str) > 255:
+                self.privmsg(nick, 'Todo string too large (Max. 255 chars).')
+                return None
+
+            try:
+                con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+                c = con.cursor()
+
+                c.execute("""SELECT * FROM todo WHERE todo = '%s'""" % (todo_str))
+
+                if len(c.fetchall()):
+                    self.privmsg(nick, 'Todo already exists.')
+                    con.close()
+                    return None
+
+                c.execute("""SELECT COUNT(*) FROM todo""")
+
+                if c.fetchall()[0][0] > 10:
+                    self.privmsg(nick, 'Too many todo (Max. 10).')
+                    con.close()
+                    return None
+
+                c.execute("""INSERT INTO todo(author, time, todo) VALUES('%s', '%d', '%s')""" % (author, t, todo_str))
+                con.commit()
+                con.close()
+            except:
+                self.privmsg(nick, 'Error during DB operations - Trying db rollback ...')
+                con.rollback()
+                con.close()
+                return None
+
+        elif todo_clean[1].lower() == "rm":
+            if not auth or level < self.commandLevels["todo_rm"]:
+                self.privmsg(nick, "You need to be admin["+str(self.commandLevels["todo_rm"])+"] to access this command.")
+                return None
+
+            if not self.repr_int(todo_clean[2]):
+                self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+                return None
+
+            rm_id = int(todo_clean[2])
+
+            try:
+                con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+                c = con.cursor()
+
+                c.execute("""DELETE FROM todo WHERE id = %d""" % (rm_id))
+                con.commit()
+                con.close
+            except:
+                self.privmsg(nick, 'Error during DB operations - Trying db rollback ...')
+                con.rollback()
+                con.close()
+                return None
+        else:
+            self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
+
+        return None
 
     def cmd_raw(self, msg0, nick):
         """
@@ -1935,9 +2016,9 @@ class Risc():
         reason = data_list[1]
 
         self.privmsg(self.channel, COLOR['boldwhite'] + '[' + COLOR['rewind'] + COLOR['boldgreen']
-                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + COLOR['boldblue']
-                     + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue']
-                     + reason + COLOR['rewind'])
+                + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + COLOR['boldblue']
+                + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue']
+                + reason + COLOR['rewind'])
         return None
 
     # <map_name> <cl_count> <max_cl_count>
@@ -1951,9 +2032,9 @@ class Risc():
         max_cl_count = data_list[2]
 
         self.privmsg(self.channel, COLOR['boldwhite'] + '['+COLOR['rewind'] + COLOR['boldgreen']
-                     + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + ' map: '
-                     + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue']
-                     + ' ' + cl_count + COLOR['rewind'] + '/' + str(max_cl_count))
+                + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + ' map: '
+                + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue']
+                + ' ' + cl_count + COLOR['rewind'] + '/' + str(max_cl_count))
         return None
 
     # <admin> <admin_id> <client> <client_id> <reason=''>
@@ -1973,9 +2054,9 @@ class Risc():
             reason = COLOR['boldblue']+data_list[4]+COLOR['rewind']
 
         self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] + sv
-                    + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind']+COLOR['boldyellow']
-                    +' '+admin+' @' + admin_id + COLOR['rewind'] + ' kicked' + COLOR['boldyellow'] +
-                    ' '+client+' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
+                + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind']+COLOR['boldyellow']
+                +' '+admin+' @' + admin_id + COLOR['rewind'] + ' kicked' + COLOR['boldyellow'] +
+                ' '+client+' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
     # <admin> <admin_id> <client> <client_id> <duration_min> <reason=''>
@@ -1996,9 +2077,9 @@ class Risc():
             reason = COLOR['boldblue']+data_list[5]+COLOR['rewind']
 
         self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']
-                    +COLOR['boldwhite']+']' + COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id
-                    +COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' + client_id
-                    + COLOR['rewind'] + ' for' + duration + ': '+re.sub('\^[0-9]{1}', '', reason))
+                +COLOR['boldwhite']+']' + COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id
+                +COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' + client_id
+                + COLOR['rewind'] + ' for' + duration + ': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
     # <admin> <admin_id> <client> <client_id> <reason=''>
@@ -2018,8 +2099,8 @@ class Risc():
             reason = COLOR['boldblue']+data_list[4]+COLOR['rewind']
 
         self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']+COLOR['boldwhite'] + ']' +
-                     COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id+COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client +
-                     ' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
+                COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id+COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client +
+                ' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
     def q3_to_IRC_color(self, msg):
@@ -2027,13 +2108,13 @@ class Risc():
         Convert a ioq3 colored string into IRC one
         """
         q3_to_IRC_map = {0: COLOR['rewind']+COLOR['boldblack'],
-                         1: COLOR['rewind']+COLOR['boldred'],
-                         2: COLOR['rewind']+COLOR['boldgreen'],
-                         3: COLOR['rewind']+COLOR['boldyellow'],
-                         4: COLOR['rewind']+COLOR['boldblue'],
-                         5: COLOR['rewind']+COLOR['blue'],
-                         6: COLOR['rewind']+COLOR['boldmagenta'],
-                         7: COLOR['rewind']+COLOR['white']}
+                1: COLOR['rewind']+COLOR['boldred'],
+                2: COLOR['rewind']+COLOR['boldgreen'],
+                3: COLOR['rewind']+COLOR['boldyellow'],
+                4: COLOR['rewind']+COLOR['boldblue'],
+                5: COLOR['rewind']+COLOR['blue'],
+                6: COLOR['rewind']+COLOR['boldmagenta'],
+                7: COLOR['rewind']+COLOR['white']}
 
         for cd in range(8):
             msg = re.sub('\^%d' % cd, q3_to_IRC_map[cd], msg)
@@ -2058,8 +2139,8 @@ class Risc():
         msg = data_list[1]
 
         self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] +
-                     sv+COLOR['rewind']+'.'+COLOR['boldblue']+re.sub('\^[0-9]{1}', '', cl)+COLOR['rewind'] +
-                     COLOR['boldwhite']+']: '+COLOR['rewind']+self.q3_to_IRC_color(msg))
+                sv+COLOR['rewind']+'.'+COLOR['boldblue']+re.sub('\^[0-9]{1}', '', cl)+COLOR['rewind'] +
+                COLOR['boldwhite']+']: '+COLOR['rewind']+self.q3_to_IRC_color(msg))
         return None
 
     # Note: using crlf separator on db data
@@ -2078,10 +2159,10 @@ class Risc():
                 con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
                 cur = con.cursor()
                 cur.execute("""CREATE TABLE IF NOT EXISTS %s(ID INT AUTO_INCREMENT PRIMARY KEY,\
-                                                           evt VARCHAR(40) NOT NULL DEFAULT '',\
-                                                           data VARCHAR(255) NOT NULL DEFAULT '',\
-                                                           time BIGINT NOT NULL DEFAULT 0,\
-                                                           processed TINYINT NOT NULL DEFAULT 0)""" % ('risc_' + sv))
+                        evt VARCHAR(40) NOT NULL DEFAULT '',\
+                        data VARCHAR(255) NOT NULL DEFAULT '',\
+                        time BIGINT NOT NULL DEFAULT 0,\
+                        processed TINYINT NOT NULL DEFAULT 0)""" % ('risc_' + sv))
                 con.commit()
                 con.close()
 
@@ -2151,9 +2232,9 @@ class Risc():
                 ret[admin] = lvl
         return ret
 
-    def init_irc_admins(self):
+    def init_db(self):
         """
-        Called on startup to init the irc admin table
+        Called on startup to init the database
         """
         # IRC-auth of some admins who can handle the bot
         d = self.get_init_admins()
@@ -2162,10 +2243,10 @@ class Risc():
         cur = con.cursor()
 
         cur.execute("""CREATE TABLE IF NOT EXISTS risc_irc_admins(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\
-                                                                auth VARCHAR(20) NOT NULL DEFAULT '',\
-                                                                level TINYINT NOT NULL DEFAULT 0,\
-                                                                addedOn BIGINT NOT NULL DEFAULT 0,\
-                                                                addedBy VARCHAR(20) NOT NULL DEFAULT '')""")
+                                                                  auth VARCHAR(20) NOT NULL DEFAULT '',\
+                                                                  level TINYINT NOT NULL DEFAULT 0,\
+                                                                  addedOn BIGINT NOT NULL DEFAULT 0,\
+                                                                  addedBy VARCHAR(20) NOT NULL DEFAULT '')""")
 
         for admin in d:
             cur.execute("""SELECT auth FROM risc_irc_admins WHERE auth = '%s'""" % (admin))
@@ -2175,6 +2256,12 @@ class Risc():
                 cur.execute("""INSERT INTO risc_irc_admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'risc')""" % (admin, d[admin], int(time.time())))
 
         con.commit()
+
+        cur.execute("""CREATE TABLE IF NOT EXISTS todo(id INT AUTO_INCREMENT PRIMARY KEY,
+                                                       author VARCHAR(32) NOT NULL DEFAULT '',
+                                                       time BIGINT NOT NULL DEFAULT 0,
+                                                       todo VARCHAR(256) NOT NULL DEFAULT '')""")
+
         con.close()
         return None
 
@@ -2354,7 +2441,7 @@ class Risc():
                 return None
         except Exception, e:
             self.debug.warning('_on_privmsg: Caught exception: %s -  Could be ascii conversion of non-ascii'+
-                               ' char (unicode) during regex process. Passing' % e)
+                    ' char (unicode) during regex process. Passing' % e)
             pass
 
         # Handle IRC msgs for chat feature
@@ -2423,30 +2510,30 @@ class Risc():
                     self._on_privmsg(line)
 
                 # Reply back to the server
-                elif re.search("^PING :", line):
-                    self._send("PONG :" + line.split(':')[1])
+            elif re.search("^PING :", line):
+                self._send("PONG :" + line.split(':')[1])
 
-                elif re.search(" KICK ", line):
-                    self.on_kick(line)
+            elif re.search(" KICK ", line):
+                self.on_kick(line)
 
-                elif re.search(" PART ", line):
-                    self.on_part(line)
+            elif re.search(" PART ", line):
+                self.on_part(line)
 
-                elif re.search(" JOIN ", line):
-                    self.on_join(line)
+            elif re.search(" JOIN ", line):
+                self.on_join(line)
 
-                elif re.search(" NICK ", line):
-                    self.on_nick(line)
+            elif re.search(" NICK ", line):
+                self.on_nick(line)
 
                 # Indicate we're connected, we can now join the channel
-                elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
-                    self.on_welcome()
+            elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
+                self.on_welcome()
 
-                elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
-                    self.on_namereply(line)
+            elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
+                self.on_namereply(line)
 
-                elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
-                    self.on_nicknameinuse(line)
+            elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
+                self.on_nicknameinuse(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
