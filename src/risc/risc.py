@@ -1133,6 +1133,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
                          ". Return the last time a player was seen in the server set."
 
+        elif command in self.commands["todo"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" [add <todo> | rm <todo_id> | list]: Aliases: "+', '.join(self.commands["todo"])+\
+                         ". add/remove/list todo."
+
         elif command in self.commands["raw"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [cmd]: Aliases: "+', '.join(self.commands["raw"])+\
                          ". Sends [cmd] data to the irc server. You need to be admin["+str(self.commandLevels["raw"])+"] to access this command."
@@ -1667,7 +1671,7 @@ class Risc():
             todo_str = ' '.join(todo_clean[2:]).encode("string_escape")
             author = nick.encode("string_escape")
 
-            if len(todo_str) > 255 or len(author) > 31:
+            if len(todo_str) > 127 or len(author) > 31:
                 self.privmsg(nick, 'Input too large.')
                 return None
 
@@ -1676,8 +1680,6 @@ class Risc():
                 c = con.cursor()
 
                 c.execute("""SELECT * FROM todo WHERE todo = '%s'""" % (todo_str))
-
-                self.debug.debug("%s rc = %d"  % (str(c.fetchall()), c.rowcount))
 
                 if c.rowcount:
                     self.privmsg(nick, 'Todo already exists.')
@@ -1699,6 +1701,7 @@ class Risc():
                 con.rollback()
                 con.close()
                 return None
+            self.privmsg(nick, "Operation successful")
         elif todo_clean[1].lower() == "rm":
             if len(todo_clean) != 3:
                 self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
@@ -1732,6 +1735,7 @@ class Risc():
                 con.rollback()
                 con.close()
                 return None
+            self.privmsg(nick, "Operation successful")
         elif todo_clean[1].lower() == "list":
             if len(todo_clean) != 2:
                 self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
@@ -1759,8 +1763,6 @@ class Risc():
                             record[1]+" (by "+COLOR["boldgreen"]+record[2]+COLOR["rewind"]+')')
         else:
             self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
-
-        self.privmsg(nick, "Operation successful")
         return None
 
     def cmd_raw(self, msg0, nick):
@@ -2307,7 +2309,7 @@ class Risc():
         cur.execute("""CREATE TABLE IF NOT EXISTS todo(id INT AUTO_INCREMENT PRIMARY KEY,
                                                        author VARCHAR(32) NOT NULL DEFAULT '',
                                                        time BIGINT NOT NULL DEFAULT 0,
-                                                       todo VARCHAR(256) NOT NULL DEFAULT '')""")
+                                                       todo VARCHAR(128) NOT NULL DEFAULT '')""")
 
         con.close()
         return None
