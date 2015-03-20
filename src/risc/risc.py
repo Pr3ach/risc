@@ -130,7 +130,8 @@
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
-#       - Add ability to "sv add <name> <ip>"
+#       - Add ability to "sv add/rm/list"
+# ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add auto join back when timeout
 #       - Add cmd: playerinfo/pi
 #       - Add/fix commands to set/get Cvars
@@ -1032,16 +1033,16 @@ class Risc():
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.get_db(sv))
             cur = con.cursor()
 
-            cur.execute("""INSERT INTO %s(evt,data,time,processed) VALUES('EVT_CHAT_SET','%s',%d,1)""" % ('risc_' + sv, state, int(time.time())))
+            cur.execute("""INSERT INTO %s(evt, data, time, processed) VALUES('EVT_CHAT_SET','%s',%d,1)""" % ('risc_' + sv, state, int(time.time())))
             con.commit()
             con.close()
         except:
-            if con:
-                con.rollback()
-                con.close()
             self.debug.error('cmd_chat: Error during db operations, trying roll back. Passing')
             self.privmsg(sourceNick, COLOR['boldred']+sourceNick+COLOR['rewind']+
                          ': There was an error changing the chat state for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
+            if con:
+                con.rollback()
+                con.close()
             return None
 
         chat_set[sv] = int(state)
