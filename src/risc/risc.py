@@ -1454,7 +1454,7 @@ class Risc():
         i = 0
         search_str = " ".join(msg0.split(' ')[1:])
         if len(search_str) >= 255:
-            self.privmsg(nick, "Input too long.")
+            self.privmsg(nick, "Input too large.")
             return None
 
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % search_str
@@ -1476,7 +1476,7 @@ class Risc():
         Return info about the specified game server ip
         """
         clean_msg = self.list_clean(msg0.split(' '))
-        if len(clean_msg) != 2:
+        if len(clean_msg) < 2:
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
             return None
         ret = ''
