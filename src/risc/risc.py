@@ -129,7 +129,7 @@
 #       - Add cmd raw [cmd] [OK]
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
-#       - Add cmd todo /add/rm/list [TEST]
+#       - Add cmd todo /add/rm/list [OK]
 #       - Add ability to "sv add <name> <ip>"
 #       - Add auto join back when timeout
 #       - Add cmd: playerinfo/pi
