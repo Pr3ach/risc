@@ -2072,7 +2072,8 @@ class Risc():
                 self.privmsg(sourceNick, ret_cmd[0])
                 self.privmsg(sourceNick, ret_cmd[1])
             else:
-                self.privmsg(sourceNick, ret_cmd)
+                if ret_cmd != "None":
+                    self.privmsg(sourceNick, ret_cmd)
 
         elif msg[0].lower().split(' ')[0] in self.commands["version"]:
             self.privmsg(sourceNick, "risc v"+__version__+" by "+__author__)
