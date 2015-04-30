@@ -1481,7 +1481,6 @@ class Risc():
         t = int(time.time())
 
         if len(argv) != 4:
-            self.privmsg(nick, "fk")
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
             return None
 
@@ -1493,7 +1492,7 @@ class Risc():
         elif re.match(re_full_ip, argv[2]):
             ip = argv[2]
         else:
-            self.privmsg(nick, "Invalid IP addr.")
+            self.privmsg(nick, "Invalid IP.")
             return None
 
         name = argv[3].encode("string_escape")
@@ -1562,12 +1561,20 @@ class Risc():
 
         elif clean_msg[1].lower() == "add":
             self.cmd_server_add(msg0, nick)
+            return None
+
         elif clean_msg[1].lower() in ("rm", "remove", "del", "delete"):
             self.cmd_server_rm(msg0, nick)
+            return None
+
         elif clean_msg[1].lower() == "rename":
             self.cmd_server_rename(msg0, nick)
+            return None
+
         elif clean_msg[1].lower() in ("ls", "list", "show"):
             self.cmd_server_list(msg0, nick)
+            return None
+
         else:
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
             return None
