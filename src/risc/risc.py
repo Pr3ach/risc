@@ -1512,10 +1512,10 @@ class Risc():
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
 
-            c.execute("""SELECT * FROM server WHERE name = '%s'""" %name)
+            c.execute("""SELECT * FROM server WHERE name = '%s' OR ip = '%s'""" % (name, ip))
 
             if c.rowcount:
-                self.privmsg(nick, "Server already exists")
+                self.privmsg(nick, "Server already exists.")
                 con.close()
                 return None
 
@@ -2069,12 +2069,10 @@ class Risc():
         elif msg[0].lower().split(' ')[0] in self.commands["server"]:
             ret_cmd = self.cmd_server(msg[0], sourceNick)
             if isinstance(ret_cmd, tuple):
-                if ret_cmd[0] != "None":
-                    self.privmsg(sourceNick, ret_cmd[0])
-                if ret_cmd[1] != "None":
-                    self.privmsg(sourceNick, ret_cmd[1])
+                self.privmsg(sourceNick, ret_cmd[0])
+                self.privmsg(sourceNick, ret_cmd[1])
             else:
-                if ret_cmd != "None":
+                if str(ret_cmd) != "None":
                     self.privmsg(sourceNick, ret_cmd)
 
         elif msg[0].lower().split(' ')[0] in self.commands["version"]:
