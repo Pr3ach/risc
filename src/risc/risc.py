@@ -1593,7 +1593,7 @@ class Risc():
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
-            c.execute("""UPDATE server SET name = '%s' WHERE name = '%s'""" % (old_name, new_name))
+            c.execute("""UPDATE server SET name = '%s' WHERE name = '%s'""" % (new_name, old_name))
             con.commit()
             con.close()
         except Exception, e:
