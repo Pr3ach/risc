@@ -1471,7 +1471,7 @@ class Risc():
                 break
         return None
 
-# TODO: Write these cmd_server_* functions
+# TODO: Write these cmd_server_* functions; handle admin rights for these cmd
     def cmd_server_add(self, msg0, nick):
         """
         Add a server ip/name in the server database
@@ -1519,6 +1519,14 @@ class Risc():
                 con.close()
                 return None
 
+            con.commit()
+            c.execute("""SELECT * FROM server""")
+
+            if c.rowcount > 20:
+                self.privmsg(nick, "Too many servers in the DB.")
+                con.close()
+                return None
+
             c.execute("""INSERT INTO server(name, ip, author, time) VALUES('%s', '%s', '%s', %d)""" % (name, ip, nick, t))
             con.commit()
             con.close()
@@ -1533,7 +1541,7 @@ class Risc():
 
     def cmd_server_rm(self, msg0, nick):
         """
-        Remove a server ip/name from the server database
+        Remove a server from the server database
         sv rm <name>
         """
         argv = self.list_clean(msg0.split(' '))
@@ -1544,7 +1552,7 @@ class Risc():
 
         name = argv[2].encode("string_escape")
 
-        if len(name) >= 32:
+        if len(name) > 32:
             self.privmsg(nick, "Server name input too large.")
             return None
 
@@ -1565,9 +1573,65 @@ class Risc():
 
 
     def cmd_server_rename(self, msg0, nick):
+        """
+        Rename a server in the server database
+        sv rename <old_name> <new_name>
+        """
+        argv = self.list_clean(msg0.split(' '))
+
+        if len(argv) != 4:
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
+
+        old_name = argv[2].encode("string_escape")
+        new_name = argv[3].encode("string_escape")
+
+        if len(old_name) > 32 or len(new_name) > 32:
+            self.privmsg(nick, "Server name input too large.")
+            return None
+
+        try:
+            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+            c = con.cursor()
+            c.execute("""UPDATE server SET name = '%s' WHERE name = '%s'""" % (old_name, new_name))
+            con.commit()
+            con.close()
+        except Exception, e:
+            self.debug.warning(nick, "cmd_server_rename: Error during DB operations. Rolling back.")
+            self.privmsg(nick, "cmd_server_rename: Error during DB operations.")
+            con.rollback()
+            return None
+
+        self.privmsg(nick, "Operation successful")
         return None
 
     def cmd_server_list(self, msg0, nick):
+        """
+        Rename a server in the server database
+        sv rename <old_name> <new_name>
+        """
+        argv = self.list_clean(msg0.split(' '))
+
+        if len(argv) != 2:
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
+
+        try:
+            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+            c = con.cursor()
+            c.execute("""SELECT name, ip, author FROM server LIMIT 20""")
+
+            for r in c.fetchall():
+                self.privmsg(nick, COLOR["boldgreen"] + r[0] + COLOR["rewind"]+COLOR["boldblue"]+" "+r[1]+" (by "+r[2]+')')
+
+            con.close()
+        except Exception, e:
+            self.debug.warning(nick, "cmd_server_list: Error during DB operations. Rolling back.")
+            self.privmsg(nick, "cmd_server_list: Error during DB operations.")
+            con.rollback()
+            return None
+
+        self.privmsg(nick, "Operation successful")
         return None
 
     def cmd_server(self, msg0, nick):
