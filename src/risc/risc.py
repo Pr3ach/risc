@@ -1621,22 +1621,49 @@ class Risc():
             c = con.cursor()
             c.execute("""SELECT name, ip, author FROM server LIMIT 20""")
 
-            for r in c.fetchall():
-                self.privmsg(nick, COLOR["boldgreen"] + r[0] + COLOR["rewind"]+':'+COLOR["boldblue"]+' '+r[1]+COLOR["rewind"]+" (by "+r[2]+')')
+            if not c.rowcount:
+                self.privmsg(nick, "Server DB is empty.")
+            else:
+                for r in c.fetchall():
+                    self.privmsg(nick, COLOR["boldgreen"] + r[0] + COLOR["rewind"]+':'+COLOR["boldblue"]+' '+r[1]+COLOR["rewind"]+" (by "+r[2]+')')
 
             con.close()
         except Exception, e:
-            self.debug.warning(nick, "cmd_server_list: Error during DB operations. Rolling back.")
+            self.debug.warning(nick, "cmd_server_list: Error during DB operations.")
             self.privmsg(nick, "cmd_server_list: Error during DB operations.")
-            con.rollback()
-            return None
         return None
+
+    def cmd_server_from_db(self, sv_name):
+        """
+        Return sv IP on success, "FAIL" on failure
+        """
+        sv_name = sv_name.encode("string_escape")
+
+        if len(sv_name) > 32:
+            return "FAIL"
+
+        try:
+            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+            c = con.cursor()
+            c.execute("""SELECT ip FROM server WHERE name = '%s'""" % sv_name)
+
+            if c.rowcount == 1:
+                con.close()
+                self.debug.debug(str(c.fetchone()))
+                return c.fetchone()[0]
+
+            con.close()
+        except Exception, e:
+            self.debug.warning(nick, "cmd_server_list: Error during DB operations.")
+            self.privmsg(nick, "cmd_server_list: Error during DB operations.")
+        return "FAIL"
 
     def cmd_server(self, msg0, nick):
         """
         Return info about the specified game server ip
         """
         clean_msg = self.list_clean(msg0.split(' '))
+        sv = None
 
         if len(clean_msg) < 2:
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
@@ -1671,13 +1698,21 @@ class Risc():
             return None
 
         else:
-            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
-            return None
+            ip_db = cmd_server_from_db(argv[1])
+            if ip_db == "FAIL":
+                self.privmsg(nick, "No such server.")
+                return None
+            else:
+                try:
+                    sv = Sv(ip_db.split(':')[0], int(ip_db.split(':')[1]), '', self.debug)
+                except Exception, e:
+                    return COLOR["boldred"]+"Exception for server '"+ip_db+"': %s" % e + COLOR["rewind"]
 
-        try:
-            sv = Sv(ip, port, '', self.debug)
-        except Exception, e:
-            return COLOR["boldred"]+"Exception for server '"+ip+':'+str(port)+"': %s" % e + COLOR["rewind"]
+        if sv is None:
+            try:
+                sv = Sv(ip, port, '', self.debug)
+            except Exception, e:
+                return COLOR["boldred"]+"Exception for server '"+ip+':'+str(port)+"': %s" % e + COLOR["rewind"]
 
         if sv.clientsList == -1:
             nbClients = 0
