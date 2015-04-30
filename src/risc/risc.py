@@ -1622,7 +1622,7 @@ class Risc():
             c.execute("""SELECT name, ip, author FROM server LIMIT 20""")
 
             for r in c.fetchall():
-                self.privmsg(nick, COLOR["boldgreen"] + r[0] + COLOR["rewind"]+':'+COLOR["boldblue"]+r[1]+COLOR["rewind"]+" (by "+r[2]+')')
+                self.privmsg(nick, COLOR["boldgreen"] + r[0] + COLOR["rewind"]+':'+COLOR["boldblue"]+' '+r[1]+COLOR["rewind"]+" (by "+r[2]+')')
 
             con.close()
         except Exception, e:
@@ -1630,8 +1630,6 @@ class Risc():
             self.privmsg(nick, "cmd_server_list: Error during DB operations.")
             con.rollback()
             return None
-
-        self.privmsg(nick, "Operation successful")
         return None
 
     def cmd_server(self, msg0, nick):
