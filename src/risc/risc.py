@@ -2400,7 +2400,7 @@ class Risc():
                                                        name VARCHAR(32) NOT NULL DEFAULT 'UNKNOWN',
                                                        ip VARCHAR(22) NOT NULL DEFAULT '0.0.0.0',
                                                        author VARCHAR(32) NOT NULL DEFAULT 'UNKNOWN',
-                                                       time BIGINT NOT NULL DEFAULT 0""")
+                                                       time BIGINT NOT NULL DEFAULT 0)""")
 
         con.commit()
         con.close()
