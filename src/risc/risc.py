@@ -1526,10 +1526,43 @@ class Risc():
             self.debug.warning(nick, "cmd_server_add: Error during DB operations. Rolling back.")
             self.privmsg(nick, "cmd_server_add: Error during DB operations.")
             con.rollback()
+            return None
+
+        self.privmsg(nick, "Operation successful.")
         return None
 
     def cmd_server_rm(self, msg0, nick):
+        """
+        Remove a server ip/name from the server database
+        sv rm <name>
+        """
+        argv = self.list_clean(msg0.split(' '))
+
+        if len(argv) != 3:
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
+
+        name = argv[2].encode("string_escape")
+
+        if len(name) >= 32:
+            self.privmsg(nick, "Server name input too large.")
+            return None
+
+        try:
+            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+            c = con.cursor()
+            c.execute("""DELETE FROM server WHERE name = '%s'""" % name)
+            con.commit()
+            con.close()
+        except Exception, e:
+            self.debug.warning(nick, "cmd_server_rm: Error during DB operations. Rolling back.")
+            self.privmsg(nick, "cmd_server_rm: Error during DB operations.")
+            con.rollback()
+            return None
+
+        self.privmsg(nick, "Operation successful")
         return None
+
 
     def cmd_server_rename(self, msg0, nick):
         return None
@@ -1563,7 +1596,7 @@ class Risc():
             self.cmd_server_add(msg0, nick)
             return None
 
-        elif clean_msg[1].lower() in ("rm", "remove", "del", "delete"):
+        elif clean_msg[1].lower() in ("rm", "remove", "del", "delete", "drop"):
             self.cmd_server_rm(msg0, nick)
             return None
 
