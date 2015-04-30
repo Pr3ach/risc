@@ -1481,16 +1481,17 @@ class Risc():
         t = int(time.time())
 
         if len(argv) != 4:
+            self.privmsg(nick, "fk")
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
             return None
 
         re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
         re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
 
-        if re.match(re_ip, argv[1]):
-            ip = argv[1]+":27960"
-        elif re.match(re_full_ip, argv[1]):
-            ip = argv[1]
+        if re.match(re_ip, argv[2]):
+            ip = argv[2]+":27960"
+        elif re.match(re_full_ip, argv[2]):
+            ip = argv[2]
         else:
             self.privmsg(nick, "Invalid IP addr.")
             return None
