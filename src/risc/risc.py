@@ -130,7 +130,7 @@
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
-#       - Add ability to "sv add/rm/list"
+#       - Add ability to "sv add/rm/rename/list"
 # ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add auto join back when timeout
 #       - Add cmd: playerinfo/pi
@@ -263,11 +263,11 @@ class Sv():
         """
         Clean a list after a split
         """
-        retList = []
-        for i in l:
-            if i != '' and i != ' ':
-                retList.append(i)
-        return retList
+        ret = []
+        for e in l:
+            if e != '' and e != ' ':
+                ret.append(e)
+        return ret
 
     def get_clients_list(self, raw):
         """
@@ -1471,14 +1471,82 @@ class Risc():
                 break
         return None
 
+# TODO: Write these cmd_server_* functions
+    def cmd_server_add(self, msg0, nick):
+        """
+        Add a server ip/name in the server database
+        sv add <ip> <name>
+        """
+        argv = self.list_clean(msg0.split(' '))
+        t = int(time.time())
+
+        if len(argv) != 4:
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
+
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
+
+        if re.match(re_ip, argv[1]):
+            ip = argv[1]+":27960"
+        elif re.match(re_full_ip, argv[1]):
+            ip = argv[1]
+        else:
+            self.privmsg(nick, "Invalid IP addr.")
+            return None
+
+        name = argv[3].encode("string_escape")
+
+        if len(name) > 32:
+            self.privmsg(nick, "Server name input too large.")
+            return None
+
+        try:
+            sv = Sv(ip, int(ip.split(':')[1]), '', self.debug)
+        except Exception, e:
+            self.debug.warning("cmd_server_add: Invalid ioq3 IP.")
+            self.privmsg(nick, "cmd_server_add: Invalid ioq3 IP.")
+            return None
+
+        try:
+            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+            c = con.cursor()
+
+            c.execute("""SELECT * FROM server WHERE name = '%s'""" %name)
+
+            if c.rowcount:
+                self.privmsg(nick, "Server already exists")
+                con.close()
+                return None
+
+            c.execute("""INSERT INTO server(name, ip, author, time) VALUES('%s', '%s', '%s', %d)""" % (name, ip, nick, t))
+            con.commit()
+            con.close()
+        except Exception, e:
+            self.debug.warning(nick, "cmd_server_add: Error during DB operations. Rolling back.")
+            self.privmsg(nick, "cmd_server_add: Error during DB operations.")
+            con.rollback()
+        return None
+
+    def cmd_server_rm(self, msg0, nick):
+        return None
+
+    def cmd_server_rename(self, msg0, nick):
+        return None
+
+    def cmd_server_list(self, msg0, nick):
+        return None
+
     def cmd_server(self, msg0, nick):
         """
         Return info about the specified game server ip
         """
         clean_msg = self.list_clean(msg0.split(' '))
+
         if len(clean_msg) < 2:
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
             return None
+
         ret = ''
         re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
         re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
@@ -1490,8 +1558,18 @@ class Risc():
         elif re.match(re_full_ip, clean_msg[1]):
             ip = clean_msg[1].split(':')[0]
             port = int(clean_msg[1].split(':')[1])
+
+        elif clean_msg[1].lower() == "add":
+            self.cmd_server_add(msg0, nick)
+        elif clean_msg[1].lower() in ("rm", "remove", "del", "delete"):
+            self.cmd_server_rm(msg0, nick)
+        elif clean_msg[1].lower() == "rename":
+            self.cmd_server_rename(msg0, nick)
+        elif clean_msg[1].lower() in ("ls", "list", "show"):
+            self.cmd_server_list(msg0, nick)
         else:
-            return "Invalid IP addr."
+            self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
 
         try:
             sv = Sv(ip, port, '', self.debug)
@@ -1528,12 +1606,12 @@ class Risc():
             ret2 = "Playing:"+",".join(players)
 
         ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ': Playing:' +\
-            COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
-            str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
-            re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
-            ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
-            COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
-            ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
+                COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
+                str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
+                re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
+                ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
+                COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
+                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
         return ret, ret2
 
     def cmd_uptime(self, msg0, nick):
@@ -1571,9 +1649,9 @@ class Risc():
         WTF?
         """
         duck_s = ["....................../??/)", "....................,/?../", ".................../..../",\
-                  "............./??/'...'/???`??", "........../'/.../..../......./??\\", "........('(...?...?.... ?~/'...')",\
-                  ".........\.................'...../", "..........''...\.......... _.??", "............\..............(",\
-                  "..............\.............\..."]
+                "............./??/'...'/???`??", "........../'/.../..../......./??\\", "........('(...?...?.... ?~/'...')",\
+                ".........\.................'...../", "..........''...\.......... _.??", "............\..............(",\
+                "..............\.............\..."]
         for s in duck_s:
             self.privmsg(self.channel, s)
         return None
@@ -1585,30 +1663,30 @@ class Risc():
         killClean = self.list_clean(msg0.split(' '))
         lenKill = len(killClean)
         weapons = {"colt": [" was given a new breathing hole by ", "'s Colt 1911."],
-				   "spas": [" was turned into peppered steak by ", "'s SPAS blast."],
-                   "ump45": [" danced the ump tango to ", "'s sweet sweet music."],
-                   "mp5": [" was MP5K spammed without mercy by ", "'s MP5K."],
-                   "mac11": [" was minced to death by ", "'s Mac 11."],
-                   "lr300": [" played 'catch the shiny bullet with ", " LR-300 rounds."],
-                   "g36": [" was on the wrong end of ", "'s G36."],
-                   "ak103": [" was torn asunder by ", "'s crass AK103."],
-                   "m4": [" got a lead enema from ", "'s retro M4."],
-                   "psg1": [" was taken out by ", "'s PSG1. Plink!"],
-                   "hk69": [" HEARD ", "'s HK69 gren... didn't AVOID it. Sucka."],
-                   "boot": [" git himself some lovin' from ", "'s boot o' passion."],
-                   "sr8": [" managed to slow down ", "'s SR-8 round just a little."],
-                   "bleed": [" bled to death from ", "'s attacks."],
-                   "negev": [" got shredded to pieces by ", "'s Negev."],
-                   "knife": [" was sliced a new orifice by ", "."],
-                   "knife_throw": [" managed to sheath ", "'s flying knife in their flesh."],
-                   "beretta": [" was pistol whipped by ", "."],
-                   "g18": [" got a whole plastic surery with ", "'s Glock"],
-                   "de": [" got a whole lot of hole from ", "'s DE round."],
-                   "nuke": [" has been nuked by ", "."],
-                   "bfg": [" has been blasted by ", "'s BFG."],
-                   "rpg": [" ate ", "'s rockets."],
-                   "lightning": [" has been deep fried by ", "."],
-                   "slap": [" has been slapped to death by ", "."]}
+                "spas": [" was turned into peppered steak by ", "'s SPAS blast."],
+                "ump45": [" danced the ump tango to ", "'s sweet sweet music."],
+                "mp5": [" was MP5K spammed without mercy by ", "'s MP5K."],
+                "mac11": [" was minced to death by ", "'s Mac 11."],
+                "lr300": [" played 'catch the shiny bullet with ", " LR-300 rounds."],
+                "g36": [" was on the wrong end of ", "'s G36."],
+                "ak103": [" was torn asunder by ", "'s crass AK103."],
+                "m4": [" got a lead enema from ", "'s retro M4."],
+                "psg1": [" was taken out by ", "'s PSG1. Plink!"],
+                "hk69": [" HEARD ", "'s HK69 gren... didn't AVOID it. Sucka."],
+                "boot": [" git himself some lovin' from ", "'s boot o' passion."],
+                "sr8": [" managed to slow down ", "'s SR-8 round just a little."],
+                "bleed": [" bled to death from ", "'s attacks."],
+                "negev": [" got shredded to pieces by ", "'s Negev."],
+                "knife": [" was sliced a new orifice by ", "."],
+                "knife_throw": [" managed to sheath ", "'s flying knife in their flesh."],
+                "beretta": [" was pistol whipped by ", "."],
+                "g18": [" got a whole plastic surery with ", "'s Glock"],
+                "de": [" got a whole lot of hole from ", "'s DE round."],
+                "nuke": [" has been nuked by ", "."],
+                "bfg": [" has been blasted by ", "'s BFG."],
+                "rpg": [" ate ", "'s rockets."],
+                "lightning": [" has been deep fried by ", "."],
+                "slap": [" has been slapped to death by ", "."]}
 
         if lenKill == 1:
             self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" has an urge to kill...")
@@ -1619,7 +1697,7 @@ class Risc():
 
             elif killClean[1].lower() in ('all', 'everyone', 'channel', 'everybody'): # FIXME: what if sm1 is named "all", "everyone" etc?
                 self.privmsg(self.channel, COLOR["boldred"]+random.choice(["The whole channel", "Everyone", "Everybody"])\
-                                  +COLOR['rewind']+" has been murdered by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+".")
+                        +COLOR['rewind']+" has been murdered by "+COLOR["boldgreen"]+sourceNick+COLOR['rewind']+".")
 
             elif sourceNick.lower() == killClean[1].lower():
                 self.privmsg(self.channel, COLOR["boldred"]+sourceNick+COLOR['rewind']+" went an hero.")
@@ -1761,7 +1839,7 @@ class Risc():
 
             for record in res:
                 self.privmsg(nick, COLOR["boldgreen"]+'#'+str(record[0])+COLOR["rewind"]+' '+
-                            record[1]+" (by "+COLOR["boldgreen"]+record[2]+COLOR["rewind"]+')')
+                        record[1]+" (by "+COLOR["boldgreen"]+record[2]+COLOR["rewind"]+')')
         else:
             self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
         return None
@@ -1825,9 +1903,12 @@ class Risc():
             ret.sort()
             return 'Found '+str(count) + ' players matching the request in the ' + COLOR['boldwhite'] + servKey + COLOR['rewind'] + ' server: ' + ', '.join(ret)
 
-    def list_clean(self, list):
+    def list_clean(self, l):
+        """
+        Clean a list after a split
+        """
         ret = []
-        for e in list:
+        for e in l:
             if e != '' and e != ' ':
                 ret.append(e)
         return ret
@@ -2293,10 +2374,10 @@ class Risc():
         cur = con.cursor()
 
         cur.execute("""CREATE TABLE IF NOT EXISTS risc_irc_admins(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\
-                                                                  auth VARCHAR(20) NOT NULL DEFAULT '',\
-                                                                  level TINYINT NOT NULL DEFAULT 0,\
-                                                                  addedOn BIGINT NOT NULL DEFAULT 0,\
-                                                                  addedBy VARCHAR(20) NOT NULL DEFAULT '')""")
+                auth VARCHAR(20) NOT NULL DEFAULT '',\
+                level TINYINT NOT NULL DEFAULT 0,\
+                addedOn BIGINT NOT NULL DEFAULT 0,\
+                addedBy VARCHAR(20) NOT NULL DEFAULT '')""")
 
         for admin in d:
             cur.execute("""SELECT auth FROM risc_irc_admins WHERE auth = '%s'""" % (admin))
@@ -2312,6 +2393,15 @@ class Risc():
                                                        time BIGINT NOT NULL DEFAULT 0,
                                                        todo VARCHAR(128) NOT NULL DEFAULT '')""")
 
+        con.commit()
+
+        cur.execute("""CREATE TABLE IF NOT EXISTS server(id INT AUTO_INCREMENT PRIMARY KEY,
+                                                       name VARCHAR(32) NOT NULL DEFAULT 'UNKNOWN',
+                                                       ip VARCHAR(22) NOT NULL DEFAULT '0.0.0.0',
+                                                       author VARCHAR(32) NOT NULL DEFAULT 'UNKNOWN',
+                                                       time BIGINT NOT NULL DEFAULT 0""")
+
+        con.commit()
         con.close()
         return None
 
