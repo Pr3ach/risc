@@ -68,7 +68,7 @@
 #       - Fixed 'make-nix.sh' [OK]
 # ------- 1.4.2 - Preacher - 08/20/2014
 #       - Fixed major bug in Sv [OK]
-#       - Fix: use only one db & table for risc_irc_admins [OK]
+#       - Fix: use only one db & table for admins [OK]
 #       - Bot auth credentials in risc.ini [OK]
 #       - Remove !lt cmd from help <cmd> cmd [OK]
 #       - Section in risc.ini for server alias [OK]
@@ -130,8 +130,9 @@
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
-#       - Add ability to "sv add/rm/rename/list"
+#       - Add ability to "sv add/rm/rename/list" [TEST]
 #       - Add auto rejoin when timeout
+#       - Fix the whole admin managing system
 # ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add cmd: playerinfo/pi
 #       - Add/fix commands to set/get Cvars
@@ -695,7 +696,7 @@ class Risc():
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             cur = con.cursor()
 
-            cur.execute("""SELECT level FROM risc_irc_admins WHERE auth = '%s'""" % auth)
+            cur.execute("""SELECT level FROM admins WHERE auth = '%s'""" % auth)
 
             con.commit()
             query = cur.fetchall()
@@ -725,59 +726,85 @@ class Risc():
     #                                                                                                                           #
     #############################################################################################################################
 
-    def cmd_iputgroup(self, source, msg):
+    def cmd_iputgroup(self, nick, msg):
         """
         Put an authed user in one of the admin group
         """
-        cleanIpg = self.list_clean(msg.split(' '))
+        argv = self.list_clean(msg.split(' '))
 
         # Check input
-        if len(cleanIpg) != 3:
-            return 0
+        if len(argv) != 3:
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help iputgroup.')
+            return None
 
-        if len(cleanIpg[1]) > 19:
-            return 0
+        if len(argv[1]) > 19:
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid target.')
+            return None
 
         try:
-            cleanIpg[2] = int(cleanIpg[2])
+            argv[2] = int(argv[2])
         except:
-            return 0
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help iputgroup.')
+            return None
 
         # Check rights
-        sourceAuth, sourceLevel = self.irc_is_admin(source)
-        if not sourceAuth or sourceLevel != 100:
-            return 0
+         nick_auth, nick_lvl = self.irc_is_admin(nick)
+        if not nick_auth or nick_lvl != 100:
+            self.privmsg(nick, "You need to be admin[100] to access this command.")
+            return None
 
-        targetAuth, targetLevel = self.irc_is_admin(cleanIpg[1])
-        if not targetAuth or (cleanIpg[2] not in self.args['iputgroup'] and cleanIpg[2] != 0) or targetLevel == cleanIpg[2]:
-            return 0
+        if argv[2] not in self.args["iputgroup"] and argv[2] != 0:
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help iputgroup.')
+            return None
+
+        target_auth = self.irc_is_authed(argv[1])
+        if not target_auth:
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+": Target isn't authed.")
+            return None
 
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             cur = con.cursor()
 
-            if targetLevel in self.args["iputgroup"] or cleanIpg[2] == 0:  # If already admin, delete the record before.
-                cur.execute("""DELETE FROM risc_irc_admins WHERE auth = '%s'""" % targetAuth)
-
-            if cleanIpg[2] in self.args['iputgroup']:
-                cur.execute("""INSERT INTO risc_irc_admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'%s')""" % (targetAuth, cleanIpg[2], int(time.time()), sourceAuth))
-
-            con.commit()
-            con.close()
+            if not argv[2]:
+                cur.execute("""DELETE FROM admins WHERE auth = '%s'""" % target_auth)
+                if c.rowcount == 1:
+                    con.commit()
+                    con.close()
+                    self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been dropped from the admin groups.")
+                    return None
+                else:
+                    self.debug.warning("cmd_iputgroup: Failure dropping admin - rolling back ...")
+                    con.rollback()
+                    con.close()
+                    self.privmsg(nick, "Operation failed.")
+                    return None
+            else:
+                cur.execute("""SELECT * FROM admins WHERE auth = '%s'""" % target_auth)
+                if c.rowcount == 1:
+                    cur.execute("""UPDATE admins SET level = %d WHERE auth = '%s'""" % (argv[2], target_auth))
+                    con.commit()
+                    con.close()
+                    self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been moved to the admin["+str(argv[2])+"] group.")
+                    return None
+                elif c.rowcount > 1:
+                    self.debug.critical("Errors detected in the admin DB: auth duplicated (%s)." % target_auth)
+                    self.privmsg(self.channel, COLOR["boldred"]+"Operation failed: Errors detected in the admin DB! Contact an admin."+COLOR["rewind"])
+                    con.close()
+                    return None
+                else:
+                    cur.execute("""INSERT INTO admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'%s')""" % (target_auth, argv[2], int(time.time()), sourceAuth))
+                    con.commit()
+                    con.close()
+                    self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been added to the admin["+str(argv[2])+"] group.")
+                    return None
 
         except:
             self.debug.critical('cmd_iputgroup: Exception caught. Rolling back the db')
             if con:
                 con.rollback()
                 con.close()
-            return 0
-
-        if cleanIpg[2] == 0:
-            return COLOR['boldgreen']+source+COLOR['rewind']+": User-auth "+COLOR['boldmagenta']+targetAuth+COLOR['rewind']+\
-                         ', '+COLOR['boldmagenta']+'admin'+COLOR['rewind']+'['+str(targetLevel)+'], is no more.'
-
-        return COLOR['boldgreen']+source+COLOR['rewind']+": User-auth "+COLOR['boldmagenta']+targetAuth+COLOR['rewind']+\
-                     " was successfully added to "+COLOR['boldmagenta']+'admin'+COLOR['rewind']+'['+str(cleanIpg[2])+'] group.'
+        return None
 
     def cmd_ileveltest(self, msg0, sourceNick):
         """
@@ -824,7 +851,7 @@ class Risc():
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             cur = con.cursor()
 
-            cur.execute("""SELECT auth FROM risc_irc_admins""")
+            cur.execute("""SELECT auth FROM admins""")
 
             admins = cur.fetchall()
             con.close()
@@ -2190,11 +2217,7 @@ class Risc():
             self.cmd_hello(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["iputgroup"]:
-            retCmdIpg = self.cmd_iputgroup(sourceNick, msg[0])
-            if not retCmdIpg:
-                self.privmsg(self.channel, COLOR['boldred']+"Failed. Check "+self.cmd_prefix+"help iputgroup."+COLOR['rewind'])
-            else:
-                self.privmsg(sourceNick, retCmdIpg)
+            self.cmd_iputgroup(sourceNick, msg[0])
 
         elif msg[0].lower().split(' ')[0] in self.commands["ikick"]:
             self.cmd_ikick(msg[0], sourceNick)
@@ -2536,18 +2559,18 @@ class Risc():
         con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
         cur = con.cursor()
 
-        cur.execute("""CREATE TABLE IF NOT EXISTS risc_irc_admins(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\
+        cur.execute("""CREATE TABLE IF NOT EXISTS admins(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\
                 auth VARCHAR(20) NOT NULL DEFAULT '',\
                 level TINYINT NOT NULL DEFAULT 0,\
                 addedOn BIGINT NOT NULL DEFAULT 0,\
                 addedBy VARCHAR(20) NOT NULL DEFAULT '')""")
 
         for admin in d:
-            cur.execute("""SELECT auth FROM risc_irc_admins WHERE auth = '%s'""" % (admin))
+            cur.execute("""SELECT auth FROM admins WHERE auth = '%s'""" % (admin))
             q = cur.fetchall()
 
             if not len(q):
-                cur.execute("""INSERT INTO risc_irc_admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'risc')""" % (admin, d[admin], int(time.time())))
+                cur.execute("""INSERT INTO admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'risc')""" % (admin, d[admin], int(time.time())))
 
         con.commit()
 
