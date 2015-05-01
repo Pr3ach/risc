@@ -511,7 +511,11 @@ class Risc():
                "ileveltest": 60,
                "raw": 100,
                "todo_add": 80,
-               "todo_rm": 100}
+               "todo_rm": 100,
+               "server_add" : 60,
+               "server_rm": 100,
+               "server_rename": 60,
+               "server_ls": 60}
 
         for cmd in ret:
             if self.cfg.has_option("levels", "cmd_"+cmd):
@@ -1471,7 +1475,6 @@ class Risc():
                 break
         return None
 
-# TODO: Write these cmd_server_* functions; handle admin rights for these cmd
     def cmd_server_add(self, msg0, nick):
         """
         Add a server ip/name in the server database
@@ -1499,6 +1502,11 @@ class Risc():
 
         if len(name) > 32:
             self.privmsg(nick, "Server name input too large.")
+            return None
+
+        auth, level = self.irc_is_admin(nick)
+        if not auth or level < self.commandLevels["server_add"]:
+            self.privmsg(nick, "You need to be admin["+str(self.commandLevels["server_add"])+"] to access this command.")
             return None
 
         try:
@@ -1556,6 +1564,11 @@ class Risc():
             self.privmsg(nick, "Server name input too large.")
             return None
 
+        auth, level = self.irc_is_admin(nick)
+        if not auth or level < self.commandLevels["server_rm"]:
+            self.privmsg(nick, "You need to be admin["+str(self.commandLevels["server_rm"])+"] to access this command.")
+            return None
+
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
@@ -1590,6 +1603,11 @@ class Risc():
             self.privmsg(nick, "Server name input too large.")
             return None
 
+        auth, level = self.irc_is_admin(nick)
+        if not auth or level < self.commandLevels["server_rename"]:
+            self.privmsg(nick, "You need to be admin["+str(self.commandLevels["server_rename"])+"] to access this command.")
+            return None
+
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
@@ -1607,13 +1625,18 @@ class Risc():
 
     def cmd_server_list(self, msg0, nick):
         """
-        Rename a server in the server database
-        sv rename <old_name> <new_name>
+        List the available servers
+        sv list
         """
         argv = self.list_clean(msg0.split(' '))
 
         if len(argv) != 2:
             self.privmsg(nick, "Invalid arguments, check "+self.cmd_prefix+"help server.")
+            return None
+
+        auth, level = self.irc_is_admin(nick)
+        if not auth or level < self.commandLevels["server_ls"]:
+            self.privmsg(nick, "You need to be admin["+str(self.commandLevels["server_ls"])+"] to access this command.")
             return None
 
         try:
@@ -1623,9 +1646,11 @@ class Risc():
 
             if not c.rowcount:
                 self.privmsg(nick, "Server DB is empty.")
-            else:
+            elif c.rowcount <= 20:
                 for r in c.fetchall():
                     self.privmsg(nick, COLOR["boldgreen"] + r[0] + COLOR["rewind"]+':'+COLOR["boldblue"]+' '+r[1]+COLOR["rewind"]+" (by "+r[2]+')')
+            else:
+                self.privmsg(nick, "Too many servers in the DB (%d)." % str(c.rowcount))    # Should never happen ...
 
             con.close()
         except Exception, e:
