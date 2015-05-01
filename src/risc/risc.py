@@ -539,7 +539,7 @@ class Risc():
         """
         Called after we successfully connected to the server
         """
-        self._send("PRIVMSG Q@CServe.quakenet.org :AUTH "+self.auth+" "+self.auth_passwd)  # Auth against Q
+        self._send("PRIVMSG Q@CServe.quakenet.org :AUTH "+self.auth+" "+self.auth_passwd)  # Auth with Q
         self.mode(self.nick, "+x")
         time.sleep(0.8)
         self.debug.info("[+] Joining " + self.channel + " ...")
@@ -1242,6 +1242,7 @@ class Risc():
         global INIPATH
         serverName = self.get_dict_key(self.argAliases['servers'], serverName.lower())
         ret = []
+        bot_count = 0
         if not serverName:
             return "Invalid arguments. Check "+self.cmd_prefix+"help players."
 
@@ -1262,6 +1263,7 @@ class Risc():
         for i in range(len(sv.clientsList)):
             if usePings and sv.clientsPings[i] == '0':
                 ping = COLOR['rewind']+' ('+COLOR['boldblue']+'BOT'+COLOR['rewind']+')'
+                bot_count += 1
             else:
                 ping = ''
 
@@ -1272,7 +1274,10 @@ class Risc():
 
         ret.sort()
         # For some reason, sv.clients is innacurate here ...
-        return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'):'+','.join(ret)
+        if usePings:
+            return 'Playing on '+serverName+' ('+str(len(sv.clientsList) - bot_count)+'+'str(bot_count)+'/'+str(sv.maxClients)+'):'+','.join(ret)
+        else
+            return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'):'+','.join(ret)
 
     def cmd_seen(self, msg0, sourceNick):
         """
