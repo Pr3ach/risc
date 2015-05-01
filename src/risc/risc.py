@@ -131,8 +131,9 @@
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
 #       - Fix the whole admin management system [OK]
-#       - Drop hello cmd
 #       - Add ability to "sv add/rm/rename/list" [TEST]
+#       - Drop hello cmd
+#       - Fix roulette cmd (again)
 #       - Add auto rejoin when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add cmd: playerinfo/pi
@@ -1188,7 +1189,7 @@ class Risc():
                          ". Sometimes, words ain't enough."
 
         elif command in self.commands["server"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+" [<ip:port> | add <ip> <name> | rm <name> | rename <old_name> <new_name>| list]: Aliases: "+', '.join(self.commands["server"])+\
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" [<ip:port> | add <ip> <name> | rm <name> | rename <old_name> <new_name> | list]: Aliases: "+', '.join(self.commands["server"])+\
                          ". Display info about the specified server. If no port is specified, assume 27960. Add, remove, rename or list all the available servers."
 
         elif command in self.commands["say"]:
