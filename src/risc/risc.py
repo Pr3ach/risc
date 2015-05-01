@@ -1276,7 +1276,7 @@ class Risc():
         # For some reason, sv.clients is innacurate here ...
         if usePings:
             return 'Playing on '+serverName+' ('+str(len(sv.clientsList) - bot_count)+'+'+str(bot_count)+'/'+str(sv.maxClients)+'):'+','.join(ret)
-        else
+        else:
             return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'):'+','.join(ret)
 
     def cmd_seen(self, msg0, sourceNick):
