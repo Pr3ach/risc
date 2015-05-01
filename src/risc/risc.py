@@ -2663,6 +2663,11 @@ class Risc():
         self.start()
         return None
 
+    def on_timeout(self, line):
+        time.sleep(30)
+        self.join()
+        return None
+
     def _on_privmsg(self, msg):
         """
         Disptach PRIVMSG messages to the right functions
@@ -2779,6 +2784,9 @@ class Risc():
 
                 elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
                     self.on_nicknameinuse(line)
+
+                elif re.search("ERROR :Closing Link: .* by .* (Ping timeout)", line):
+                    self.on_timeout(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
