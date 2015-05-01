@@ -2665,7 +2665,7 @@ class Risc():
 
     def on_timeout(self, line):
         self.debug.info("Connection timedout.")
-        time.sleep(3)
+        time.sleep(180)
         self.connect()
         return None
 
