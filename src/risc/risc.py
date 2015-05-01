@@ -2195,9 +2195,6 @@ class Risc():
         elif msg[0].lower().split(' ')[0] in self.commands["seen"]:
             self.cmd_seen(msg[0],sourceNick)
 
-        elif msg[0].lower().split(' ')[0] in self.commands["set"]:
-            self.cmd_set(msg[0], sourceNick)
-
         elif msg[0].lower().strip().split(' ')[0] in self.commands["base64"]:
             cleanB64 = self.list_clean(msg[0].split(' '))[0]
             cleanB64Data = ''.join(msg[0][len(cleanB64)+1:])
