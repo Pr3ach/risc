@@ -131,8 +131,8 @@
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
 #       - Add ability to "sv add/rm/rename/list"
+#       - Add auto rejoin when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
-#       - Add auto join back when timeout
 #       - Add cmd: playerinfo/pi
 #       - Add/fix commands to set/get Cvars
 
@@ -1633,7 +1633,7 @@ class Risc():
             self.privmsg(nick, "cmd_server_list: Error during DB operations.")
         return None
 
-    def cmd_server_from_db(self, sv_name):
+    def cmd_server_from_db(self, sv_name, nick):
         """
         Return sv IP on success, "FAIL" on failure
         """
@@ -1698,7 +1698,7 @@ class Risc():
             return None
 
         else:
-            ip_db = cmd_server_from_db(argv[1])
+            ip_db = self.cmd_server_from_db(clean_msg[1], nick)
             if ip_db == "FAIL":
                 self.privmsg(nick, "No such server.")
                 return None
