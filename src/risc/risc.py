@@ -165,7 +165,7 @@ from irc_rpl import *
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,hello,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill,raw,todo"
+CMDS = "help,ishowadmins,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill,raw,todo"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -420,7 +420,6 @@ class Risc():
         self.commands = {"quit": ["quit", "leave", "disconnect", "q"],
                          "help": ["h", "help"],
                          "ishowadmins": ["isa", "ishowadmins"],
-                         "hello": ["hi", "hello"],
                          "status": ["status", "st"],
                          "players": ["players", "p"],
                          "base64": ["b64", "base64"],
@@ -878,38 +877,6 @@ class Risc():
 
         return None
 
-    def cmd_hello(self, msg0, sourceNick):
-        """
-        Say hello
-        """
-        helloClean = self.list_clean(msg0.split(' '))
-        lenHello = len(helloClean)
-
-        if lenHello > 2:
-            self.privmsg(sourceNick, 'Invalid arguments. Check '+self.cmd_prefix+'help hello.')
-            return None
-
-        if lenHello == 1:
-            self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" says hi to "+self.channel)
-            return None
-
-        else:
-            if len(helloClean[1]) > 28:
-                self.privmsg(sourceNick, 'Nick has too many chars.')
-                return None
-            elif sourceNick.lower() == helloClean[1].lower():
-                self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" is feeling alone ...")
-                return None
-            elif self.nick.lower() == helloClean[1].lower():
-                self.privmsg(self.channel, "Know you're talking to a bot? :')")
-                return None
-            else:
-                if self.is_on_channel(helloClean[1]):
-                    self.privmsg(self.channel, COLOR["boldgreen"]+sourceNick+COLOR['rewind']+" says hi to "+helloClean[1])
-                else:
-                    self.privmsg(sourceNick, "No such nick.")
-        return None
-
     def cmd_ikick(self, msg0, sourceNick):
         """
         Kick a user out of the channel
@@ -1196,10 +1163,6 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
                     ". Makes "+self.nick+ " say <str>. You need to be registered as admin["+str(self.commandLevels['say'])+\
                     "] with "+self.nick+"."
-
-        elif command in self.commands["hello"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> Aliases: " + ', '.join(self.commands["hello"])+\
-                         ". Simply says hi to user <user>. Use without <user> argument to target the channel."
 
         elif command in self.commands["uptime"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["uptime"])+". "+\
@@ -2216,10 +2179,7 @@ class Risc():
         self.debug.info("on_pubmsg: Received command '"+msg[0]+"' from '"+sourceNick+"'"+global_msg)
 
         # Big switch where we handles received commands and eventually their args
-        if msg[0].lower().split(' ')[0] in self.commands["hello"]:
-            self.cmd_hello(msg[0], sourceNick)
-
-        elif msg[0].lower().split(' ')[0] in self.commands["iputgroup"]:
+        if msg[0].lower().split(' ')[0] in self.commands["iputgroup"]:
             self.cmd_iputgroup(sourceNick, msg[0])
 
         elif msg[0].lower().split(' ')[0] in self.commands["ikick"]:
