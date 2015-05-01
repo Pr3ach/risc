@@ -799,8 +799,8 @@ class Risc():
                     self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been added to the admin["+str(argv[2])+"] group.")
                     return None
 
-        except:
-            self.debug.critical('cmd_iputgroup: Exception caught. Rolling back the db')
+        except Exception, e:
+            self.debug.critical('cmd_iputgroup: Exception caught: '%s'. Rolling back the db' % e)
             self.privmsg(self.channel, COLOR["boldred"]+"Exception caught: Operation failed."+COLOR["rewind"])
             if con:
                 con.rollback()
