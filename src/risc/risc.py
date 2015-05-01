@@ -764,10 +764,10 @@ class Risc():
 
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
-            cur = con.cursor()
+            c = con.cursor()
 
             if not argv[2]:
-                cur.execute("""DELETE FROM admins WHERE auth = '%s'""" % target_auth)
+                c.execute("""DELETE FROM admins WHERE auth = '%s'""" % target_auth)
                 if c.rowcount == 1:
                     con.commit()
                     con.close()
@@ -780,9 +780,9 @@ class Risc():
                     self.privmsg(nick, "Operation failed.")
                     return None
             else:
-                cur.execute("""SELECT * FROM admins WHERE auth = '%s'""" % target_auth)
+                c.execute("""SELECT * FROM admins WHERE auth = '%s'""" % target_auth)
                 if c.rowcount == 1:
-                    cur.execute("""UPDATE admins SET level = %d WHERE auth = '%s'""" % (argv[2], target_auth))
+                    c.execute("""UPDATE admins SET level = %d WHERE auth = '%s'""" % (argv[2], target_auth))
                     con.commit()
                     con.close()
                     self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been moved to the admin["+str(argv[2])+"] group.")
@@ -793,7 +793,7 @@ class Risc():
                     con.close()
                     return None
                 else:
-                    cur.execute("""INSERT INTO admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'%s')""" % (target_auth, argv[2], int(time.time()), sourceAuth))
+                    c.execute("""INSERT INTO admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'%s')""" % (target_auth, argv[2], int(time.time()), sourceAuth))
                     con.commit()
                     con.close()
                     self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been added to the admin["+str(argv[2])+"] group.")
@@ -801,6 +801,7 @@ class Risc():
 
         except:
             self.debug.critical('cmd_iputgroup: Exception caught. Rolling back the db')
+            self.privmsg(self.channel, COLOR["boldred"]+"Exception caught: Operation failed."+COLOR["rewind"])
             if con:
                 con.rollback()
                 con.close()
