@@ -130,9 +130,10 @@
 #       - Add ability to completely disable riscb3 related functions/threads [OK]
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
+#       - Fix the whole admin management system [OK]
+#       - Drop hello cmd
 #       - Add ability to "sv add/rm/rename/list" [TEST]
 #       - Add auto rejoin when timeout
-#       - Fix the whole admin managing system
 # ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add cmd: playerinfo/pi
 #       - Add/fix commands to set/get Cvars
@@ -1187,8 +1188,8 @@ class Risc():
                          ". Sometimes, words ain't enough."
 
         elif command in self.commands["server"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+" <ip:port>: Aliases: "+', '.join(self.commands["server"])+\
-                         ". Display info about the specified server. If no port is specified, assume 27960."
+            return COLOR['boldgreen'] + command + COLOR['rewind']+" [<ip:port> | add <ip> <name> | rm <name> | rename <old_name> <new_name>| list]: Aliases: "+', '.join(self.commands["server"])+\
+                         ". Display info about the specified server. If no port is specified, assume 27960. Add, remove, rename or list all the available servers."
 
         elif command in self.commands["say"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
@@ -1261,7 +1262,7 @@ class Risc():
         elif command in self.commands["iputgroup"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <level> Aliases: "+', '.join(self.commands["iputgroup"])+\
                          ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['iputgroup'])+\
-                         "] with risc. <user> must have a quakenet account. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+'.'
+                         "] with risc. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+'. Use <level> = 0 to drop an admin."
 
         elif command in self.commands["kill"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <weapon> Alias(es): " + ', '.join(self.commands["kill"])+\
