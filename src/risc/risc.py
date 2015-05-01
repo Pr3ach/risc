@@ -1764,7 +1764,7 @@ class Risc():
                 else:
                     ping = ''
                 players.append(COLOR['boldgreen']+' '+sv.clientsList[i]+COLOR['rewind']+ping)
-            ret2 = "Playing:"+",".join(players)
+            ret2 = "Playing ("+str(len(sv.clientsList) - bot_count)+'+'+str(bot_count)+"/"+str(sv.maxClients)+'): '+",".join(players)
 
         ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ': Playing:' +\
                 COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
