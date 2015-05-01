@@ -2664,8 +2664,9 @@ class Risc():
         return None
 
     def on_timeout(self, line):
-        time.sleep(30)
-        self.join()
+        self.debug.info("Connection timedout.")
+        time.sleep(3)
+        self.connect()
         return None
 
     def _on_privmsg(self, msg):
