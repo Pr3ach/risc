@@ -1649,7 +1649,6 @@ class Risc():
 
             if c.rowcount == 1:
                 con.close()
-                self.debug.debug(str(c.fetchone()))
                 return c.fetchone()[0]
 
             con.close()
