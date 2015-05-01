@@ -800,7 +800,7 @@ class Risc():
                     return None
 
         except Exception, e:
-            self.debug.critical('cmd_iputgroup: Exception caught: '%s'. Rolling back the db' % e)
+            self.debug.critical("cmd_iputgroup: Exception caught: '%s'. Rolling back the db" % e)
             self.privmsg(self.channel, COLOR["boldred"]+"Exception caught: Operation failed."+COLOR["rewind"])
             if con:
                 con.rollback()
