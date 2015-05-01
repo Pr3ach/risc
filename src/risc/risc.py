@@ -1758,13 +1758,19 @@ class Risc():
                 usePings = True
 
             players = []
+            bot_count = 0
             for i in range(len(sv.clientsList)):
                 if usePings and sv.clientsPings[i] == '0':
                     ping = COLOR['rewind']+' ('+COLOR['boldblue']+'BOT'+COLOR['rewind']+')'
+                    bot_count += 1
                 else:
                     ping = ''
                 players.append(COLOR['boldgreen']+' '+sv.clientsList[i]+COLOR['rewind']+ping)
-            ret2 = "Playing ("+str(len(sv.clientsList) - bot_count)+'+'+str(bot_count)+"/"+str(sv.maxClients)+'): '+",".join(players)
+
+            if usePings:
+                ret2 = "Playing ("+str(len(sv.clientsList) - bot_count)+'+'+str(bot_count)+"/"+str(sv.maxClients)+'): '+",".join(players)
+            else:
+                ret2 = "Playing ("+str(len(sv.clientsList))+"/"+str(sv.maxClients)+'): '+",".join(players)
 
         ret = COLOR['boldgreen'] + re.sub('\^[0-9]', '', sv.hostname) + COLOR['rewind'] + ': Playing:' +\
                 COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
