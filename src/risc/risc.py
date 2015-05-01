@@ -793,7 +793,7 @@ class Risc():
                     con.close()
                     return None
                 else:
-                    c.execute("""INSERT INTO admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'%s')""" % (target_auth, argv[2], int(time.time()), sourceAuth))
+                    c.execute("""INSERT INTO admins(auth,level,addedOn,addedBy) VALUES('%s',%d,%d,'%s')""" % (target_auth, argv[2], int(time.time()), nick_auth))
                     con.commit()
                     con.close()
                     self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been added to the admin["+str(argv[2])+"] group.")
