@@ -131,9 +131,9 @@
 #       - Don't stop on Exception in cmd_search [OK]
 #       - Add cmd todo /add/rm/list [OK]
 #       - Fix the whole admin management system [OK]
-#       - Add ability to "sv add/rm/rename/list" [TEST]
 #       - Drop hello cmd [OK]
-#       - Fix roulette cmd (again) [TEST]
+#       - Fix roulette cmd (yes, again) [OK]
+#       - Add ability to "sv add/rm/rename/list" [OK]
 #       - Add auto rejoin when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add cmd: playerinfo/pi
