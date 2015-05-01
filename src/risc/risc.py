@@ -1274,7 +1274,7 @@ class Risc():
 
         ret.sort()
         # For some reason, sv.clients is innacurate here ...
-        if usePings:
+        if usePings and bot_count:
             return 'Playing on '+serverName+' ('+str(len(sv.clientsList) - bot_count)+'+'+str(bot_count)+'/'+str(sv.maxClients)+'):'+','.join(ret)
         else:
             return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'):'+','.join(ret)
@@ -1767,7 +1767,7 @@ class Risc():
                     ping = ''
                 players.append(COLOR['boldgreen']+' '+sv.clientsList[i]+COLOR['rewind']+ping)
 
-            if usePings:
+            if usePings and bot_count:
                 ret2 = "Playing ("+str(len(sv.clientsList) - bot_count)+'+'+str(bot_count)+"/"+str(sv.maxClients)+'): '+",".join(players)
             else:
                 ret2 = "Playing ("+str(len(sv.clientsList))+"/"+str(sv.maxClients)+'): '+",".join(players)
@@ -1897,7 +1897,7 @@ class Risc():
 
     def cmd_todo(self, msg0, nick):
         """
-        todo [add <todo> | rm <num>]
+        todo [add <todo> | rm <num> | list]
         """
         todo_clean = self.list_clean(msg0.split(' '))
         t = int(time.time())
@@ -1951,7 +1951,7 @@ class Risc():
                 con.close()
                 return None
             self.privmsg(nick, "Operation successful")
-        elif todo_clean[1].lower() == "rm":
+        elif todo_clean[1].lower() in ("rm", "remove", "del", "delete"):
             if len(todo_clean) != 3:
                 self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
                 return None
@@ -1985,7 +1985,7 @@ class Risc():
                 con.close()
                 return None
             self.privmsg(nick, "Operation successful")
-        elif todo_clean[1].lower() == "list":
+        elif todo_clean[1].lower() in ("list", "ls", "show"):
             if len(todo_clean) != 2:
                 self.privmsg(nick, 'Invalid arguments. Check '+self.cmd_prefix+'help todo.')
                 return None
