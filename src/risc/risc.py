@@ -748,7 +748,7 @@ class Risc():
             return None
 
         # Check rights
-         nick_auth, nick_lvl = self.irc_is_admin(nick)
+        nick_auth, nick_lvl = self.irc_is_admin(nick)
         if not nick_auth or nick_lvl != 100:
             self.privmsg(nick, "You need to be admin[100] to access this command.")
             return None
