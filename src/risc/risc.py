@@ -132,8 +132,8 @@
 #       - Add cmd todo /add/rm/list [OK]
 #       - Fix the whole admin management system [OK]
 #       - Add ability to "sv add/rm/rename/list" [TEST]
-#       - Drop hello cmd
-#       - Fix roulette cmd (again)
+#       - Drop hello cmd [OK]
+#       - Fix roulette cmd (again) [TEST]
 #       - Add auto rejoin when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
 #       - Add cmd: playerinfo/pi
@@ -174,6 +174,7 @@ debug_mode = 1
 
 # used by cmd_roulette()
 roulette_shot = random.randint(1, 6)
+roulette_cur = random.randint(1, 6)
 
 # IRC color codes
 COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
@@ -1784,18 +1785,21 @@ class Risc():
         Roulette game 6 chambers
         """
         cmd = self.list_clean(msg0.split(' '))
+
         if len(cmd) != 1:
             self.privmsg(self.channel, "Invalid usage, check "+self.cmd_prefix+"help roulette.")
             return None
+
         global roulette_shot
+        global roulette_cur
 
-        cur = random.randint(1, 6)
-
-        if cur == roulette_shot:
+        if roulette_cur == roulette_shot:
             self.privmsg(self.channel,COLOR['boldred']+"*BANG*"+COLOR['rewind']+" -"+COLOR['boldred']+' '+nick+" is no more ..."+COLOR['rewind'])
             roulette_shot = random.randint(1, 6)
+            roulette_cur = random.randint(1, 6)
             self.sock.send('KICK '+self.channel+' '+nick+' :'+"got rekt"+'\r\n')
         else:
+            roulette_cur = (roulette_cur + 1)%7
             self.privmsg(self.channel, COLOR['boldgreen']+"+click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
         return None
 
