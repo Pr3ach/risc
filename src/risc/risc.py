@@ -136,8 +136,6 @@
 #       - Add ability to "sv add/rm/rename/list" [OK]
 #       - Add auto rejoin when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
-#       - Add cmd: playerinfo/pi
-#       - Add/fix commands to set/get Cvars
 
 
 __author__ = 'Preacher'
@@ -165,7 +163,7 @@ from irc_rpl import *
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,set,say,google,server,uptime,version,roulette,duck,kill,raw,todo"
+CMDS = "help,ishowadmins,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,say,google,server,uptime,version,roulette,duck,kill,raw,todo"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -431,7 +429,6 @@ class Risc():
                          "iputgroup": ["iputgroup", "ipg"],
                          "chat": ["chat"],
                          "seen": ["seen"],
-                         "set": ["set"],
                          "say": ["say"],
                          "google": ["google", "g"],
                          "server": ["server", "sv"],
@@ -1194,10 +1191,6 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind'] + " <string>: Aliases: " + ', '.join(self.commands["sha1"])+\
                          ". Returns the sha1 of the string <string>."
 
-        elif command in self.commands["set"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind'] + " <server> <cvar> <value>: Aliases: " + ', '.join(self.commands["set"])+\
-                         ". Set a value for the specified cvar and server."
-
         elif command in self.commands["chat"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + " <server> <on|off>: Aliases: " + ', '.join(self.commands["chat"])+\
                          ". Enable or disable the chat feature betwen IRC and the game server <server>. Return the state of the chat feature"+\
@@ -1384,58 +1377,6 @@ class Risc():
         else:
             ret.sort()
             return 'Found ' + str(count) + ' players matching: ' + ', '.join(ret)
-
-    def cmd_set(self, msg0, sourceNick):
-        """
-        Set a Cvar value to the specified server
-        """
-        cmd_clean = self.list_clean(msg0.split(' '))
-        cmd_len = len(cmd_clean)
-
-        if cmd_len != 4:
-            self.privmsg(sourceNick,"Invalid arguments, check "+self.cmd_prefix+"help set.")
-            return None
-
-        sv = self.get_dict_key(self.argAliases['servers'], cmd_clean[1])
-
-        if not sv or sv not in self.sv_running:
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+
-                         ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
-            return None
-
-        auth, level = self.irc_is_admin(sourceNick)
-
-        if not auth or level < self.commandLevels['set']:
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You need to be admin["+
-                         str(self.commandLevels['set'])+'] to access this command.')
-            return None
-
-        try:
-            data = cmd_clean[2]+'\r\n'+cmd_clean[3]
-            db = self.get_db(sv)
-            if not db:
-                self.privmsg(sourceNick, COLOR['boldred']+sourceNick+COLOR['rewind']+
-                         ': There was an error setting the Cvar for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
-                return None
-            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
-            cur = con.cursor()
-
-            # <Cvar> <value>
-            cur.execute("""INSERT INTO %s(evt,data,time,processed) VALUES('EVT_CVAR_SET','%s',%d,0)""" % ('risc_' + sv, data, int(time.time())))
-            con.commit()
-            con.close()
-        except Exception, e:
-            self.debug.error('cmd_set: Exception: %s - Trying rollback db - Passing' % e)
-            if con:
-                con.rollback()
-                con.close()
-            self.privmsg(sourceNick, COLOR['boldred']+sourceNick+COLOR['rewind']+
-                         ': There was an error setting the Cvar for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
-            pass
-
-        self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+
-                         ': Setting the Cvar for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
-        return None
 
     def cmd_say(self, msg0, nick):
         """
@@ -2829,7 +2770,7 @@ class Risc():
                 elif re.search(" NICK ", line):
                     self.on_nick(line)
 
-                    # Indicate we're connected, we can now join the channel
+                # Indicate we're connected, we can now join the channel
                 elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
                     self.on_welcome()
 
