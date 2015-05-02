@@ -135,6 +135,7 @@
 #       - Fix roulette cmd (yes, again) [OK]
 #       - Add ability to "sv add/rm/rename/list" [OK]
 #       - Add auto rejoin when timeout
+#       - Fix "Title: <empty>" bug on some links
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
@@ -2590,12 +2591,15 @@ class Risc():
         url_list = self.xurls(msg)
         for url in url_list:
             try:
-                self.privmsg(self.channel, "Title: " + lxml.html.fromstring(requests.get(url, headers=\
-                        {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"}).text).find(".//title")\
-                        .text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url)+')'))
+                title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
+
+                if title is None:
+                    return None
+
+                title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url)+')'
+                self.privmsg(self.channel, "Title: " + title)
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' % e)
-
         return None
 
     def on_kick(self, raw_msg):
