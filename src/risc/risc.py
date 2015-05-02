@@ -2600,7 +2600,7 @@ class Risc():
                 title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
                 self.privmsg(self.channel, "Title: " + title)
             except Exception, e:
-                self.debug.error('process_irc: Exception caught: '%s'.' % e)
+                self.debug.error("process_irc: Exception caught: '%s'." % e)
 
         return None
 
