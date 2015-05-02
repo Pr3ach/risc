@@ -2594,10 +2594,9 @@ class Risc():
             try:
                 title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
 
-                if title is None:
+                if title is None or not hasattr(title, "text"):
                     continue
 
-                self.debug.debug(str(title.text))
                 title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
                 self.privmsg(self.channel, "Title: " + title)
             except Exception, e:
