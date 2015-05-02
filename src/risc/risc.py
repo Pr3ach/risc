@@ -2594,8 +2594,7 @@ class Risc():
             try:
                 title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
 
-                self.debug.debug(str(type(title)))
-                self.debug.debug(str(hasattr(title, "text")))
+                self.debug.debug(str(title.text))
                 if title is None or not hasattr(title, "text"):
                     self.debug.info("process_irc: Bad URL - Ignoring.")
                     continue
