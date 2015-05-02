@@ -2582,27 +2582,21 @@ class Risc():
         """
         Handle IRC messages if needed
         """
-        self.debug.debug("info")
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
-        self.debug.debug("info")
         msg = ':'.join(raw_msg[0].split(':')[2:])
         nick = raw_msg[0].split('!')[0][1:]
-        self.debug.debug("info")
 
         # Process URLs posting
         url_list = self.xurls(msg)
-        self.debug.debug("info")
 
         for url in url_list:
             try:
-                self.debug.debug("info")
                 title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
-                self.debug.debug("info")
 
                 if title is None:
                     continue
-                self.debug.debug("info")
+                self.debug.debug(str(type(title)))
 
                 title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
                 self.privmsg(self.channel, "Title: " + title)
