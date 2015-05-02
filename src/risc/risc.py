@@ -2783,17 +2783,17 @@ class Risc():
                     self.on_nick(line)
 
                 # Indicate we're connected, we can now join the channel
-            elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
-                self.on_welcome()
+                elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
+                    self.on_welcome()
 
-            elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
-                self.on_namereply(line)
+                elif re.search(' '+RPL_NAMEREPLY+' '+self.nick+' ', line):
+                    self.on_namereply(line)
 
-            elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
-                self.on_nicknameinuse(line)
+                elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
+                    self.on_nicknameinuse(line)
 
-            elif re.search("ERROR :Closing Link: .* by .* \(Ping timeout\)", line):
-                self.on_timeout(line)
+                elif re.search("ERROR :Closing Link: .* by .* \(Ping timeout\)", line):
+                    self.on_timeout(line)
 
 if __name__ == '__main__':
     print "[+] Running ..."
