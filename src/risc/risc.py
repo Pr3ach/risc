@@ -2599,6 +2599,7 @@ class Risc():
                 self.debug.debug(str(type(title)))
 
                 title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
+                self.debug.debug(str(type(title)))
                 self.privmsg(self.channel, "Title: " + title)
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' % e)
