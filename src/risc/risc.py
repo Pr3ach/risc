@@ -2591,19 +2591,19 @@ class Risc():
         url_list = self.xurls(msg)
 
         for url in url_list:
-            #try:
-            title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
+            try:
+                title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
 
-            self.debug.debug("DBG")
-            if title is None or hasattr(title, "text") == False:
-                self.debug.info("process_irc: Bad URL - Ignoring.")
-                continue
-            self.debug.debug("DBG")
+                self.debug.debug(str(type(title)))
+                self.debug.debug(str(hasattr(title, "text")))
+                if title is None or not hasattr(title, "text"):
+                    self.debug.info("process_irc: Bad URL - Ignoring.")
+                    continue
 
-            title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
-            self.privmsg(self.channel, "Title: " + title)
-            #except Exception, e:
-                #self.debug.error("process_irc: Exception caught: '%s'." % e)
+                title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
+                self.privmsg(self.channel, "Title: " + title)
+            except Exception, e:
+                self.debug.error("process_irc: Exception caught: '%s'." % e)
 
         return None
 
