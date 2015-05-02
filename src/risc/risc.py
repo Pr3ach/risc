@@ -1454,7 +1454,7 @@ class Risc():
             sv = Sv(ip.split(':')[0], int(ip.split(':')[1]), '', self.debug)
         except Exception, e:
             self.debug.warning("cmd_server_add: Invalid ioq3 IP.")
-            self.privmsg(nick, "cmd_server_add: Invalid ioq3 IP.")
+            self.privmsg(nick, "Invalid ioq3 IP.")
             return None
 
         try:
