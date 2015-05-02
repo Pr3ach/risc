@@ -2589,17 +2589,19 @@ class Risc():
 
         # Process URLs posting
         url_list = self.xurls(msg)
+
         for url in url_list:
             try:
                 title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
 
                 if title is None:
-                    return None
+                    continue
 
-                title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url)+')'
+                title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
                 self.privmsg(self.channel, "Title: " + title)
             except Exception, e:
                 self.debug.error('process_irc: Exception: %s - Ret' % e)
+
         return None
 
     def on_kick(self, raw_msg):
