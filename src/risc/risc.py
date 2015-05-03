@@ -135,6 +135,7 @@
 #       - Fix roulette cmd (yes, again) [OK]
 #       - Add ability to "sv add/rm/rename/list" [OK]
 #       - Add auto rejoin when timeout
+#       - Fix "Title: <empty>" bug on some links
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
@@ -176,9 +177,9 @@ roulette_cur = random.randint(1, 6)
 
 # IRC color codes
 COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
-         'magenta': '\x036', 'boldmagenta': '\x02\x036', 'blue': '\x032',
-         'boldred': '\x02\x034', 'boldblue': '\x02\x032', 'boldgreen': '\x02\x033',
-         'boldyellow': '\x02\x038', 'boldblack': '\x02\x031', 'rewind': '\x0f'}
+        'magenta': '\x036', 'boldmagenta': '\x02\x036', 'blue': '\x032',
+        'boldred': '\x02\x034', 'boldblue': '\x02\x032', 'boldgreen': '\x02\x033',
+        'boldyellow': '\x02\x038', 'boldblack': '\x02\x031', 'rewind': '\x0f'}
 
 ##########################################################################################################
 #                                                                                                        #
@@ -417,37 +418,37 @@ class Risc():
 
         # Commands and their aliases
         self.commands = {"quit": ["quit", "leave", "disconnect", "q"],
-                         "help": ["h", "help"],
-                         "ishowadmins": ["isa", "ishowadmins"],
-                         "status": ["status", "st"],
-                         "players": ["players", "p"],
-                         "base64": ["b64", "base64"],
-                         "sha1": ["sha1"],
-                         "md5": ["md5"],
-                         "search": ['search', 's'],
-                         "ikick": ["ikick", "ik"],
-                         "iputgroup": ["iputgroup", "ipg"],
-                         "chat": ["chat"],
-                         "seen": ["seen"],
-                         "say": ["say"],
-                         "google": ["google", "g"],
-                         "server": ["server", "sv"],
-                         "uptime": ["uptime"],
-                         "version": ["version", "v"],
-                         "roulette": ["roulette", 'r'],
-                         "duck": ["duck"],
-                         "ileveltest": ['ileveltest', 'ilt'],
-                         "kill": ['kill', 'k'],
-                         "raw": ["raw"],
-                         "todo": ["todo"]}
+                "help": ["h", "help"],
+                "ishowadmins": ["isa", "ishowadmins"],
+                "status": ["status", "st"],
+                "players": ["players", "p"],
+                "base64": ["b64", "base64"],
+                "sha1": ["sha1"],
+                "md5": ["md5"],
+                "search": ['search', 's'],
+                "ikick": ["ikick", "ik"],
+                "iputgroup": ["iputgroup", "ipg"],
+                "chat": ["chat"],
+                "seen": ["seen"],
+                "say": ["say"],
+                "google": ["google", "g"],
+                "server": ["server", "sv"],
+                "uptime": ["uptime"],
+                "version": ["version", "v"],
+                "roulette": ["roulette", 'r'],
+                "duck": ["duck"],
+                "ileveltest": ['ileveltest', 'ilt'],
+                "kill": ['kill', 'k'],
+                "raw": ["raw"],
+                "todo": ["todo"]}
 
         # Valid argument for each commands
         tmp = ["all"]
         tmp.extend(self.svs)
         self.args = {"status": tmp,
-                     "players": self.svs,
-                     "search": self.svs,
-                     "iputgroup": [60, 80]}
+                "players": self.svs,
+                "search": self.svs,
+                "iputgroup": [60, 80]}
 
         # Commands that need some rights
         self.commandLevels = self.get_cmd_levels()
@@ -503,19 +504,19 @@ class Risc():
         Init the different command access levels
         """
         ret = {"quit": 80,
-               "ikick": 80,
-               "iputgroup": 100,
-               "chat": 80,
-               "set": 80,
-               "say": 60,
-               "ileveltest": 60,
-               "raw": 100,
-               "todo_add": 80,
-               "todo_rm": 100,
-               "server_add" : 60,
-               "server_rm": 100,
-               "server_rename": 60,
-               "server_ls": 60}
+                "ikick": 80,
+                "iputgroup": 100,
+                "chat": 80,
+                "set": 80,
+                "say": 60,
+                "ileveltest": 60,
+                "raw": 100,
+                "todo_add": 80,
+                "todo_rm": 100,
+                "server_add" : 60,
+                "server_rm": 100,
+                "server_rename": 60,
+                "server_ls": 60}
 
         for cmd in ret:
             if self.cfg.has_option("levels", "cmd_"+cmd):
@@ -833,14 +834,14 @@ class Risc():
                 self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": You're a "+self.nick+" admin["+str(targetLevel)+'].')
             else:
                 self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": User "+COLOR['boldblue']+testNick+COLOR['rewind']+
-                             " is a "+self.nick+" admin["+str(targetLevel)+'].')
+                        " is a "+self.nick+" admin["+str(targetLevel)+'].')
         else:
             if sourceNick.lower() == testNick.lower():
                 self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You're not a "+self.nick+" admin.")
             else:
                 self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": User "+COLOR['boldblue']+
-                             testNick+COLOR['rewind']+' is not a '+self.nick+" admin.")
-        return None
+                        testNick+COLOR['rewind']+' is not a '+self.nick+" admin.")
+                return None
 
     def cmd_ishowadmins(self, msg0, sourceNick):
         """
@@ -902,11 +903,11 @@ class Risc():
                 return None
         else:
             self.privmsg(self.channel, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": "+COLOR['boldred']+
-                         "You need to be admin["+str(self.commandLevels['ikick'])+"] to access this command, or the target admin"+\
-                                 " group is higher or equal to yours."+COLOR['rewind'])
+                    "You need to be admin["+str(self.commandLevels['ikick'])+"] to access this command, or the target admin"+\
+                            " group is higher or equal to yours."+COLOR['rewind'])
 
-    def cmd_sha1(self, msg0, sourceNick):
-        """
+            def cmd_sha1(self, msg0, sourceNick):
+                """
         Give the SHA1 for the given string
         """
         cleanSha1Data = ''.join(msg0[6:])  # In case we have spaces in the string, they're taken into account
@@ -918,7 +919,7 @@ class Risc():
                 sha1 = hashlib.sha1(cleanSha1Data).hexdigest()
             except:
                 self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+': '+
-                             COLOR['boldred']+'There was an error while computing. Check your input.'+COLOR['rewind'])
+                        COLOR['boldred']+'There was an error while computing. Check your input.'+COLOR['rewind'])
                 return None
             self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+': '+sha1)
         return None
@@ -936,7 +937,7 @@ class Risc():
                 md5 = hashlib.md5(cleanMd5Data).hexdigest()
             except:
                 self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+': '+COLOR['boldred']+
-                             'There was an error processing your command. Check your input.'+COLOR['rewind'])
+                        'There was an error processing your command. Check your input.'+COLOR['rewind'])
                 return None
             self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+': '+md5)
         return None
@@ -952,8 +953,8 @@ class Risc():
             self.exit_process("Exiting now: %s" % sourceNick)
         else:
             self.privmsg(self.channel, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": "+COLOR['boldred']+
-                         "You need to be admin["+str(self.commandLevels["quit"])+"] to access this command."+COLOR['rewind'])
-        return None
+                    "You need to be admin["+str(self.commandLevels["quit"])+"] to access this command."+COLOR['rewind'])
+            return None
 
     def cmd_help(self, msg0, sourceNick):
         """
@@ -997,23 +998,23 @@ class Risc():
 
         if not sv or sv not in self.sv_running:
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+
-                         ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
+                    ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
             return None
 
         if len_cmd == 2:
             if chat_set[sv]:
                 self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+sv+
-                             " server is currently"+COLOR['boldgreen']+' ON'+COLOR['rewind'])
+                        " server is currently"+COLOR['boldgreen']+' ON'+COLOR['rewind'])
             else:
                 self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+sv+
-                             " server is currently"+COLOR['boldred']+' OFF'+COLOR['rewind'])
-            return None
+                        " server is currently"+COLOR['boldred']+' OFF'+COLOR['rewind'])
+                return None
 
         auth, level = self.irc_is_admin(sourceNick)
 
         if not auth or level < self.commandLevels['chat']:
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You need to be admin["+
-                         str(self.commandLevels['chat'])+'] to access this command.')
+                    str(self.commandLevels['chat'])+'] to access this command.')
             return None
 
 
@@ -1038,7 +1039,7 @@ class Risc():
         except:
             self.debug.error('cmd_chat: Error during db operations, trying roll back. Passing')
             self.privmsg(sourceNick, COLOR['boldred']+sourceNick+COLOR['rewind']+
-                         ': There was an error changing the chat state for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
+                    ': There was an error changing the chat state for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
             if con:
                 con.rollback()
                 con.close()
@@ -1048,11 +1049,11 @@ class Risc():
 
         if chat_set[sv]:
             self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+COLOR['boldblue']+sv+
-                         COLOR['rewind']+" server is now"+COLOR['boldgreen']+' ON'+COLOR['rewind'])
+                    COLOR['rewind']+" server is now"+COLOR['boldgreen']+' ON'+COLOR['rewind'])
         else:
             self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+COLOR['boldblue']+sv+
-                         COLOR['rewind']+" server is now"+COLOR['boldred']+' OFF'+COLOR['rewind'])
-        return None
+                    COLOR['rewind']+" server is now"+COLOR['boldred']+' OFF'+COLOR['rewind'])
+            return None
 
     def cmd_status(self, serv):
         """
@@ -1078,7 +1079,7 @@ class Risc():
                     nbClients = len(sv.clientsList)
 
                 ret += COLOR['boldgreen']+i+COLOR['rewind']+': Playing:'+COLOR['boldblue']+' '+str(nbClients)+COLOR['rewind']+\
-                             '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
+                        '/'+str(sv.maxClients)+', map: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind']+' - '
                 del sv
             if len(ret) >= 3:
                 ret = ret[:-3]
@@ -1108,13 +1109,13 @@ class Risc():
                 sv.allowVote = COLOR['boldred']+'OFF'+COLOR['rewind']
 
             ret = COLOR['boldgreen'] + keyFromValue + COLOR['rewind'] + ': Playing:' +\
-                COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
-                str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
-                re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
-                ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
-                COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
-                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote+', IP:'+COLOR['boldblue']+' '+fullIp[0]+':'+\
-                str(fullIp[1])+COLOR['rewind']
+                    COLOR['boldblue'] + ' '+str(nbClients) + COLOR['rewind'] + '/' +\
+                    str(sv.maxClients) + ', map: '+COLOR['boldblue'] +\
+                    re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
+                    ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
+                    COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
+                    ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote+', IP:'+COLOR['boldblue']+' '+fullIp[0]+':'+\
+                    str(fullIp[1])+COLOR['rewind']
             del sv
         return ret
 
@@ -1126,36 +1127,36 @@ class Risc():
 
         if command in self.commands["quit"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: " + ', '.join(self.commands["quit"])+\
-                         ". Tells risc to leave. You need to be registered as admin["+str(self.commandLevels['quit'])+\
-                         "] with "+self.nick+"."
+                    ". Tells risc to leave. You need to be registered as admin["+str(self.commandLevels['quit'])+\
+                    "] with "+self.nick+"."
 
         elif command in self.commands["seen"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
-                         ". Return the last time a player was seen in the server set."
+                    ". Return the last time a player was seen in the server set."
 
         elif command in self.commands["todo"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [add <todo> | rm <todo_id> | list]: Aliases: "+', '.join(self.commands["todo"])+\
-                         ". add/remove/list todo."
+                    ". add/remove/list todo."
 
         elif command in self.commands["raw"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [cmd]: Aliases: "+', '.join(self.commands["raw"])+\
-                         ". Sends [cmd] data to the irc server. You need to be admin["+str(self.commandLevels["raw"])+"] to access this command."
+                    ". Sends [cmd] data to the irc server. You need to be admin["+str(self.commandLevels["raw"])+"] to access this command."
 
         elif command in self.commands["version"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["version"])+\
-                         ". Return the bot version."
+                    ". Return the bot version."
 
         elif command in self.commands["roulette"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["roulette"])+\
-                         ". Russian roulette game."
+                    ". Russian roulette game."
 
         elif command in self.commands["duck"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["duck"])+\
-                         ". Sometimes, words ain't enough."
+                    ". Sometimes, words ain't enough."
 
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [<ip:port> | add <ip> <name> | rm <name> | rename <old_name> <new_name> | list]: Aliases: "+', '.join(self.commands["server"])+\
-                         ". Display info about the specified server. If no port is specified, assume 27960. Add, remove, rename or list all the available servers."
+                    ". Display info about the specified server. If no port is specified, assume 27960. Add, remove, rename or list all the available servers."
 
         elif command in self.commands["say"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
@@ -1168,16 +1169,16 @@ class Risc():
 
         elif command in self.commands["players"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <serverName>: Aliases: "+", ".join(self.commands["players"])+\
-                         ". Shows all players on the <serverName> server. Available args/server-name: "+', '.join(self.args["players"])+'.'
+                    ". Shows all players on the <serverName> server. Available args/server-name: "+', '.join(self.args["players"])+'.'
 
         elif command in self.commands["search"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <playerNick> <server> Aliases: " + ', '.join(self.commands["search"])+\
-                         ". Search for the player <playerNick> in the current server set if <server> is not specified,"+\
-                         " else it performs the search in the <server> server."
+                    ". Search for the player <playerNick> in the current server set if <server> is not specified,"+\
+                    " else it performs the search in the <server> server."
 
         elif command in self.commands["ishowadmins"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["ishowadmins"])+". Show all "+\
-                         self.nick+" admins."
+                    self.nick+" admins."
 
         elif command in self.commands["google"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["google"])+". Perform a"+\
@@ -1185,46 +1186,46 @@ class Risc():
 
         elif command in self.commands["base64"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <utf8String>: Aliases: "+', '.join(self.commands["base64"])+\
-                         ". Returns a base64 encoded string from the utf-8 string <utf8String>."
+                    ". Returns a base64 encoded string from the utf-8 string <utf8String>."
 
         elif command in self.commands["sha1"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + " <string>: Aliases: " + ', '.join(self.commands["sha1"])+\
-                         ". Returns the sha1 of the string <string>."
+                    ". Returns the sha1 of the string <string>."
 
         elif command in self.commands["chat"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + " <server> <on|off>: Aliases: " + ', '.join(self.commands["chat"])+\
-                         ". Enable or disable the chat feature betwen IRC and the game server <server>. Return the state of the chat feature"+\
-                         " in the servers when no arg are specified, or the state of the chat feature in the specified server if any."+\
-                         " You need to be admin["+str(self.commandLevels['chat'])+'] to access this command.'
+                    ". Enable or disable the chat feature betwen IRC and the game server <server>. Return the state of the chat feature"+\
+                    " in the servers when no arg are specified, or the state of the chat feature in the specified server if any."+\
+                    " You need to be admin["+str(self.commandLevels['chat'])+'] to access this command.'
 
         elif command in self.commands["ikick"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> <reason> Aliases: " + ', '.join(self.commands["ikick"]) +\
-                         ". Kicks the channel user <user>. You need to registered as admin[" +\
-                         str(self.commandLevels['ikick']) +\
-                         "] with risc. Also you can't kick another admin unless your level is strictly higher than his."
+                    ". Kicks the channel user <user>. You need to registered as admin[" +\
+                    str(self.commandLevels['ikick']) +\
+                    "] with risc. Also you can't kick another admin unless your level is strictly higher than his."
 
         elif command in self.commands["ileveltest"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> Aliases: " + ', '.join(self.commands["ileveltest"]) +\
-                         ". Returns the level of the user <user> if he's registered as admin with risc. If you don't specify a <user> parameter,"+\
-                         " the command will return your level. You're required to be registered as admin[" +\
-                         str(self.commandLevels['ileveltest'])+"] with "+self.nick+" to access this command."
+                    ". Returns the level of the user <user> if he's registered as admin with risc. If you don't specify a <user> parameter,"+\
+                    " the command will return your level. You're required to be registered as admin[" +\
+                    str(self.commandLevels['ileveltest'])+"] with "+self.nick+" to access this command."
 
         elif command in self.commands["md5"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <string>: Aliases: "+', '.join(self.commands["md5"])+\
-                         ". Returns the md5 of the string <string>."
+                    ". Returns the md5 of the string <string>."
 
         elif command in self.commands["status"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ' <serverName>' + ": Aliases: " + ', '.join(self.commands["status"])+\
-                         ". Diplays information about the <serverName> server. Available args/server-name: "+', '.join(self.args['status'])
+                    ". Diplays information about the <serverName> server. Available args/server-name: "+', '.join(self.args['status'])
 
         elif command in self.commands["iputgroup"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <level> Aliases: "+', '.join(self.commands["iputgroup"])+\
-                         ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['iputgroup'])+\
-                         "] with risc. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+". Use <level> = 0 to drop an admin."
+                    ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['iputgroup'])+\
+                    "] with risc. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+". Use <level> = 0 to drop an admin."
 
         elif command in self.commands["kill"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <weapon> Alias(es): " + ', '.join(self.commands["kill"])+\
-                         ". Performs a kill on the specified <user> with the desired <weapon>. Can be used without <weapon> argument."
+                    ". Performs a kill on the specified <user> with the desired <weapon>. Can be used without <weapon> argument."
         else:
             return "Command not found: " + COLOR['boldmagenta']+command+COLOR['rewind']
 
@@ -1310,9 +1311,9 @@ class Risc():
             if last_seen != (0, 0) and last_seen_sv != '':
                 t = time.gmtime(last_seen[1])
                 self.privmsg(sourceNick, "Player %s%s%s @%d was last seen on the %s%s%s server on%s %d/%d/%d %sat%s %d:%d %s(GMT)" % (\
-                             COLOR['boldblue'], cleanCmd[1], COLOR['rewind'], last_seen[0], COLOR['boldblue'], last_seen_sv,\
-                             COLOR['rewind'], COLOR['boldblue'], t[1], t[2], t[0], COLOR['rewind'],\
-                             COLOR['boldblue'], t[3], t[4], COLOR['rewind']))
+                        COLOR['boldblue'], cleanCmd[1], COLOR['rewind'], last_seen[0], COLOR['boldblue'], last_seen_sv,\
+                        COLOR['rewind'], COLOR['boldblue'], t[1], t[2], t[0], COLOR['rewind'],\
+                        COLOR['boldblue'], t[3], t[4], COLOR['rewind']))
                 return None
         except Exception, e:
             self.debug.error('cmd_seen: Caught exception: %s - Passing' % e)
@@ -1360,7 +1361,7 @@ class Risc():
                     if len(pings[sv]) == len(clients[sv]):
                         if pings[sv][i] == '0':
                             ret.append(COLOR['boldgreen'] + clients[sv][i] + COLOR['rewind'] + ' (' + COLOR['boldblue'] +
-                                       'BOT' + COLOR['rewind'] + ',' + COLOR['boldblue'] + ' ' + sv + COLOR['rewind'] + ')')
+                                    'BOT' + COLOR['rewind'] + ',' + COLOR['boldblue'] + ' ' + sv + COLOR['rewind'] + ')')
                         else:
                             ret.append(COLOR['boldgreen'] + clients[sv][i] + COLOR['rewind'] + ' (' + COLOR['boldblue'] + sv + COLOR['rewind'] + ')')
                     else:
@@ -1453,7 +1454,7 @@ class Risc():
             sv = Sv(ip.split(':')[0], int(ip.split(':')[1]), '', self.debug)
         except Exception, e:
             self.debug.warning("cmd_server_add: Invalid ioq3 IP.")
-            self.privmsg(nick, "cmd_server_add: Invalid ioq3 IP.")
+            self.privmsg(nick, "Invalid ioq3 IP.")
             return None
 
         try:
@@ -2588,13 +2589,20 @@ class Risc():
 
         # Process URLs posting
         url_list = self.xurls(msg)
+
         for url in url_list:
             try:
-                self.privmsg(self.channel, "Title: " + lxml.html.fromstring(requests.get(url, headers=\
-                        {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"}).text).find(".//title")\
-                        .text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url)+')'))
+                title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
+
+                self.debug.debug(str(title.text))
+                if title is None or not hasattr(title, "text"):
+                    self.debug.info("process_irc: Bad URL - Ignoring.")
+                    continue
+
+                title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
+                self.privmsg(self.channel, "Title: " + title)
             except Exception, e:
-                self.debug.error('process_irc: Exception: %s - Ret' % e)
+                self.debug.error("process_irc: Exception caught: '%s'." % e)
 
         return None
 
