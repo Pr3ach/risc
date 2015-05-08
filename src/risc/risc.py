@@ -138,7 +138,7 @@
 #       - Add auto rejoin when timeout [OK]
 #       - Fix "Title: <empty>" bug on some links [OK]
 #       - Fix utf issues [OK]
-#       - Fix sv rename bug
+#       - Fix sv rename bug [OK]
 #       - Simplify initialization process
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
