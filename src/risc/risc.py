@@ -2597,6 +2597,7 @@ class Risc():
         for url in url_list:
             try:
                 br = Browser()
+                br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0')]
                 br.open(url)
                 self.privmsg(self.channel, "Title: " + br.title())
             except Exception, e:
