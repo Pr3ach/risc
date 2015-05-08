@@ -1486,7 +1486,7 @@ class Risc():
             con.close()
         except Exception, e:
             self.debug.warning(nick, "cmd_server_add: Error during DB operations. Rolling back.")
-            self.privmsg(nick, "cmd_server_add: Error during DB operations.")
+            self.privmsg(nick, "Error during DB operations.")
             con.rollback()
             return None
 
@@ -1523,7 +1523,7 @@ class Risc():
             con.close()
         except Exception, e:
             self.debug.warning(nick, "cmd_server_rm: Error during DB operations. Rolling back.")
-            self.privmsg(nick, "cmd_server_rm: Error during DB operations.")
+            self.privmsg(nick, "Error during DB operations.")
             con.rollback()
             return None
 
@@ -1557,12 +1557,18 @@ class Risc():
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
+
+            c.execute("""SELECT * FROM server WHERE name = '%s'""" % new_name)
+            if c.rowcount:
+                self.privmsg(nick, "Server name already exists.")
+                con.close()
+                return None
             c.execute("""UPDATE server SET name = '%s' WHERE name = '%s'""" % (new_name, old_name))
             con.commit()
             con.close()
         except Exception, e:
             self.debug.warning(nick, "cmd_server_rename: Error during DB operations. Rolling back.")
-            self.privmsg(nick, "cmd_server_rename: Error during DB operations.")
+            self.privmsg(nick, "Error during DB operations.")
             con.rollback()
             return None
 
@@ -1601,7 +1607,7 @@ class Risc():
             con.close()
         except Exception, e:
             self.debug.warning(nick, "cmd_server_list: Error during DB operations.")
-            self.privmsg(nick, "cmd_server_list: Error during DB operations.")
+            self.privmsg(nick, "Error during DB operations.")
         return None
 
     def cmd_server_from_db(self, sv_name, nick):
@@ -1625,7 +1631,7 @@ class Risc():
             con.close()
         except Exception, e:
             self.debug.warning(nick, "cmd_server_list: Error during DB operations.")
-            self.privmsg(nick, "cmd_server_list: Error during DB operations.")
+            self.privmsg(nick, "Error during DB operations.")
         return "FAIL"
 
     def cmd_server(self, msg0, nick):
@@ -2818,5 +2824,5 @@ if __name__ == '__main__':
         inst.debug.error('Caught UnicodeDecodeError exception on Risc.start(). Passing')
         pass
     except Exception, e:
-        inst.debug.critical('Unhandled exception on Risc(): %s. Exiting.' % e)
+        inst.debug.critical("Unhandled exception on Risc(): '%s'. Exiting." % e)
         inst.exit_process()
