@@ -136,8 +136,8 @@
 #       - Fix roulette cmd (yes, again) [OK]
 #       - Add ability to "sv add/rm/rename/list" [OK]
 #       - Add auto rejoin when timeout [OK]
-#       - Fix "Title: <empty>" bug on some links
-#       - Fix utf issues
+#       - Fix "Title: <empty>" bug on some links [OK]
+#       - Fix utf issues [OK]
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
