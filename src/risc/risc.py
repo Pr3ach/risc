@@ -1,4 +1,5 @@
 #!/usr/bin/python2
+# -*- coding: utf-8 -*-
 
 # CHANGELOG
 #
@@ -134,8 +135,9 @@
 #       - Drop hello cmd [OK]
 #       - Fix roulette cmd (yes, again) [OK]
 #       - Add ability to "sv add/rm/rename/list" [OK]
-#       - Add auto rejoin when timeout
+#       - Add auto rejoin when timeout [OK]
 #       - Fix "Title: <empty>" bug on some links
+#       - Fix utf issues
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
@@ -160,6 +162,7 @@ import tld
 import random
 import requests
 from irc_rpl import *
+from mechanize import Browser
 
 init_time = int(time.time())
 last_cmd_time = 0
@@ -2580,10 +2583,11 @@ class Risc():
 
     def process_irc(self, raw_msg):
         """
-        Handle IRC messages if needed
+        Handle IRC messages
         """
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
+
         msg = ':'.join(raw_msg[0].split(':')[2:])
         nick = raw_msg[0].split('!')[0][1:]
 
@@ -2592,15 +2596,8 @@ class Risc():
 
         for url in url_list:
             try:
-                title = requests.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/33.0"})
-
-                self.debug.debug(str(title.text))
-                if title is None or not hasattr(title, "text"):
-                    self.debug.info("process_irc: Bad URL - Ignoring.")
-                    continue
-
-                title = lxml.html.fromstring(title.text).find(".//title").text.encode("ascii", errors="backslashreplace")+" (at "+str(tld.get_tld(url))+')'
-                self.privmsg(self.channel, "Title: " + title)
+                br = Browser()
+                self.privmsg(self.channel, "Title: " + br.open(url).title())
             except Exception, e:
                 self.debug.error("process_irc: Exception caught: '%s'." % e)
 
