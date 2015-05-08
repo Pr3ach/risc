@@ -2597,7 +2597,8 @@ class Risc():
         for url in url_list:
             try:
                 br = Browser()
-                self.privmsg(self.channel, "Title: " + br.open(url).title())
+                br.open(url)
+                self.privmsg(self.channel, "Title: " + br.title())
             except Exception, e:
                 self.debug.error("process_irc: Exception caught: '%s'." % e)
 
