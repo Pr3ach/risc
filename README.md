@@ -3,14 +3,15 @@ risc is an IRC bot providing interaction with the UrbanTerror (ioq3) game throug
 the [BigBrotherBot](http://www.bigbrotherbot.net/) (b3) API.
 
 ## Required dependencies
-The whole software requires some python libs before you can run it, you can install these using pip (or pip2) or easy_install:
+The whole software requires some python libs before you can run it, you can install these using pip2 or easy_install:
 
 * `tld`
 * `requests`
 * `lxml`
+* `mechanize`
 
 ## Installation - risc standalone
-Clone (master) into your home directory. You'll find two main folders 
+Clone (master) into your home directory. You'll find two main folders
 in b3-risc/src: `extplugins` and `risc`. The first one is used for b3
 interaction, while the second is the main IRC bot. Both will interact.
 
