@@ -135,11 +135,10 @@
 #       - Drop hello cmd [OK]
 #       - Fix roulette cmd (yes, again) [OK]
 #       - Add ability to "sv add/rm/rename/list" [OK]
-#       - Add auto rejoin when timeout [OK]
+#       - Add auto reconnect when timeout [OK]
 #       - Fix "Title: <empty>" bug on some links [OK]
 #       - Fix utf issues [OK]
 #       - Fix sv rename bug [OK]
-#       - Simplify initialization process
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
