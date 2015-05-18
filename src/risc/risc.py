@@ -2832,7 +2832,7 @@ def main():
         inst.debug.error('Caught UnicodeDecodeError exception on Risc.start(). Passing')
         pass
     except Exception, e:
-        if e == "risc_exception_irc_timeout":
+        if str(e) == "risc_exception_irc_timeout":
             main()
         else:
             inst.debug.critical("Unhandled exception on Risc(): '%s'. Exiting." % e)
