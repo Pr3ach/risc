@@ -138,6 +138,7 @@
 #       - Fix "Title: <empty>" bug on some links [OK]
 #       - Fix utf issues [OK]
 #       - Fix sv rename bug [OK]
+#       - Improve init stuff
 #       - Add auto reconnect when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
@@ -201,6 +202,7 @@ class Debug:
     """
     def __init__(self, use__stdout__):
         t = time.time()
+
         if not use__stdout__:
             sys.stdout = open("risc_"+str(int(t))+'.log', "w+", 0)
 
@@ -383,7 +385,8 @@ class Risc():
             self.db_passwd = self.cfg.get('db', 'passwd')
             self.db_name = self.cfg.get('db', 'self_db')    # db for risc settings (admins etc)
             self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
-            self.on_kick_threshold = int(self.cfg.get("risc", "on_kick_threshold"))
+            self.on_kick_delay = int(self.cfg.get("risc", "on_kick_delay"))
+            self.on_timeout_delay = int(self.cfg.get("risc", "on_timeout_delay"))
 
             # Get servers, their dbs
             self.svs = self.cfg.get('var', 'servers').split(',')
@@ -2623,8 +2626,8 @@ class Risc():
         reason = ':'.join(raw_msg.split(':')[2:])
 
         if target == self.nick:
-            self.debug.warning("on_kick: Got kicked by '%s' for '%s' - Joining again in %ss ..." % (kicker, reason, str(self.on_kick_threshold)))
-            time.sleep(self.on_kick_threshold)
+            self.debug.warning("on_kick: Got kicked by '%s' for '%s' - Joining again in %ss ..." % (kicker, reason, str(self.on_kick_delay)))
+            time.sleep(self.on_kick_delay)
             self.join()
         else:
             self.debug.info("on_kick: '%s' kicked '%s' for '%s'" % (kicker, target, reason))
@@ -2684,9 +2687,9 @@ class Risc():
         Called on ping timeout
         """
         global THREADS_STOP
-        self.debug.info("Connection timedout. Starting another risc instance in 180s ...")
+        self.debug.info("Connection timedout. Starting another risc instance in "+str(self.on_timeout_delay)+"...")
         THREADS_STOP = 1
-        time.sleep(180)
+        time.sleep(self.on_timeout_delay)
         raise Exception("risc_exception_irc_timeout")
         return None
 
@@ -2808,7 +2811,7 @@ class Risc():
                     self.on_nicknameinuse(line)
 
 #FIXME?: may be someone else timeout-ing ?
-                elif re.search("ERROR :Closing Link: .* by .* \(Ping timeout\)", line):
+                elif re.search("ERROR :Closing Link: "+self.nick+" by .* \(Ping timeout\)", line):
                     self.on_timeout(line)
 
 def main():
