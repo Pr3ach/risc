@@ -138,8 +138,10 @@
 #       - Fix "Title: <empty>" bug on some links [OK]
 #       - Fix utf issues [OK]
 #       - Fix sv rename bug [OK]
+#       - Add server IP to cmd_sv [TEST]
+#       - Add auto reconnect when timeout [TEST]
+#       - Add cmd_remindme
 #       - Improve init stuff
-#       - Add auto reconnect when timeout
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
@@ -376,6 +378,7 @@ class Risc():
             self.cfg = ConfigParser.ConfigParser()
             self.cfg.read(INIPATH)
 
+            # Gather config info
             self.host = self.cfg.get('irc', 'host')
             self.port = int(self.cfg.get('irc', 'port'))
             self.channel = self.cfg.get("irc", "channel")
@@ -383,13 +386,11 @@ class Risc():
             self.db_host = self.cfg.get('db', 'host')
             self.db_user = self.cfg.get('db', 'user')
             self.db_passwd = self.cfg.get('db', 'passwd')
-            self.db_name = self.cfg.get('db', 'self_db')    # db for risc settings (admins etc)
+            self.db_name = self.cfg.get('db', 'self_db')                                    # db for risc settings (admins etc)
             self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
             self.on_kick_delay = int(self.cfg.get("risc", "on_kick_delay"))
             self.on_timeout_delay = int(self.cfg.get("risc", "on_timeout_delay"))
-
-            # Get servers, their dbs
-            self.svs = self.cfg.get('var', 'servers').split(',')
+            self.svs = self.cfg.get('var', 'servers').split(',')                            # Get servers, their dbs
 
             if len(self.svs) > 8:
                 self.debug.error('Too many servers. Max of 8 servers can be supported.')
@@ -402,10 +403,8 @@ class Risc():
             # Get the servers on which the riscb3 plugin is running
             self.sv_running = (self.cfg.get('var', 'svrunning').split(','))
 
-            # Get bot credentials to auth with Q
             self.auth = self.cfg.get('irc', 'auth')
             self.auth_passwd = self.cfg.get('irc', 'auth_passwd')
-
             self.cmd_prefix = self.cfg.get('risc', 'cmd_prefix')
             self.cmd_prefix_global = self.cfg.get('risc', 'cmd_prefix_global')
             self.use_riscb3 = int(self.cfg.get('risc', 'use_riscb3'))
@@ -1735,7 +1734,8 @@ class Risc():
                 re.sub('\^[0-9]', '', sv.mapName)+COLOR['rewind'] +\
                 ', nextmap: '+COLOR['boldblue']+re.sub('\^[0-9]', '', sv.nextMap) +\
                 COLOR['rewind']+', version: '+COLOR['boldblue']+re.sub('\^[0-9]','',sv.version)+COLOR['rewind'] +\
-                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote
+                ', auth: '+sv.authNotoriety+', vote: '+sv.allowVote+", IP: "+COLOR["boldblue"]+\
+                (str(sv.ip)+':'+str(sv.port))+COLOR["rewind"]
         return ret, ret2
 
     def cmd_uptime(self, msg0, nick):
