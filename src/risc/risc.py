@@ -141,7 +141,6 @@
 #       - Add server IP to cmd_sv [OK]
 #       - Add auto reconnect when timeout [TEST]
 #       - Add cmd_remindme
-#       - Improve init stuff
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
 
