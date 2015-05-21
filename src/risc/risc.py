@@ -138,7 +138,7 @@
 #       - Fix "Title: <empty>" bug on some links [OK]
 #       - Fix utf issues [OK]
 #       - Fix sv rename bug [OK]
-#       - Add server IP to cmd_sv [TEST]
+#       - Add server IP to cmd_sv [OK]
 #       - Add auto reconnect when timeout [TEST]
 #       - Add cmd_remindme
 #       - Improve init stuff
