@@ -139,7 +139,7 @@
 #       - Fix utf issues [OK]
 #       - Fix sv rename bug [OK]
 #       - Add server IP to cmd_sv [OK]
-#       - Add auto reconnect when timeout [TEST]
+#       - Add auto reconnect when timeout [OK]
 #       - Add cmd_remindme
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
