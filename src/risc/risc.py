@@ -140,7 +140,7 @@
 #       - Fix sv rename bug [OK]
 #       - Add server IP to cmd_sv [OK]
 #       - Add auto reconnect when timeout [OK]
-#       - Allow partial name in sv [TEST]
+#       - Allow partial name in sv [OK]
 #       - Add cmd_remindme
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
@@ -1619,7 +1619,7 @@ class Risc():
         """
         sv_name = sv_name.encode("string_escape")
 
-        if len(sv_name) > 32:
+        if len(sv_name) > 30:
             return "FAIL"
 
         try:
