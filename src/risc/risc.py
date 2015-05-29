@@ -1625,7 +1625,7 @@ class Risc():
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
-            c.execute("""SELECT ip FROM server WHERE name LIKE '%%s%'""" % sv_name)
+            c.execute("""SELECT ip FROM server WHERE name LIKE '%s'""" % ('%'+sv_name+'%'))
 
             if c.rowcount == 1:
                 con.close()
