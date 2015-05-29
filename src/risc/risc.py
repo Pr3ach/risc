@@ -140,6 +140,7 @@
 #       - Fix sv rename bug [OK]
 #       - Add server IP to cmd_sv [OK]
 #       - Add auto reconnect when timeout [OK]
+#       - Allow partial name in sv [TEST]
 #       - Add cmd_remindme
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
@@ -1624,7 +1625,7 @@ class Risc():
         try:
             con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
             c = con.cursor()
-            c.execute("""SELECT ip FROM server WHERE name = '%s'""" % sv_name)
+            c.execute("""SELECT ip FROM server WHERE name LIKE '%%s%'""" % sv_name)
 
             if c.rowcount == 1:
                 con.close()
