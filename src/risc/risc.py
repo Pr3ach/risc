@@ -2810,7 +2810,6 @@ class Risc():
                 elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
                     self.on_nicknameinuse(line)
 
-#FIXME?: may be someone else timeout-ing ?
                 elif re.search("ERROR :Closing Link: "+self.nick+" by .* \(Ping timeout\)", line):
                     self.on_timeout(line)
 
