@@ -141,6 +141,7 @@
 #       - Add server IP to cmd_sv [OK]
 #       - Add auto reconnect when timeout [OK]
 #       - Allow partial name in sv [OK]
+#       - Fix SSL bug in Mechanize.browser [TEST]
 #       - Add cmd_remindme
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
@@ -167,6 +168,8 @@ import random
 import requests
 from irc_rpl import *
 from mechanize import Browser
+import ssl
+from functools import wraps
 
 init_time = int(time.time())
 last_cmd_time = 0
@@ -176,7 +179,7 @@ chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
 users = {}         # {"user.lower()" :{"chan_lvl": "operator|voice"}} # Can't rely on chan_lvl: 'bug' on rename ...
-debug_mode = 1
+debug_mode = 0
 THREADS_STOP = 0
 
 # used by cmd_roulette()
@@ -2595,12 +2598,28 @@ class Risc():
 
         return ret
 
+    def sslwrap(func):
+        @wraps(func)
+        def bar(*args, **kw):
+            kw['ssl_version'] = ssl.PROTOCOL_TLSv1
+            return func(*args, **kw)
+        return bar
+
     def process_irc(self, raw_msg):
         """
         Handle IRC messages
         """
+        global last_cmd_time
+
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
+
+        # Basic Anti-Spam stuff
+        cur_time = time.time()
+        if int(cur_time) - last_cmd_time <= self.anti_spam_threshold:
+            last_cmd_time = int(cur_time)
+            return None
+        last_cmd_time = int(cur_time)
 
         msg = ':'.join(raw_msg[0].split(':')[2:])
         nick = raw_msg[0].split('!')[0][1:]
@@ -2816,6 +2835,7 @@ class Risc():
 def main():
     print "[+] Running ..."
     try:
+        ssl.wrap_socket = sslwrap(ssl.wrap_socket) # Init SSL wrapper
         inst = Risc()  # Init config and stuff
         inst.start()
     except KeyboardInterrupt:
