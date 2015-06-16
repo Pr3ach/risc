@@ -2598,13 +2598,6 @@ class Risc():
 
         return ret
 
-    def sslwrap(func):
-        @wraps(func)
-        def bar(*args, **kw):
-            kw['ssl_version'] = ssl.PROTOCOL_TLSv1
-            return func(*args, **kw)
-        return bar
-
     def process_irc(self, raw_msg):
         """
         Handle IRC messages
@@ -2831,6 +2824,16 @@ class Risc():
 
                 elif re.search("ERROR :Closing Link: "+self.nick+" by .* \(Ping timeout\)", line):
                     self.on_timeout(line)
+
+def sslwrap(func):
+    """
+    Overrides SSL version
+    """
+    @wraps(func)
+    def bar(*args, **kw):
+        kw['ssl_version'] = ssl.PROTOCOL_TLSv1
+        return func(*args, **kw)
+    return bar
 
 def main():
     print "[+] Running ..."
