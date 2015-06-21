@@ -2602,17 +2602,8 @@ class Risc():
         """
         Handle IRC messages
         """
-        global last_cmd_time
-
         if not re.search(' PRIVMSG ', raw_msg[0]):
             return None
-
-        # Basic Anti-Spam stuff
-        cur_time = time.time()
-        if int(cur_time) - last_cmd_time <= self.anti_spam_threshold:
-            last_cmd_time = int(cur_time)
-            return None
-        last_cmd_time = int(cur_time)
 
         msg = ':'.join(raw_msg[0].split(':')[2:])
         nick = raw_msg[0].split('!')[0][1:]
