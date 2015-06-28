@@ -141,6 +141,7 @@
 #       - Add server IP to cmd_sv [OK]
 #       - Add auto reconnect when timeout [OK]
 #       - Allow partial name in sv [OK]
+#       - Removed cmd ikick [TEST]
 #       - Fix SSL bug in Mechanize.browser [TEST]
 #       - Add cmd_remindme
 # ------- 1.6 - Preacher - MM/DD/YYYY
@@ -174,7 +175,7 @@ from functools import wraps
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,disconnect,status,players,base64,sha1,md5,search,ikick,iputgroup,ileveltest,seen,chat,say,google,server,uptime,version,roulette,duck,kill,raw,todo"
+CMDS = "help,ishowadmins,disconnect,status,players,base64,sha1,md5,search,iputgroup,ileveltest,google,server,uptime,version,roulette,kill,raw,todo"
 chat_set = {}
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
@@ -436,17 +437,13 @@ class Risc():
                 "sha1": ["sha1"],
                 "md5": ["md5"],
                 "search": ['search', 's'],
-                "ikick": ["ikick", "ik"],
                 "iputgroup": ["iputgroup", "ipg"],
                 "chat": ["chat"],
-                "seen": ["seen"],
-                "say": ["say"],
                 "google": ["google", "g"],
                 "server": ["server", "sv"],
                 "uptime": ["uptime"],
                 "version": ["version", "v"],
                 "roulette": ["roulette", 'r'],
-                "duck": ["duck"],
                 "ileveltest": ['ileveltest', 'ilt'],
                 "kill": ['kill', 'k'],
                 "raw": ["raw"],
@@ -515,11 +512,9 @@ class Risc():
         Init the different command access levels
         """
         ret = {"quit": 80,
-                "ikick": 80,
                 "iputgroup": 100,
                 "chat": 80,
                 "set": 80,
-                "say": 60,
                 "ileveltest": 60,
                 "raw": 100,
                 "todo_add": 80,
@@ -884,38 +879,8 @@ class Risc():
 
         return None
 
-    def cmd_ikick(self, msg0, sourceNick):
+    def cmd_sha1(self, msg0, sourceNick):
         """
-        Kick a user out of the channel
-        """
-        cleanKick = self.list_clean(msg0.split(' '))
-        lenKick = len(cleanKick)
-        reason = sourceNick
-
-        if lenKick < 2:
-            self.privmsg(sourceNick, "Invalid arguments. Check "+self.cmd_prefix+"help ikick.")
-            return None
-
-        if lenKick >= 3:
-            reason = ' '.join(cleanKick[2:])
-
-        sourceAuth, sourceLevel = self.irc_is_admin(sourceNick)
-        targetAuth, targetLevel = self.irc_is_admin(cleanKick[1])
-
-        if sourceAuth and sourceLevel >= self.commandLevels['ikick'] and sourceLevel > targetLevel:
-            try:
-                self.sock.send('KICK '+self.channel+' '+cleanKick[1]+' :'+reason+'\r\n')
-            except:
-                self.privmsg(sourceNick, "Couldn't kick the requested user!")
-                self.debug.warning("cmd_ikick: Couldn't kick user!")
-                return None
-        else:
-            self.privmsg(self.channel, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": "+COLOR['boldred']+
-                    "You need to be admin["+str(self.commandLevels['ikick'])+"] to access this command, or the target admin"+\
-                            " group is higher or equal to yours."+COLOR['rewind'])
-
-            def cmd_sha1(self, msg0, sourceNick):
-                """
         Give the SHA1 for the given string
         """
         cleanSha1Data = ''.join(msg0[6:])  # In case we have spaces in the string, they're taken into account
@@ -1138,10 +1103,6 @@ class Risc():
                     ". Tells risc to leave. You need to be registered as admin["+str(self.commandLevels['quit'])+\
                     "] with "+self.nick+"."
 
-        elif command in self.commands["seen"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+" <player>: Aliases: "+', '.join(self.commands["seen"])+\
-                    ". Return the last time a player was seen in the server set."
-
         elif command in self.commands["todo"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [add <todo> | rm <todo_id> | list]: Aliases: "+', '.join(self.commands["todo"])+\
                     ". add/remove/list todo."
@@ -1158,18 +1119,9 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["roulette"])+\
                     ". Russian roulette game."
 
-        elif command in self.commands["duck"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["duck"])+\
-                    ". Sometimes, words ain't enough."
-
         elif command in self.commands["server"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" [<ip:port> | add <ip> <name> | rm <name> | rename <old_name> <new_name> | list]: Aliases: "+', '.join(self.commands["server"])+\
                     ". Display info about the specified server. If no port is specified, assume 27960. Add, remove, rename or list all the available servers."
-
-        elif command in self.commands["say"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+" <str>: Aliases: "+', '.join(self.commands["say"])+\
-                    ". Makes "+self.nick+ " say <str>. You need to be registered as admin["+str(self.commandLevels['say'])+\
-                    "] with "+self.nick+"."
 
         elif command in self.commands["uptime"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["uptime"])+". "+\
@@ -1205,12 +1157,6 @@ class Risc():
                     ". Enable or disable the chat feature betwen IRC and the game server <server>. Return the state of the chat feature"+\
                     " in the servers when no arg are specified, or the state of the chat feature in the specified server if any."+\
                     " You need to be admin["+str(self.commandLevels['chat'])+'] to access this command.'
-
-        elif command in self.commands["ikick"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> <reason> Aliases: " + ', '.join(self.commands["ikick"]) +\
-                    ". Kicks the channel user <user>. You need to registered as admin[" +\
-                    str(self.commandLevels['ikick']) +\
-                    "] with risc. Also you can't kick another admin unless your level is strictly higher than his."
 
         elif command in self.commands["ileveltest"]:
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> Aliases: " + ', '.join(self.commands["ileveltest"]) +\
@@ -1281,55 +1227,6 @@ class Risc():
         else:
             return 'Playing on '+serverName+' ('+str(len(sv.clientsList))+'/'+str(sv.maxClients)+'):'+','.join(ret)
 
-    def cmd_seen(self, msg0, sourceNick):
-        """
-        Return the last time a user was seen in the server set
-        """
-        cleanCmd = self.list_clean(msg0.split(' '))
-
-        if len(cleanCmd) != 2:
-            self.privmsg(sourceNick, "Invalid arguments, check "+self.cmd_prefix+"help seen.")
-            return None
-
-        # b3 uses 32 chars to store names
-        if len(cleanCmd[1]) > 31:
-            self.privmsg(sourceNick, "User nick too long, max length: 31 chars.")
-
-        try:
-            last_seen = (0, 0)
-            last_seen_sv = ''
-            for sv in self.svs:
-                query = ()
-                db = self.get_db(sv)
-                if not db:
-                    continue
-                con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
-                cur = con.cursor()
-
-                cur.execute("""SELECT id, time_edit FROM clients WHERE name = '%s' AND id = (SELECT MAX(id) FROM clients WHERE name = '%s')""" % (cleanCmd[1], cleanCmd[1]))
-                query = cur.fetchone()
-                con.close()
-
-                if isinstance(query, tuple):
-                    if len(query) == 2:
-                        if query[1] > last_seen[1]:
-                            last_seen_sv = sv
-                            last_seen = query
-
-            if last_seen != (0, 0) and last_seen_sv != '':
-                t = time.gmtime(last_seen[1])
-                self.privmsg(sourceNick, "Player %s%s%s @%d was last seen on the %s%s%s server on%s %d/%d/%d %sat%s %d:%d %s(GMT)" % (\
-                        COLOR['boldblue'], cleanCmd[1], COLOR['rewind'], last_seen[0], COLOR['boldblue'], last_seen_sv,\
-                        COLOR['rewind'], COLOR['boldblue'], t[1], t[2], t[0], COLOR['rewind'],\
-                        COLOR['boldblue'], t[3], t[4], COLOR['rewind']))
-                return None
-        except Exception, e:
-            self.debug.error('cmd_seen: Caught exception: %s - Passing' % e)
-            pass
-
-        self.privmsg(sourceNick, "No such player.")
-        return None
-
     def cmd_search(self, player, rawRet=0):
         """
         Search for a player in the entire server set
@@ -1386,19 +1283,6 @@ class Risc():
         else:
             ret.sort()
             return 'Found ' + str(count) + ' players matching: ' + ', '.join(ret)
-
-    def cmd_say(self, msg0, nick):
-        """
-        Tell risc to say something
-        """
-        auth, level = self.irc_is_admin(nick)
-
-        if not auth or level < self.commandLevels['say']:
-            self.privmsg(nick, "You must be at least in the admin["+str(self.commandLevels['say'])+"] group to access this command.")
-            return None
-
-        self.privmsg(self.channel, " ".join(msg0.split(' ')[1:]))
-        return None
 
     def cmd_google(self, msg0, nick):
         """
@@ -1769,18 +1653,6 @@ class Risc():
         else:
             roulette_cur = (roulette_cur + 1)%7
             self.privmsg(self.channel, COLOR['boldgreen']+"+click+"+COLOR['rewind']+" -"+COLOR['boldgreen']+' '+nick+" is safe."+COLOR['rewind'])
-        return None
-
-    def cmd_duck(self):
-        """
-        WTF?
-        """
-        duck_s = ["....................../??/)", "....................,/?../", ".................../..../",\
-                "............./??/'...'/???`??", "........../'/.../..../......./??\\", "........('(...?...?.... ?~/'...')",\
-                ".........\.................'...../", "..........''...\.......... _.??", "............\..............(",\
-                "..............\.............\..."]
-        for s in duck_s:
-            self.privmsg(self.channel, s)
         return None
 
     def cmd_kill(self, msg0, sourceNick):
@@ -2154,12 +2026,6 @@ class Risc():
         if msg[0].lower().split(' ')[0] in self.commands["iputgroup"]:
             self.cmd_iputgroup(sourceNick, msg[0])
 
-        elif msg[0].lower().split(' ')[0] in self.commands["ikick"]:
-            self.cmd_ikick(msg[0], sourceNick)
-
-        elif msg[0].lower().split(' ')[0] in self.commands["say"]:
-            self.cmd_say(msg[0], sourceNick)
-
         elif msg[0].lower().split(' ')[0] in self.commands["kill"]:
             self.cmd_kill(msg[0], sourceNick)
 
@@ -2168,9 +2034,6 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["roulette"]:
             self.cmd_roulette(msg[0], sourceNick)
-
-        elif msg[0].lower().split(' ')[0] in self.commands["duck"]:
-            self.cmd_duck()
 
         elif msg[0].lower().split(' ')[0] in self.commands["raw"]:
             self.cmd_raw(msg[0], sourceNick)
@@ -2207,9 +2070,6 @@ class Risc():
 
         elif msg[0].lower().split(' ')[0] in self.commands["chat"]:
             self.cmd_chat(msg[0], sourceNick)
-
-        elif msg[0].lower().split(' ')[0] in self.commands["seen"]:
-            self.cmd_seen(msg[0],sourceNick)
 
         elif msg[0].lower().strip().split(' ')[0] in self.commands["base64"]:
             cleanB64 = self.list_clean(msg[0].split(' '))[0]
@@ -2574,6 +2434,9 @@ class Risc():
         return None
 
     def clean_unicode(self, s):
+        """
+        Convert an unicode string to ascii
+        """
         l = []
         for ch in s:
             ascii_ch = ord(ch)
@@ -2621,6 +2484,9 @@ class Risc():
         return None
 
     def on_kick(self, raw_msg):
+        """
+        Called on kick
+        """
         kicker = raw_msg.split('!')[0][1:]
         target = raw_msg.split(' ')[3]
         reason = ':'.join(raw_msg.split(':')[2:])
@@ -2691,10 +2557,10 @@ class Risc():
         THREADS_STOP = 1
         time.sleep(self.on_timeout_delay)
         raise Exception("risc_exception_irc_timeout")
-        return None
+    return None
 
-    def _on_privmsg(self, msg):
-        """
+def _on_privmsg(self, msg):
+    """
         Disptach PRIVMSG messages to the right functions
         """
         global is_global_msg
@@ -2779,7 +2645,7 @@ class Risc():
                     continue # Only treat unfinished msgs after they've been rebuilt
 
                 if debug_mode:
-                    print line
+                    self.debug.debug(line)
 
                 if re.search(" PRIVMSG ", line):
                     self._on_privmsg(line)
@@ -2800,7 +2666,6 @@ class Risc():
                 elif re.search(" NICK ", line):
                     self.on_nick(line)
 
-                # Indicate we're connected, we can now join the channel
                 elif re.search(' '+RPL_WELCOME+' '+self.nick+' ', line):
                     self.on_welcome()
 
@@ -2812,16 +2677,6 @@ class Risc():
 
                 elif re.search("ERROR :Closing Link: "+self.nick+" by .* \(Ping timeout\)", line):
                     self.on_timeout(line)
-
-def sslwrap(func):
-    """
-    Overrides SSL version
-    """
-    @wraps(func)
-    def bar(*args, **kw):
-        kw['ssl_version'] = ssl.PROTOCOL_TLSv1
-        return func(*args, **kw)
-    return bar
 
 def main():
     print "[+] Running ..."

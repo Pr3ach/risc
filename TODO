@@ -1,0 +1,12 @@
+- remove all riscb3 code
+- fix youtube and possibly other websites SSL issues
+- add gametype info
+- add option to encode/decode base64
+- remove ikick cmd
+- remove say cmd
+- remove duck cmd
+
+- irc: irc_protocol
+- debug: debugging/output
+- risc: bot cmds
+- q3: handle to q3 engine
