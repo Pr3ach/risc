@@ -5,6 +5,7 @@
 - remove ikick cmd
 - remove say cmd
 - remove duck cmd
+- add remindme cmd
 
 - irc: irc_protocol
 - debug: debugging/output
