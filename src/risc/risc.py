@@ -580,9 +580,6 @@ class Risc():
         elif msg[0].lower() == "ping":
             self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + "PONG " + "\001")
 
-        else:
-            self._send("NOTICE " + sourceNick + " :\001" + msg[0].upper() + ' ' + "Error: " + msg[0] + " CTCP command is not supported." + "\001")
-
         return None
 
     def user_add(self, user):
