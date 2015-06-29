@@ -6,8 +6,10 @@
 - remove say cmd
 - remove duck cmd
 - add remindme cmd
+- change sha1/md5 to some more generic "hash <hash_algo> <data>" function
+- use YouTube api
 
+- risc: main part, bot cmds
 - irc: irc_protocol
 - debug: debugging/output
-- risc: bot cmds
 - q3: handle to q3 engine
