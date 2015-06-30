@@ -8,6 +8,7 @@
 - add remindme cmd
 - change sha1/md5 to some more generic "hash <hash_algo> <data>" function
 - use YouTube api
+- add load_config()
 
 - risc: main part, bot cmds
 - irc: irc_protocol

@@ -28,7 +28,7 @@
 #       - !lt now returns a link to the last post in the thread [OK]
 #       - Write irc_is_admin(): returns auth + level from *nick* [OK]
 #       - Add required rights to help command [OK]
-#       - Add !ilt / ileveltest command [OK]
+#       - Add !ilt / getlevel command [OK]
 #       - Updated irc_is_admin [OK]
 #       - Fixed time response in TIME ctcp [OK]
 #       - Fixed unicode char causing crash [OK]
@@ -44,6 +44,7 @@
 # ------- 1.3 - Preacher
 #       - Minor change in colors [OK]
 #       - Added chat ability (IRC to game, other side implemented in riscb3 plugin) [OK]
+
 #       - q3_to_IRC_color() [OK]
 #       - PEP8: LF between functions and classes [OK]
 #       - PEP8: Removed file encoding [OK]
@@ -142,7 +143,7 @@
 #       - Add auto reconnect when timeout [OK]
 #       - Allow partial name in sv [OK]
 #       - Removed cmd ikick [TEST]
-#       - Fix SSL bug in Mechanize.browser [TEST]
+#       - Fix SSL bug in Mechanize.browser
 #       - Add cmd_remindme
 # ------- 1.6 - Preacher - MM/DD/YYYY
 
@@ -169,19 +170,17 @@ import random
 import requests
 from irc_rpl import *
 from mechanize import Browser
-import ssl
-from functools import wraps
 
 init_time = int(time.time())
 last_cmd_time = 0
 HELP = None
-CMDS = "help,ishowadmins,disconnect,status,players,base64,sha1,md5,search,iputgroup,ileveltest,google,server,uptime,version,roulette,kill,raw,todo"
-chat_set = {}
+CMDS = "help,disconnect,setlevel,getlevel,showadmins,status,players,base64,sha1,md5,search,google,server,uptime,version,roulette,kill,raw,todo"
 INIPATH = "risc.ini"
 is_global_msg = 0  # Set if the command starts with '@' instead of '!'
 users = {}         # {"user.lower()" :{"chan_lvl": "operator|voice"}} # Can't rely on chan_lvl: 'bug' on rename ...
 debug_mode = 0
 THREADS_STOP = 0
+MAX_Q3_SERVERS = 32
 
 # used by cmd_roulette()
 roulette_shot = random.randint(1, 6)
@@ -200,43 +199,6 @@ COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\
 #                                                                                                        #
 #                                                                                                        #
 ##########################################################################################################
-
-
-class Debug:
-    """
-    Set of functions to write to the log file
-    """
-    def __init__(self, use__stdout__):
-        t = time.time()
-
-        if not use__stdout__:
-            sys.stdout = open("risc_"+str(int(t))+'.log', "w+", 0)
-
-    def info(self, info_msg):
-        t = time.localtime()
-        print '%d/%d %d:%d:%d INFO %s' % (t[1], t[2], t[3], t[4], t[5], info_msg)
-        return None
-
-    def debug(self, debug_msg):
-        t = time.localtime()
-        print '%d/%d %d:%d:%d DEBUG %s' % (t[1], t[2], t[3], t[4], t[5], debug_msg)
-        return None
-
-    def warning(self, warning_msg):
-        t = time.localtime()
-        print '%d/%d %d:%d:%d WARNING %s' % (t[1], t[2], t[3], t[4], t[5], warning_msg)
-        return None
-
-    def error(self, error_msg):
-        t = time.localtime()
-        print '%d/%d %d:%d:%d ERROR %s' % (t[1], t[2], t[3], t[4], t[5], error_msg)
-        return None
-
-    def critical(self, critical_msg):
-        t = time.localtime()
-        print '%d/%d %d:%d:%d CRITICAL %s' % (t[1], t[2], t[3], t[4], t[5], critical_msg)
-        return None
-
 
 class Sv():
     """
@@ -372,114 +334,86 @@ class Risc():
     """
     def __init__(self):
         try:
-            global chat_set
-            global INIPATH
-
             self.debug = Debug(0)
-
+            self.load_config()
             filterwarnings("ignore", category = mysql.Warning)
-
-            self.cfg = ConfigParser.ConfigParser()
-            self.cfg.read(INIPATH)
-
-            # Gather config info
-            self.host = self.cfg.get('irc', 'host')
-            self.port = int(self.cfg.get('irc', 'port'))
-            self.channel = self.cfg.get("irc", "channel")
-            self.nick = self.cfg.get("irc", "nick")
-            self.db_host = self.cfg.get('db', 'host')
-            self.db_user = self.cfg.get('db', 'user')
-            self.db_passwd = self.cfg.get('db', 'passwd')
-            self.db_name = self.cfg.get('db', 'self_db')                                    # db for risc settings (admins etc)
-            self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
-            self.on_kick_delay = int(self.cfg.get("risc", "on_kick_delay"))
-            self.on_timeout_delay = int(self.cfg.get("risc", "on_timeout_delay"))
-            self.svs = self.cfg.get('var', 'servers').split(',')                            # Get servers, their dbs
-
-            if len(self.svs) > 8:
-                self.debug.error('Too many servers. Max of 8 servers can be supported.')
-
-            self.dbs = self.cfg.get('db', 'databases').split(',')
-
-            if len(self.dbs) != len(self.svs):
-                self.debug.error('Number of databases does not match the number of servers.')
-
-            # Get the servers on which the riscb3 plugin is running
-            self.sv_running = (self.cfg.get('var', 'svrunning').split(','))
-
-            self.auth = self.cfg.get('irc', 'auth')
-            self.auth_passwd = self.cfg.get('irc', 'auth_passwd')
-            self.cmd_prefix = self.cfg.get('risc', 'cmd_prefix')
-            self.cmd_prefix_global = self.cfg.get('risc', 'cmd_prefix_global')
-            self.use_riscb3 = int(self.cfg.get('risc', 'use_riscb3'))
-
             self.init_help()
-
-            if len(self.cmd_prefix) != 1:
-                self.cmd_prefix = '!'
-
-            if len(self.cmd_prefix_global) != 1:
-                self.cmd_prefix_global = '@'
-
-            for sv in self.sv_running:
-                chat_set[sv] = 0
         except:
             self.debug.critical("Risc.__init__: Exception caught while loading config settings - Make sure there's no missing field")
             raise SystemExit
 
-        # Commands and their aliases
+        # Commands and aliases
         self.commands = {"quit": ["quit", "leave", "disconnect", "q"],
                 "help": ["h", "help"],
-                "ishowadmins": ["isa", "ishowadmins"],
+                "showadmins": ["sa", "showadmins"],
                 "status": ["status", "st"],
                 "players": ["players", "p"],
                 "base64": ["b64", "base64"],
                 "sha1": ["sha1"],
                 "md5": ["md5"],
                 "search": ['search', 's'],
-                "iputgroup": ["iputgroup", "ipg"],
+                "setlevel": ["setlevel"],
                 "chat": ["chat"],
                 "google": ["google", "g"],
                 "server": ["server", "sv"],
                 "uptime": ["uptime"],
                 "version": ["version", "v"],
                 "roulette": ["roulette", 'r'],
-                "ileveltest": ['ileveltest', 'ilt'],
+                "getlevel": ['getlevel'],
                 "kill": ['kill', 'k'],
                 "raw": ["raw"],
                 "todo": ["todo"]}
 
-        # Valid argument for each commands
+        # Commands arguments
         tmp = ["all"]
         tmp.extend(self.svs)
         self.args = {"status": tmp,
                 "players": self.svs,
                 "search": self.svs,
-                "iputgroup": [60, 80]}
-
-        # Commands that need some rights
-        self.commandLevels = self.get_cmd_levels()
+                "setlevel": [60, 80]}
 
         # Commands arguments aliases
         self.argAliases = {'servers': self.get_sv_aliases()}
 
-    def start(self):
-        """
-        Launch the bot: connect, start event dispatcher, join
-        """
-        self.init_db()
-        self.connect()
-        self.debug.info('[+] Connected on '+self.host+' port '+str(self.port))
-        self.set_evt_callbacks()
-        self.dispatcher()
-        return None
+        # Commands levels
+        self.commandLevels = self.get_cmd_levels()
 
-    def exit_process(self, msg="exit_process: Exiting"):
-        global THREADS_STOP
-        self.debug.info(msg)
-        THREADS_STOP = 1
-        time.sleep(0.5)
-        sys.exit(0)
+    def load_config(self):
+        """
+        Load config settings
+        """
+        global INIPATH
+
+        self.cfg = ConfigParser.ConfigParser()
+        self.cfg.read(INIPATH)
+
+            # Gather config info
+        self.host = self.cfg.get('irc', 'host')
+        self.port = int(self.cfg.get('irc', 'port'))
+        self.channel = self.cfg.get("irc", "channel")
+        self.nick = self.cfg.get("irc", "nick")
+        self.db_host = self.cfg.get('db', 'host')
+        self.db_user = self.cfg.get('db', 'user')
+        self.db_passwd = self.cfg.get('db', 'passwd')
+        self.db_name = self.cfg.get('db', 'self_db')                                    # db for risc settings (admins etc)
+        self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
+        self.on_kick_delay = int(self.cfg.get("risc", "on_kick_delay"))
+        self.on_timeout_delay = int(self.cfg.get("risc", "on_timeout_delay"))
+        self.svs = self.cfg.get('var', 'servers').split(',')                            # Get servers, their dbs
+        self.auth = self.cfg.get('irc', 'auth')
+        self.auth_passwd = self.cfg.get('irc', 'auth_passwd')
+        self.cmd_prefix = self.cfg.get('risc', 'cmd_prefix')
+        self.cmd_prefix_global = self.cfg.get('risc', 'cmd_prefix_global')
+
+        if len(self.svs) > MAX_Q3_SERVERS:
+            self.debug.error('Too many servers. Max: %u' %(MAX_Q3_SERVERS))
+
+        if len(self.cmd_prefix) != 1:
+            self.cmd_prefix = '!'
+
+        if len(self.cmd_prefix_global) != 1:
+            self.cmd_prefix_global = '@'
+        return None
 
     def init_help(self):
         """
@@ -512,10 +446,9 @@ class Risc():
         Init the different command access levels
         """
         ret = {"quit": 80,
-                "iputgroup": 100,
+                "setlevel": 100,
                 "chat": 80,
-                "set": 80,
-                "ileveltest": 60,
+                "getlevel": 60,
                 "raw": 100,
                 "todo_add": 80,
                 "todo_rm": 100,
@@ -527,9 +460,28 @@ class Risc():
         for cmd in ret:
             if self.cfg.has_option("levels", "cmd_"+cmd):
                 lvl = int(self.cfg.get("levels", "cmd_"+cmd))
-                if lvl in self.args["iputgroup"] or lvl == 100:
+                if lvl in self.args["setlevel"] or lvl == 100:
                     ret[cmd] = lvl
         return ret
+
+    def start(self):
+        """
+        Launch the bot: connect, start event dispatcher, join
+        """
+        self.init_db()
+        self.connect()
+        self.debug.info('[+] Connected on '+self.host+' port '+str(self.port))
+        self.set_evt_callbacks()
+        self.dispatcher()
+        return None
+
+    def exit_process(self, msg="exit_process: Exiting"):
+        global THREADS_STOP
+        self.debug.info(msg)
+        THREADS_STOP = 1
+        time.sleep(0.5)
+        sys.exit(0)
+        return None
 
     def repr_int(self, s):
         if not s:
@@ -676,15 +628,6 @@ class Risc():
                     return key
         return 0
 
-    def get_db(self, name):
-        """
-        Return the db associated with the given server name
-        """
-        name = name.lower()
-        if name in self.svs:
-            return self.dbs[self.svs.index(name)]
-        return 0
-
     def irc_is_admin(self, nick):
         """
         Check whether a user is a risc admin or not, if he is, return the tuple auth,level, otherwise return 0
@@ -729,7 +672,7 @@ class Risc():
     #                                                                                                                           #
     #############################################################################################################################
 
-    def cmd_iputgroup(self, nick, msg):
+    def cmd_setlevel(self, nick, msg):
         """
         Put an authed user in one of the admin group
         """
@@ -737,7 +680,7 @@ class Risc():
 
         # Check input
         if len(argv) != 3:
-            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help iputgroup.')
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help setlevel.')
             return None
 
         if len(argv[1]) > 19:
@@ -747,7 +690,7 @@ class Risc():
         try:
             argv[2] = int(argv[2])
         except:
-            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help iputgroup.')
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help setlevel.')
             return None
 
         # Check rights
@@ -756,8 +699,8 @@ class Risc():
             self.privmsg(nick, "You need to be admin[100] to access this command.")
             return None
 
-        if argv[2] not in self.args["iputgroup"] and argv[2] != 0:
-            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help iputgroup.')
+        if argv[2] not in self.args["setlevel"] and argv[2] != 0:
+            self.privmsg(nick, COLOR['boldmagenta']+nick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help setlevel.')
             return None
 
         target_auth = self.irc_is_authed(argv[1])
@@ -777,7 +720,7 @@ class Risc():
                     self.privmsg(nick, "User-auth "+COLOR["boldgreen"]+target_auth+COLOR["rewind"]+" has been dropped from the admin groups.")
                     return None
                 else:
-                    self.debug.warning("cmd_iputgroup: Failure dropping admin - rolling back ...")
+                    self.debug.warning("cmd_setlevel: Failure dropping admin - rolling back ...")
                     con.rollback()
                     con.close()
                     self.privmsg(nick, "Operation failed.")
@@ -803,14 +746,14 @@ class Risc():
                     return None
 
         except Exception, e:
-            self.debug.critical("cmd_iputgroup: Exception caught: '%s'. Rolling back the db" % e)
+            self.debug.critical("cmd_setlevel: Exception caught: '%s'. Rolling back the db" % e)
             self.privmsg(self.channel, COLOR["boldred"]+"Exception caught: Operation failed."+COLOR["rewind"])
             if con:
                 con.rollback()
                 con.close()
         return None
 
-    def cmd_ileveltest(self, msg0, sourceNick):
+    def cmd_getlevel(self, msg0, sourceNick):
         """
         Check whether the given user is in the admin group
         """
@@ -818,13 +761,13 @@ class Risc():
         testNick = sourceNick
 
         if len(cleanLt) > 2:
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help ileveltest.')
+            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+': Invalid arguments. Check '+self.cmd_prefix+'help getlevel.')
             return None
 
         sourceAuth, sourceLevel = self.irc_is_admin(sourceNick)
 
-        if sourceLevel < self.commandLevels['ileveltest'] or not sourceAuth:
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You cannot access this command. Check "+self.cmd_prefix+"help ileveltest.")
+        if sourceLevel < self.commandLevels['getlevel'] or not sourceAuth:
+            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You cannot access this command. Check "+self.cmd_prefix+"help getlevel.")
             return None
 
         if len(cleanLt) == 2:
@@ -832,7 +775,7 @@ class Risc():
 
         targetAuth, targetLevel = self.irc_is_admin(testNick)
 
-        if targetAuth and (targetLevel in self.args['iputgroup'] or targetLevel == 100):
+        if targetAuth and (targetLevel in self.args['setlevel'] or targetLevel == 100):
             if sourceNick.lower() == testNick.lower():
                 self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": You're a "+self.nick+" admin["+str(targetLevel)+'].')
             else:
@@ -846,7 +789,7 @@ class Risc():
                         testNick+COLOR['rewind']+' is not a '+self.nick+" admin.")
                 return None
 
-    def cmd_ishowadmins(self, msg0, sourceNick):
+    def cmd_showadmins(self, msg0, sourceNick):
         """
         Show the risc admin list
         """
@@ -861,7 +804,7 @@ class Risc():
             con.close()
         except Exception, e:
             self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": Error: Couldn't retrieve the "+self.nick+" admin list")
-            self.debug.critical("cmd_ishowadmins: Exception: %s." % e)
+            self.debug.critical("cmd_showadmins: Exception: %s." % e)
             if con:
                 con.rollback()
                 con.close()
@@ -944,89 +887,6 @@ class Risc():
         else:
             self.privmsg(sourceNick, "Too many arguments. Check "+self.cmd_prefix+"help.")
         return None
-
-    def cmd_chat(self, msg0, sourceNick):
-        """
-        Turn ON | OFF the chat feature in the specified server
-        """
-        global chat_set
-        clean_cmd = self.list_clean(msg0.split(' '))
-        len_cmd = len(clean_cmd)
-
-        if len_cmd not in (1, 2, 3):
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": Invalid arguments, check "+self.cmd_prefix+"help chat.")
-            return None
-
-        if len_cmd == 1:
-            ret = COLOR['boldgreen']+sourceNick+COLOR['rewind']+': Chat state: '
-            for sv in chat_set:
-                cur_state = COLOR['boldred']+'OFF'+COLOR['rewind']
-                if chat_set[sv]:
-                    cur_state = COLOR['boldgreen']+'ON'+COLOR['rewind']
-                ret += sv+': '+cur_state+', '
-            self.privmsg(sourceNick, ret[:-2])
-            return None
-
-        sv = self.get_dict_key(self.argAliases['servers'], clean_cmd[1])
-
-        if not sv or sv not in self.sv_running:
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+
-                    ": Invalid arguments, target server either doesn't exist or is not running riscb3.")
-            return None
-
-        if len_cmd == 2:
-            if chat_set[sv]:
-                self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+sv+
-                        " server is currently"+COLOR['boldgreen']+' ON'+COLOR['rewind'])
-            else:
-                self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+sv+
-                        " server is currently"+COLOR['boldred']+' OFF'+COLOR['rewind'])
-                return None
-
-        auth, level = self.irc_is_admin(sourceNick)
-
-        if not auth or level < self.commandLevels['chat']:
-            self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": You need to be admin["+
-                    str(self.commandLevels['chat'])+'] to access this command.')
-            return None
-
-
-        try:
-            state = '0'
-
-            if clean_cmd[2].lower() in ('enable', 'on', '1'):
-                state = '1'
-
-            # Do not turn chat on in several server at a time
-            if 1 in chat_set.values() and state == '1':
-                self.privmsg(sourceNick, COLOR['boldmagenta']+sourceNick+COLOR['rewind']+": Chat is already enabl"\
-                        "ed in a server, only one server at a time is allowed.")
-                return None
-
-            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.get_db(sv))
-            cur = con.cursor()
-
-            cur.execute("""INSERT INTO %s(evt, data, time, processed) VALUES('EVT_CHAT_SET','%s',%d,1)""" % ('risc_' + sv, state, int(time.time())))
-            con.commit()
-            con.close()
-        except:
-            self.debug.error('cmd_chat: Error during db operations, trying roll back. Passing')
-            self.privmsg(sourceNick, COLOR['boldred']+sourceNick+COLOR['rewind']+
-                    ': There was an error changing the chat state for the '+COLOR['boldblue']+sv+COLOR['rewind']+' server.')
-            if con:
-                con.rollback()
-                con.close()
-            return None
-
-        chat_set[sv] = int(state)
-
-        if chat_set[sv]:
-            self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+COLOR['boldblue']+sv+
-                    COLOR['rewind']+" server is now"+COLOR['boldgreen']+' ON'+COLOR['rewind'])
-        else:
-            self.privmsg(sourceNick, COLOR['boldgreen']+sourceNick+COLOR['rewind']+": Chat for the "+COLOR['boldblue']+sv+
-                    COLOR['rewind']+" server is now"+COLOR['boldred']+' OFF'+COLOR['rewind'])
-            return None
 
     def cmd_status(self, serv):
         """
@@ -1136,8 +996,8 @@ class Risc():
                     ". Search for the player <playerNick> in the current server set if <server> is not specified,"+\
                     " else it performs the search in the <server> server."
 
-        elif command in self.commands["ishowadmins"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["ishowadmins"])+". Show all "+\
+        elif command in self.commands["showadmins"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": Aliases: "+', '.join(self.commands["showadmins"])+". Show all "+\
                     self.nick+" admins."
 
         elif command in self.commands["google"]:
@@ -1158,11 +1018,11 @@ class Risc():
                     " in the servers when no arg are specified, or the state of the chat feature in the specified server if any."+\
                     " You need to be admin["+str(self.commandLevels['chat'])+'] to access this command.'
 
-        elif command in self.commands["ileveltest"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> Aliases: " + ', '.join(self.commands["ileveltest"]) +\
+        elif command in self.commands["getlevel"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind'] + ": <user> Aliases: " + ', '.join(self.commands["getlevel"]) +\
                     ". Returns the level of the user <user> if he's registered as admin with risc. If you don't specify a <user> parameter,"+\
                     " the command will return your level. You're required to be registered as admin[" +\
-                    str(self.commandLevels['ileveltest'])+"] with "+self.nick+" to access this command."
+                    str(self.commandLevels['getlevel'])+"] with "+self.nick+" to access this command."
 
         elif command in self.commands["md5"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+" <string>: Aliases: "+', '.join(self.commands["md5"])+\
@@ -1172,10 +1032,10 @@ class Risc():
             return COLOR['boldgreen'] + command + COLOR['rewind'] + ' <serverName>' + ": Aliases: " + ', '.join(self.commands["status"])+\
                     ". Diplays information about the <serverName> server. Available args/server-name: "+', '.join(self.args['status'])
 
-        elif command in self.commands["iputgroup"]:
-            return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <level> Aliases: "+', '.join(self.commands["iputgroup"])+\
-                    ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['iputgroup'])+\
-                    "] with risc. Valid values for <level> include "+', '.join(str(x) for x in self.args['iputgroup'])+". Use <level> = 0 to drop an admin."
+        elif command in self.commands["setlevel"]:
+            return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <level> Aliases: "+', '.join(self.commands["setlevel"])+\
+                    ". Set an admin level <level> to the user <user>. You need to be registered as admin[" + str(self.commandLevels['setlevel'])+\
+                    "] with risc. Valid values for <level> include "+', '.join(str(x) for x in self.args['setlevel'])+". Use <level> = 0 to drop an admin."
 
         elif command in self.commands["kill"]:
             return COLOR['boldgreen'] + command + COLOR['rewind']+": <user> <weapon> Alias(es): " + ', '.join(self.commands["kill"])+\
@@ -1968,27 +1828,6 @@ class Risc():
                 unit += 's'
             return duration+unit
 
-    def on_ichat(self, rawMsg):
-        """
-        Called on IRC message
-        """
-        global chat_set
-        sourceNick = rawMsg[0].split('!')[0][1:]
-        msg = rawMsg[0].split(':')[2]
-
-        # Store the event in the table of the servers which have chat enabled
-        for sv in chat_set:
-            if chat_set[sv]:
-                db = self.get_db(sv)
-                if not db:
-                    continue
-                con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
-                cur = con.cursor()
-                cur.execute("""INSERT INTO %s(evt,data,time,processed) VALUES('EVT_ICHAT','%s',%d,0)""" % ('risc_' + sv, sourceNick + '\r\n' + msg, int(time.time())))
-                con.commit()
-                con.close()
-        return None
-
     ##############################################################################################################
     #                                                                                                            #
     #                                                                                                            #
@@ -2023,8 +1862,8 @@ class Risc():
         self.debug.info("on_pubmsg: Received command '"+msg[0]+"' from '"+sourceNick+"'"+global_msg)
 
         # Big switch where we handles received commands and eventually their args
-        if msg[0].lower().split(' ')[0] in self.commands["iputgroup"]:
-            self.cmd_iputgroup(sourceNick, msg[0])
+        if msg[0].lower().split(' ')[0] in self.commands["setlevel"]:
+            self.cmd_setlevel(sourceNick, msg[0])
 
         elif msg[0].lower().split(' ')[0] in self.commands["kill"]:
             self.cmd_kill(msg[0], sourceNick)
@@ -2056,8 +1895,8 @@ class Risc():
         elif msg[0].lower().split(' ')[0] in self.commands["uptime"]:
             self.privmsg(sourceNick, self.cmd_uptime(msg[0], sourceNick))
 
-        elif msg[0].lower().split(' ')[0] in self.commands["ileveltest"]:
-            self.cmd_ileveltest(msg[0], sourceNick)
+        elif msg[0].lower().split(' ')[0] in self.commands["getlevel"]:
+            self.cmd_getlevel(msg[0], sourceNick)
 
         elif msg[0].lower().split(' ')[0] in self.commands["search"]:
             cleanSearch = self.list_clean(msg[0].lower().split(' '))
@@ -2106,110 +1945,13 @@ class Risc():
         elif msg[0].lower().strip().split(' ')[0] in self.commands["help"]:
             self.cmd_help(msg[0], sourceNick)
 
-        elif msg[0].lower().strip() in self.commands["ishowadmins"]:
-            self.cmd_ishowadmins(msg[0], sourceNick)
+        elif msg[0].lower().strip() in self.commands["showadmins"]:
+            self.cmd_showadmins(msg[0], sourceNick)
 
         elif msg[0].lower().strip() in self.commands["quit"]:
             self.cmd_quit(msg[0], sourceNick)
 
         is_global_msg = 0
-        return None
-
-    # <client> <reason>
-    def game_on_calladmin(self, sv, data):
-        """
-        Called when a player uses the calladmin command
-        """
-        data_list = data.split('\r\n')
-        player = data_list[0]
-        reason = data_list[1]
-
-        self.privmsg(self.channel, COLOR['boldwhite'] + '[' + COLOR['rewind'] + COLOR['boldgreen']
-                + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + COLOR['boldblue']
-                + ' ' + player + COLOR['rewind'] + ' requested an admin: ' + COLOR['boldblue']
-                + reason + COLOR['rewind'])
-        return None
-
-    # <map_name> <cl_count> <max_cl_count>
-    def game_on_game_map_change(self, sv, data):
-        """
-        Called on map change
-        """
-        data_list = data.split('\r\n')
-        map_name = data_list[0]
-        cl_count = data_list[1]
-        max_cl_count = data_list[2]
-
-        self.privmsg(self.channel, COLOR['boldwhite'] + '['+COLOR['rewind'] + COLOR['boldgreen']
-                + sv + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind'] + ' map: '
-                + COLOR['boldblue'] + map_name + COLOR['rewind'] + ', players:' + COLOR['boldblue']
-                + ' ' + cl_count + COLOR['rewind'] + '/' + str(max_cl_count))
-        return None
-
-    # <admin> <admin_id> <client> <client_id> <reason=''>
-    def game_on_client_kick(self, sv, data):
-        """
-        Called on player kick
-        """
-        data_list = data.split('\r\n')
-        admin = data_list[0]
-        admin_id = data_list[1]
-        client = data_list[2]
-        client_id = data_list[3]
-
-        if data_list[4] == '':
-            reason = COLOR['boldmagenta']+'No reason specified'+COLOR['rewind']
-        else:
-            reason = COLOR['boldblue']+data_list[4]+COLOR['rewind']
-
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] + sv
-                + COLOR['rewind'] + COLOR['boldwhite'] + ']' + COLOR['rewind']+COLOR['boldyellow']
-                +' '+admin+' @' + admin_id + COLOR['rewind'] + ' kicked' + COLOR['boldyellow'] +
-                ' '+client+' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
-        return None
-
-    # <admin> <admin_id> <client> <client_id> <duration_min> <reason=''>
-    def game_on_client_ban_temp(self, sv, data):
-        """
-        Called on player temp-ban
-        """
-        data_list = data.split('\r\n')
-        admin = data_list[0]
-        admin_id = data_list[1]
-        client = data_list[2]
-        client_id = data_list[3]
-        duration = COLOR['boldyellow'] + ' ' + self.mintostr(int(data_list[4])) + COLOR['rewind']
-
-        if data_list[5] == '':
-            reason = COLOR['boldmagenta']+'No reason specified'+COLOR['rewind']
-        else:
-            reason = COLOR['boldblue']+data_list[5]+COLOR['rewind']
-
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']
-                +COLOR['boldwhite']+']' + COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id
-                +COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client+' @' + client_id
-                + COLOR['rewind'] + ' for' + duration + ': '+re.sub('\^[0-9]{1}', '', reason))
-        return None
-
-    # <admin> <admin_id> <client> <client_id> <reason=''>
-    def game_on_client_ban(self, sv, data):
-        """
-        Called on player ban
-        """
-        data_list = data.split('\r\n')
-        admin = data_list[0]
-        admin_id = data_list[1]
-        client = data_list[2]
-        client_id = data_list[3]
-
-        if data_list[4] == '':
-            reason = COLOR['boldmagenta']+'No reason specified'+COLOR['rewind']
-        else:
-            reason = COLOR['boldblue']+data_list[4]+COLOR['rewind']
-
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen']+sv+COLOR['rewind']+COLOR['boldwhite'] + ']' +
-                COLOR['rewind']+COLOR['boldyellow']+' '+admin+' @'+admin_id+COLOR['rewind']+' banned'+COLOR['boldyellow']+' '+client +
-                ' @'+client_id+COLOR['rewind']+': '+re.sub('\^[0-9]{1}', '', reason))
         return None
 
     def q3_to_IRC_color(self, msg):
@@ -2229,101 +1971,17 @@ class Risc():
             msg = re.sub('\^%d' % cd, q3_to_IRC_map[cd], msg)
         return msg
 
-    # <client> <msg>
-    def on_chat(self, sv, ID, data):
-        """
-        Catch player messages and broadcast them on IRC
-        """
-        db = self.get_db(sv)
-        if not db:
-            return None
-        con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
-        cur = con.cursor()
-        cur.execute("""UPDATE %s SET processed = 1 WHERE ID = %d""" % ('risc_'+sv, ID))
-        con.commit()
-        con.close()
-
-        data_list = data.split('\r\n')
-        cl = data_list[0]
-        msg = data_list[1]
-
-        self.privmsg(self.channel, COLOR['boldwhite']+'['+COLOR['rewind']+COLOR['boldgreen'] +
-                sv+COLOR['rewind']+'.'+COLOR['boldblue']+re.sub('\^[0-9]{1}', '', cl)+COLOR['rewind'] +
-                COLOR['boldwhite']+']: '+COLOR['rewind']+self.q3_to_IRC_color(msg))
-        return None
-
-    # Note: using crlf separator on db data
-    def game_watcher(self):
-        """
-        Watch for game events sent by the riscb3 plugin
-        """
-        global chat_set
-        global THREADS_STOP
-        self.debug.info('[+] Started "game_watcher" event callback.')
-        try:
-            # in case the bot is ran before the plugin, init tables
-            for sv in self.sv_running:
-                db = self.get_db(sv)
-                if not db:
-                    continue
-                con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
-                cur = con.cursor()
-                cur.execute("""CREATE TABLE IF NOT EXISTS %s(ID INT AUTO_INCREMENT PRIMARY KEY,\
-                        evt VARCHAR(40) NOT NULL DEFAULT '',\
-                        data VARCHAR(255) NOT NULL DEFAULT '',\
-                        time BIGINT NOT NULL DEFAULT 0,\
-                        processed TINYINT NOT NULL DEFAULT 0)""" % ('risc_' + sv))
-                con.commit()
-                con.close()
-
-            while 1 and not THREADS_STOP:
-                time.sleep(0.3)
-
-                for sv in self.sv_running:
-                    db = self.get_db(sv)
-                    if not db:
-                        continue
-                    con = mysql.connect(self.db_host, self.db_user, self.db_passwd, db)
-                    cur = con.cursor()
-
-                    cur.execute("""SELECT ID,evt,data FROM %s WHERE processed = 0""" % ('risc_'+sv))
-                    res = cur.fetchall()
-                    cur.execute("""UPDATE %s SET processed = 1 WHERE processed = 0 AND evt != 'EVT_CHAT' AND evt != 'EVT_ICHAT'""" % ('risc_'+sv))
-                    con.commit()
-                    con.close()
-
-                    if len(res) >= 1:
-                        for row in res:
-                            if row[1] == 'EVT_CALLADMIN':
-                                self.game_on_calladmin(sv, row[2])
-                            elif row[1] == 'EVT_CHAT' and chat_set[sv]:  # Extra precautions
-                                self.on_chat(sv, row[0], row[2])
-                            elif row[1] == 'EVT_GAME_MAP_CHANGE':
-                                self.game_on_game_map_change(sv, row[2])
-                            elif row[1] == 'EVT_CLIENT_KICK':
-                                self.game_on_client_kick(sv, row[2])
-                            elif row[1] == 'EVT_CLIENT_BAN_TEMP':
-                                self.game_on_client_ban_temp(sv, row[2])
-                            elif row[1] == 'EVT_CLIENT_BAN':
-                                self.game_on_client_ban(sv, row[2])
-                            else:
-                                pass
-        except Exception, e:
-            self.debug.error('game_watcher: Exception caught: %s - Passing' % e)
-            pass
-        return None
-
     def set_evt_callbacks(self):
         """
         Starts threads to watch specific events
         """
-        self.debug.info("[+] Setting and starting event callbacks")
+        #self.debug.info("[+] Setting and starting event callbacks")
 
         # game_watcher event callback
-        if self.use_riscb3:
-            th = threading.Thread(None, self.game_watcher, None, (), None)
-            th.daemon = True  # So that the prog doesn't wait for the threads to exit
-            th.start()
+        #if self.use_riscb3:
+            #th = threading.Thread(None, self.game_watcher, None, (), None)
+            #th.daemon = True  # So that the prog doesn't wait for the threads to exit
+            #th.start()
         return None
 
     def get_init_admins(self):
@@ -2338,7 +1996,7 @@ class Risc():
             data = a.split(':')
             admin = data[0]
             lvl = int(data[1])
-            if lvl in self.args["iputgroup"] or lvl == 100:
+            if lvl in self.args["setlevel"] or lvl == 100:
                 ret.setdefault(admin)
                 ret[admin] = lvl
         return ret
@@ -2559,7 +2217,7 @@ class Risc():
         raise Exception("risc_exception_irc_timeout")
     return None
 
-def _on_privmsg(self, msg):
+    def _on_privmsg(self, msg):
     """
         Disptach PRIVMSG messages to the right functions
         """
@@ -2681,8 +2339,7 @@ def _on_privmsg(self, msg):
 def main():
     print "[+] Running ..."
     try:
-        ssl.wrap_socket = sslwrap(ssl.wrap_socket) # Init SSL wrapper
-        inst = Risc()  # Init config and stuff
+        inst = Risc()
         inst.start()
     except KeyboardInterrupt:
         inst.debug.warning('Caught <c-c>. Exiting.')
