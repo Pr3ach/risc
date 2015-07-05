@@ -18,9 +18,10 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.0"
+__version__ = "1.1"
 
 import time
+import sys
 
 class Debug():
     """
@@ -31,7 +32,7 @@ class Debug():
         self.log_file = ""
 
         if not use__stdout__:
-            self.log_file = log_prefix + str(int(t)) + ".log"
+            self.log_file = log_prefix + "_"+ str(int(t)) + ".log"
             sys.stdout = open(self.log_file, "w+", 0)
 
     def info(self, info_msg):

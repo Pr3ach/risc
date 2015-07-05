@@ -9,8 +9,11 @@
 - change sha1/md5 to some more generic "hash <hash_algo> <data>" function
 - use YouTube api
 - add load_config()
+- resolve_cmd()
+- resolve_server()
 
-- risc: main part, bot cmds
+- risc: events, misc
+- cmd: irc cmds
 - irc: irc_protocol
 - debug: debugging/output
 - q3: handle to q3 engine
