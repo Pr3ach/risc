@@ -32,12 +32,17 @@ RPL_ENDOFNAMES              = "366"             # <channel> :<info>
 RPL_MOTD                    = "372"             # :- <string>
 ERR_NICKNAMEINUSE           = "433"             # <nick> :<reason>
 
+COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
+        'magenta': '\x036', 'boldmagenta': '\x02\x036', 'blue': '\x032',
+        'boldred': '\x02\x034', 'boldblue': '\x02\x032', 'boldgreen': '\x02\x033',
+        'boldyellow': '\x02\x038', 'boldblack': '\x02\x031', 'rewind': '\x0f'}
+
 USER_ALIASES = 0
 USER_MASK = 1
-
 USER_MASKS = {'v': 1, 'o': 2}
 
 DATA_PROCESSED = 0x539
+
 IRC_STOP = 0
 
 class Irc():
@@ -81,6 +86,17 @@ class Irc():
         self.disconnect()
         self.sock.close()
         return None
+
+    def get_user_level(self, user):
+        """
+        Return the maximum level of a user
+        """
+        level_mask = self.users[user][USER_MASK]
+
+        for s in USER_MASKS:
+            if USER_MASKS[s] & level_mask:
+                return USER_MASKS[s]
+        return 0
 
     def set_callback(self, cb_name, cb_function):
         """

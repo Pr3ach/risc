@@ -38,7 +38,6 @@ import lxml.html
 import tld
 import random
 import requests
-from irc_rpl import *
 from mechanize import Browser
 import debug
 import irc
@@ -46,16 +45,8 @@ import ioq3
 import cmd
 
 init_time = int(time.time())
-last_cmd_time = 0
 INIPATH = "risc.ini"
-THREADS_STOP = 0
 MAX_Q3_SERVERS = 32
-
-# IRC color codes
-COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\x035',
-        'magenta': '\x036', 'boldmagenta': '\x02\x036', 'blue': '\x032',
-        'boldred': '\x02\x034', 'boldblue': '\x02\x032', 'boldgreen': '\x02\x033',
-        'boldyellow': '\x02\x038', 'boldblack': '\x02\x031', 'rewind': '\x0f'}
 
 class Risc():
     """
@@ -66,6 +57,7 @@ class Risc():
             self.debug = debug.Debug(0, "risc")
             self.load_config()
             self.irc = irc.Irc(self.host, self.port, self.channel, self.nick)
+            self.cmd = cmd.Cmd(self)
             filterwarnings("ignore", category = mysql.Warning)
         except:
             self.debug.critical("Risc.__init__: Exception caught while loading config settings - Make sure there's no missing field")
@@ -104,6 +96,22 @@ class Risc():
 
         if len(self.cmd_prefix_global) != 1:
             self.cmd_prefix_global = '@'
+
+        self.load_cmd_levels()
+        return None
+
+    def load_cmd_levels(self):
+        """
+        Load cmd levels from config
+        """
+        for c in cmd.cmds:
+            lvl = ''
+            if self.cfg.has_option("levels", "cmd_"+c):
+                lvl = self.cfg.get("levels", "cmd_"+c)
+                if lvl not in ("root", "op", "voice", ""):
+                    cmd.cmds[c][cmd.CMD_LEVEL] = ""
+                    continue
+                cmd.cmds[c][cmd.CMD_LEVEL] = lvl
         return None
 
     def start(self):
@@ -119,6 +127,8 @@ class Risc():
         """
         Called on PRIVMSG
         """
+        if msg[0] in (self.cmd_prefix, self.cmd_prefix_global):
+            self.cmd.process(_from, to, msg)
         return None
 
     def on_welcome(self, host, welcome_msg):
