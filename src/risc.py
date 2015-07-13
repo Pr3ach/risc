@@ -182,7 +182,7 @@ class Risc():
                 br.set_handle_robots(False)
                 br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0')]
                 br.open(url)
-                self.privmsg(self.channel, "Title: " + br.title())
+                self.irc.privmsg(self.channel, "Title: " + br.title())
             except Exception, e:
                 self.debug.error("process_irc: Exception caught: '%s'." % e)
         return None
