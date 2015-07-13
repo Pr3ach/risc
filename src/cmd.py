@@ -51,10 +51,12 @@ class Cmd():
                 ret.append(e)
         return ret
 
-    def get_cmd(self, cmd):
+    def get_cmd(self, msg):
         """
         Return the original command name if it exists, return "" otherwise
         """
+        cmd = self.clean_list(msg.split(' '))[0][1:]
+
         if cmd in cmds:
             return cmd
 
@@ -65,10 +67,10 @@ class Cmd():
 
     def init_cmd(self, _from, to, msg):
         """
-        Return a list [level_required, "output"] for a given command
+        Return a list [cmd_level, "output"] for a given command
         """
         ret = []
-        cmd = self.get_cmd(self.clean_list(msg.split(' '))[0][1:])
+        cmd = self.get_cmd(msg)
 
         ret[0] = cmds[cmd][CMD_LEVEL]
 
@@ -82,8 +84,7 @@ class Cmd():
         """
         Parse IRC messages for valid commands to call the appropriate functions
         """
-        cmd = self.get_cmd(self.clean_list(msg.split(' '))[0][1:])
-
+        cmd = self.get_cmd(msg)
         if cmd != "":
             getattr(self, "cmd_"+cmd)(_from, to, msg)
         return None
@@ -92,9 +93,15 @@ class Cmd():
         """
         Display the main help message
         """
-        init = self.init_cmd(_from, to, msg)
-        argv = self.clean_list(msg.split(' '))
+        cinfo = self.init_cmd(_from, to, msg)
 
-        self.privmsg(init[1], "TEST")
-        self.privmsg(init[1], "l: "+init[0])
+        if self.irc.get_user_level(_from) < cmds[self.get_cmd(msg)][CMD_LEVEL]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        self.privmsg(cinfo[1], "Commands: %s." %(', '.join(cmds.keys())))
         return None

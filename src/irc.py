@@ -91,6 +91,9 @@ class Irc():
         """
         Return the maximum level of a user
         """
+        if user not in self.users:
+            return 0
+
         mask = self.users[user][USER_MASK]
 
         for s in LEVEL_MASKS:
