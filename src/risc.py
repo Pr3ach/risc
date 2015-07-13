@@ -96,7 +96,7 @@ class Risc():
         for c in cmd.cmds:
             lvl = ''
             if self.cfg.has_option("levels", "cmd_"+c):
-                lvl = self.cfg.get("levels", "cmd_"+c)
+                lvl = self.cfg.get("levels", "cmd_"+c).lower()
                 if lvl in ("root", "r"):
                     cmd.cmds[c][cmd.CMD_LEVEL] = 4
                 elif lvl in ("op", "o"):
@@ -120,8 +120,19 @@ class Risc():
         """
         Stop the IRC module and leave
         """
+        self.debug.info("Exiting")
         self.irc.stop()
         return None
+
+    def clean_list(self, l):
+        """
+        Clean a list after a split
+        """
+        ret = []
+        for e in l:
+            if e != "" and e != ' ':
+                ret.append(e)
+        return ret
 
     def on_privmsg(self, _from, to, msg):
         """
@@ -140,16 +151,16 @@ class Risc():
         self.irc._send("PRIVMSG Q@CServe.quakenet.org :AUTH "+self.auth+" "+self.auth_passwd)
         self.irc.mode(self.nick, "+x")
         time.sleep(0.8)
-        self.debug.info("[+] Joining " + self.channel + " ...")
+        self.debug.info("Joining " + self.channel + " ...")
         self.irc.join()
-        self.debug.info("[*] Now processing\n")
+        self.debug.info("Done")
         return None
 
     def xurls(self, raw_msg):
         """
         Extract URLs from str to a list
         """
-        raw_msg = self.list_clean(raw_msg.split(' '))
+        raw_msg = self.clean_list(raw_msg.split(' '))
         re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}'\
                 '[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}'\
                 '\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:'\
@@ -194,7 +205,6 @@ def main():
         inst.stop()
     except UnicodeDecodeError:
         inst.debug.critical('Caught UnicodeDecodeError exception on Risc.start().')
-        inst.stop()
     except Exception, e:
         if str(e) == "risc_exception_irc_timeout":
             main()
