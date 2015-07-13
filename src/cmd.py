@@ -20,18 +20,18 @@
 from irc import COLOR
 import time
 
-cmds = {"quit": [["quit", "leave", "disconnect", "q"], ""],
-        "help": [["h", "help"], ""],
-        "status": [["status", "st"], ""],
-        "players": [["players", "p"], ""],
-        "base64": [["b64", "base64"], ""],
-        "search": [['search', "s"], ""],
-        "google": [["google", "g"], ""],
-        "uptime": [["uptime"], ""],
-        "version": [["version", "v"], ""],
-        "roulette": [["roulette", "r"], ""],
-        "kill": [["kill", "k"], ""],
-        "raw": [["raw"], ""]}
+cmds = {"quit": [["quit", "leave", "disconnect", "q"], 0],
+        "help": [["h", "help"], 0],
+        "status": [["status", "st"], 0],
+        "players": [["players", "p"], 0],
+        "base64": [["b64", "base64"], 0],
+        "search": [['search', "s"], 0],
+        "google": [["google", "g"], 0],
+        "uptime": [["uptime"], 0],
+        "version": [["version", "v"], 0],
+        "roulette": [["roulette", "r"], 0],
+        "kill": [["kill", "k"], 0],
+        "raw": [["raw"], 0]}
 
 CMD_ALIASES = 0
 CMD_LEVEL = 1
@@ -65,10 +65,10 @@ class Cmd():
 
     def init_cmd(self, _from, to, msg):
         """
-        Return a list ["level_required", "output_type"] for a given command
+        Return a list [level_required, "output"] for a given command
         """
         ret = []
-        cmd = self.get_cmd(self.clean_list(msg.split(' '))[0])
+        cmd = self.get_cmd(self.clean_list(msg.split(' '))[0][1:])
 
         ret[0] = cmds[cmd][CMD_LEVEL]
 
@@ -82,7 +82,7 @@ class Cmd():
         """
         Parse IRC messages for valid commands to call the appropriate functions
         """
-        cmd = self.get_cmd(self.clean_list(msg.split(' '))[0])
+        cmd = self.get_cmd(self.clean_list(msg.split(' '))[0][1:])
 
         if cmd != "":
             getattr(self, "cmd_"+cmd)(_from, to, msg)

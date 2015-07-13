@@ -39,7 +39,7 @@ COLOR = {'white': '\x030', 'boldwhite': '\x02\x030', 'green': '\x033', 'red': '\
 
 USER_ALIASES = 0
 USER_MASK = 1
-USER_MASKS = {'v': 1, 'o': 2}
+LEVEL_MASKS = {'o': 2, 'v': 1}
 
 DATA_PROCESSED = 0x539
 
@@ -51,7 +51,7 @@ class Irc():
         self.port = port
         self.channel = channel
         self.nick = nick
-        self.users = {} # {"user": [["old_nick", "old_nick2" ...], "level"], ...}
+        self.users = {} # {"user": [["old_nick", "old_nick2" ...], mode_mask], ...}
         self.callbacks = {"all": None,
                 "on_privmsg": None,
                 "on_welcome": self.on_welcome,
@@ -91,11 +91,11 @@ class Irc():
         """
         Return the maximum level of a user
         """
-        level_mask = self.users[user][USER_MASK]
+        mask = self.users[user][USER_MASK]
 
-        for s in USER_MASKS:
-            if USER_MASKS[s] & level_mask:
-                return USER_MASKS[s]
+        for s in LEVEL_MASKS:
+            if LEVEL_MASKS[s] & mask:
+                return LEVEL_MASKS[s]
         return 0
 
     def set_callback(self, cb_name, cb_function):
@@ -137,10 +137,10 @@ class Irc():
         for user in user_list:
             level = 0
             if user[0] == '@':
-                level = USER_MASKS['o']
+                level = LEVEL_MASKS['o']
                 user = user[1:]
             elif user[0] == '+':
-                level = USER_MASKS['v']
+                level = LEVEL_MASKS['v']
                 user = user[1:]
             if user in self.users:
                 continue
@@ -194,9 +194,9 @@ class Irc():
                 continue
 
             if cur == '+':
-                self.users[target][USER_MASK] |= USER_MASKS[i]
+                self.users[target][USER_MASK] |= LEVEL_MASKS[i]
             else:
-                self.users[target][USER_MASK] &= ~USER_MASKS[i]
+                self.users[target][USER_MASK] &= ~LEVEL_MASKS[i]
         return None
 
     def on_nicknameinuse(self, nick):
@@ -414,7 +414,7 @@ class Irc():
                     if self.callbacks["all"](line) == DATA_PROCESSED:
                         continue
 
-                elif re.search(" PRIVMSG ", line):
+                if re.search(" PRIVMSG ", line):
                     self.call_cb_privmsg(line)
 
                     # Reply back to the server

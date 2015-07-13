@@ -22,30 +22,19 @@ __author__ = 'Preacher'
 __version__ = '1.6-dev'
 
 
-import socket
-import threading
 import time
-import sys
 import ConfigParser
 import re
-import base64
-import hashlib
 import MySQLdb as mysql
 from warnings import filterwarnings
-import json
-import datetime
-import lxml.html
-import tld
-import random
-import requests
 from mechanize import Browser
 import debug
 import irc
 import ioq3
 import cmd
 
-init_time = int(time.time())
 INIPATH = "risc.ini"
+init_time = int(time.time())
 MAX_Q3_SERVERS = 32
 
 class Risc():
@@ -108,10 +97,14 @@ class Risc():
             lvl = ''
             if self.cfg.has_option("levels", "cmd_"+c):
                 lvl = self.cfg.get("levels", "cmd_"+c)
-                if lvl not in ("root", "op", "voice", ""):
-                    cmd.cmds[c][cmd.CMD_LEVEL] = ""
-                    continue
-                cmd.cmds[c][cmd.CMD_LEVEL] = lvl
+                if lvl in ("root", "r"):
+                    cmd.cmds[c][cmd.CMD_LEVEL] = 4
+                elif lvl in ("op", "o"):
+                    cmd.cmds[c][cmd.CMD_LEVEL] = 2
+                elif lvl in ("voice", "v"):
+                    cmd.cmds[c][cmd.CMD_LEVEL] = 1
+                else:
+                    cmd.cmds[c][cmd.CMD_LEVEL] = 0
         return None
 
     def start(self):
