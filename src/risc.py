@@ -116,12 +116,21 @@ class Risc():
         self.irc.start()
         return None
 
+    def stop(self):
+        """
+        Stop the IRC module and leave
+        """
+        self.irc.stop()
+        return None
+
     def on_privmsg(self, _from, to, msg):
         """
         Called on PRIVMSG
         """
         if msg[0] in (self.cmd_prefix, self.cmd_prefix_global):
             self.cmd.process(_from, to, msg)
+        else:
+            self.process_irc(msg)
         return None
 
     def on_welcome(self, host, welcome_msg):
@@ -180,26 +189,24 @@ def main():
         inst.start()
     except KeyboardInterrupt:
         inst.debug.warning('Caught <c-c>. Exiting.')
-        inst.irc.stop()
-        inst.exit_process()
+        inst.stop()
     except SystemExit:
-        inst.disconnect()
-        inst.exit_process("Caught SystemExit")
+        inst.stop()
     except TypeError:
-        inst.debug.error('Caught TypeError exception on Risc.start(): Contact an admin to fix this asap. Passing')
-        pass
+        inst.debug.critical('Caught TypeError exception on Risc.start(): Contact an admin to fix this asap.')
+        inst.stop()
     except NameError:
-        inst.debug.error('Caught NameError exception on Risc.start(): Contact an admin to fix this asap. Passing')
-        pass
+        inst.debug.critical('Caught NameError exception on Risc.start(): Contact an admin to fix this asap.')
+        inst.stop()
     except UnicodeDecodeError:
-        inst.debug.error('Caught UnicodeDecodeError exception on Risc.start(). Passing')
-        pass
+        inst.debug.critical('Caught UnicodeDecodeError exception on Risc.start().')
+        inst.stop()
     except Exception, e:
         if str(e) == "risc_exception_irc_timeout":
             main()
         else:
             inst.debug.critical("Unhandled exception on Risc(): '%s'. Exiting." % e)
-            inst.exit_process("Unhandled exception")
+            inst.stop()
 
 if __name__ == "__main__":
     main()

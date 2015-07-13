@@ -93,6 +93,7 @@ class Cmd():
     def cmd_help(self, _from, to, msg):
         """
         Display the main help message
+        help
         """
         cinfo = self.init_cmd(_from, to, msg)
 
