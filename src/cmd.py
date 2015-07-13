@@ -20,8 +20,8 @@
 from irc import COLOR
 import time
 
-cmds = {"quit": [["quit", "leave", "disconnect", "q"], 0],
-        "help": [["h", "help"], 0],
+cmds = {"help": [["h", "help"], 0],
+        "quit": [["quit", "leave", "disconnect", "q"], 0],
         "status": [["status", "st"], 0],
         "players": [["players", "p"], 0],
         "base64": [["b64", "base64"], 0],
@@ -106,4 +106,22 @@ class Cmd():
         argc = len(argv)
 
         self.privmsg(cinfo[1], "Commands: %s." %(', '.join(cmds.keys())))
+        return None
+
+    def cmd_quit(self, _from, to, msg):
+        """
+        Simply leave
+        quit
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        self.risc.stop()
         return None
