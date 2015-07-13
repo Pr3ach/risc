@@ -19,14 +19,15 @@
 
 from irc import COLOR
 import time
+import json
 
 cmds = {"help": [["h", "help"], 0],
         "quit": [["quit", "leave", "disconnect", "q"], 0],
+        "google": [["google", "g"], 0],
         "status": [["status", "st"], 0],
         "players": [["players", "p"], 0],
         "base64": [["b64", "base64"], 0],
         "search": [['search', "s"], 0],
-        "google": [["google", "g"], 0],
         "uptime": [["uptime"], 0],
         "version": [["version", "v"], 0],
         "roulette": [["roulette", "r"], 0],
@@ -102,9 +103,6 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        argv = self.clean_list(msg.split(' '))
-        argc = len(argv)
-
         self.privmsg(cinfo[1], "Commands: %s." %(', '.join(cmds.keys())))
         return None
 
@@ -120,8 +118,37 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        argv = self.clean_list(msg.split(' '))
-        argc = len(argv)
-
         self.risc.stop()
+        return None
+
+    def cmd_google(self, _from, to, msg):
+        """
+        Query google
+        google <query>
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        #argv = self.clean_list(msg.split(' '))
+        #argc = len(argv)
+
+        i = 0
+        search_str = ' '.join(msg.split(' ')[1:])
+
+        url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % search_str
+        res = requests.get(url)
+
+        if len(json.loads(res.text)['responseData']['results']):
+            self.privmsg(cinfo[1], "Top hits: ")
+        else:
+            self.privmsg(cinfo[1], "No results.")
+            return None
+
+        for hit in json.loads(res.text)['responseData']['results'] and i<4:
+            self.privmsg(nick, hit["url"])
+            i+=1
         return None
