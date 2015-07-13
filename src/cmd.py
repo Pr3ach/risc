@@ -72,12 +72,12 @@ class Cmd():
         ret = []
         cmd = self.get_cmd(msg)
 
-        ret[0] = cmds[cmd][CMD_LEVEL]
+        ret.append(cmds[cmd][CMD_LEVEL])
 
         if msg[0] == self.risc.cmd_prefix:
-            ret[1] = _from
+            ret.append(_from)
         else:
-            ret[1] = self.risc.channel
+            ret.append(self.risc.channel)
         return ret
 
     def process(self, _from, to, msg):
@@ -95,7 +95,7 @@ class Cmd():
         """
         cinfo = self.init_cmd(_from, to, msg)
 
-        if self.irc.get_user_level(_from) < cmds[self.get_cmd(msg)][CMD_LEVEL]:
+        if self.irc.get_user_level(_from) < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None

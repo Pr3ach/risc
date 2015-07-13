@@ -219,6 +219,8 @@ class Irc():
         """
         if self.callbacks["on_privmsg"] is not None:
             _from = line.split('!')[0][1:]
+            if _from[0] in ('@', '+', '&'):
+                _from = _from[1:]
             to = line.split(' ')[2]
             msg = ' '.join(line.split(' ')[3:])[1:]
 
