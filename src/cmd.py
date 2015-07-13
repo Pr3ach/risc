@@ -20,6 +20,7 @@
 from irc import COLOR
 import time
 import json
+import requests
 
 cmds = {"help": [["h", "help"], 0],
         "quit": [["quit", "leave", "disconnect", "q"], 0],
@@ -149,6 +150,6 @@ class Cmd():
             return None
 
         for hit in json.loads(res.text)['responseData']['results'] and i<4:
-            self.privmsg(nick, hit["url"])
+            self.privmsg(cinfo[1], hit["url"])
             i+=1
         return None
