@@ -130,7 +130,7 @@ class Risc():
         if msg[0] in (self.cmd_prefix, self.cmd_prefix_global):
             self.cmd.process(_from, to, msg)
         else:
-            self.process_irc(msg)
+            self.process_irc(_from, to, msg)
         return None
 
     def on_welcome(self, host, welcome_msg):
@@ -150,28 +150,22 @@ class Risc():
         Extract URLs from str to a list
         """
         raw_msg = self.list_clean(raw_msg.split(' '))
-        re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:/?|[/?]\S+)$', re.IGNORECASE)
+        re_url = re.compile(r'(?:http|ftp)s?://(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}'\
+                '[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}'\
+                '\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[?[A-F0-9]*:[A-F0-9:]+\]?)(?::\d+)?(?:'\
+                '/?|[/?]\S+)$', re.IGNORECASE)
         ret = []
-
         for s in raw_msg:
             if re.match(re_url, s):
                 ret.append(s)
         return ret
 
-    def process_irc(self, raw_msg):
+    def process_irc(self, _from, to, msg):
         """
         Handle IRC messages
         """
-        if not re.search(' PRIVMSG ', raw_msg[0]):
-            return None
-
-        msg = ':'.join(raw_msg[0].split(':')[2:])
-        nick = raw_msg[0].split('!')[0][1:]
-
         # Process URLs posting
-        url_list = self.xurls(msg)
-
-        for url in url_list:
+        for url in self.xurls(msg):
             try:
                 br = Browser()
                 br.set_handle_robots(False)
