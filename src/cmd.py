@@ -39,7 +39,8 @@ CMD_LEVEL = 1
 class Cmd():
     def __init__(self, risc):
         self.risc = risc
-        self.privmsg = self.risc.irc.privmsg
+        self.irc = risc.irc
+        self.privmsg = self.irc.privmsg
 
     def clean_list(self, l):
         """
