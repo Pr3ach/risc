@@ -154,6 +154,25 @@ class Cmd():
                 ", ".join(cmds[cmd][CMD_ALIASES])+'.'+" Access: "+access+'.')
         return None
 
+    def _cmd_help_google(self, _from, to, msg, cmd):
+        """
+        Help for google command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: google <query>. Description: Search for <query> in google "\
+                "and display the results. Aliases: " +\
+                ", ".join(cmds[cmd][CMD_ALIASES])+'.'+" Access: "+access+'.')
+        return None
+
     def cmd_quit(self, _from, to, msg):
         """
         Simply leave
