@@ -18,6 +18,7 @@
 #
 
 from irc import COLOR
+from irc import LEVEL_MASKS
 import time
 import json
 import requests
@@ -123,10 +124,10 @@ class Cmd():
             if cmd == "":
                 self.privmsg(cinfo[1], "Command not found: %s." %(argv[1]))
                 return None
-            getattr(self, "cmd_help_"+cmd)(_from, to, msg)
+            getattr(self, "_cmd_help_"+cmd)(_from, to, msg)
         return None
 
-    def cmd_help_help(self, _from, to, msg):
+    def _cmd_help_help(self, _from, to, msg):
         """
         Help for help command ...
         """
@@ -134,7 +135,7 @@ class Cmd():
         self.privmsg(cinfo[1], "-_-'")
         return None
 
-    def cmd_help_quit(self, _from, to, msg):
+    def _cmd_help_quit(self, _from, to, msg):
         """
         Help for quit command
         """
@@ -143,9 +144,9 @@ class Cmd():
 
         if cinfo[0] == 4:
             access = "root"
-        elif cinfo[0] == self.irc.LEVEL_MASKS['o']:
+        elif cinfo[0] == LEVEL_MASKS['o']:
             access = "op"
-        elif cinfo[0] == self.irc.LEVEL_MASKS['v']:
+        elif cinfo[0] == LEVEL_MASKS['v']:
             access = "voice"
 
         self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
