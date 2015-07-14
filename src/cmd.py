@@ -134,8 +134,12 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        #argv = self.clean_list(msg.split(' '))
-        #argc = len(argv)
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 2:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help google.")
+            return None
 
         i = 0
         search_str = ' '.join(msg.split(' ')[1:])
@@ -149,7 +153,9 @@ class Cmd():
             self.privmsg(cinfo[1], "No results.")
             return None
 
-        for hit in json.loads(res.text)['responseData']['results'] and i<4:
+        for hit in json.loads(res.text)['responseData']['results']:
             self.privmsg(cinfo[1], hit["url"])
             i+=1
+            if i > 4:
+                break
         return None
