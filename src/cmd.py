@@ -124,10 +124,10 @@ class Cmd():
             if cmd == "":
                 self.privmsg(cinfo[1], "Command not found: %s." %(argv[1]))
                 return None
-            getattr(self, "_cmd_help_"+cmd)(_from, to, msg)
+            getattr(self, "_cmd_help_"+cmd)(_from, to, msg, cmd)
         return None
 
-    def _cmd_help_help(self, _from, to, msg):
+    def _cmd_help_help(self, _from, to, msg, cmd):
         """
         Help for help command ...
         """
@@ -135,7 +135,7 @@ class Cmd():
         self.privmsg(cinfo[1], "-_-'")
         return None
 
-    def _cmd_help_quit(self, _from, to, msg):
+    def _cmd_help_quit(self, _from, to, msg, cmd):
         """
         Help for quit command
         """
@@ -151,7 +151,7 @@ class Cmd():
 
         self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
                 "the IRC server and exit. Aliases: " +\
-                ", ".join(cmds[self.get_cmd(msg)])+'.'+" Access: "+access+'.')
+                ", ".join(cmds[cmd])+'.'+" Access: "+access+'.')
         return None
 
     def cmd_quit(self, _from, to, msg):
