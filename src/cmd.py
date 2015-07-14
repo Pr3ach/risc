@@ -151,7 +151,7 @@ class Cmd():
 
         self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
                 "the IRC server and exit. Aliases: " +\
-                ", ".join(cmds[cmd])+'.'+" Access: "+access+'.')
+                ", ".join(cmds[cmd][CMD_ALIASES])+'.'+" Access: "+access+'.')
         return None
 
     def cmd_quit(self, _from, to, msg):
