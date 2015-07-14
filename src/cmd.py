@@ -17,6 +17,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import irc
 from irc import COLOR
 import time
 import json
@@ -141,11 +142,11 @@ class Cmd():
         cinfo = self.init_cmd(_from, to, msg)
         access = "all"
 
-        if cinfo[0] == 4:
+        if cmds[cmd][CMD_LEVEL] == 4:
             access = "root"
-        elif cinfo[0] == irc.LEVEL_MASKS['o']:
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
             access = "op"
-        elif cinfo[0] == irc.LEVEL_MASKS['v']:
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
         self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
