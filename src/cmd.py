@@ -56,7 +56,7 @@ class Cmd():
 
     def get_cmd(self, msg):
         """
-        Return the original command name if it exists, return "" otherwise
+        Return the original command name from the message if it exists, return "" otherwise
         """
         cmd = self.clean_list(msg.split(' '))[0][1:]
 
@@ -66,6 +66,15 @@ class Cmd():
         for c in cmds:
             if cmd in cmds[c][CMD_ALIASES]:
                 return c
+        return ""
+
+    def get_cmd_from_alias(self, cmd_alias):
+        """
+        Retrieve the original cmd name from an alias, if it exists, return "" otherwise
+        """
+        for cmd in cmds:
+            if cmd_alias in cmds[cmd][CMD_ALIASES]:
+                return cmd
         return ""
 
     def init_cmd(self, _from, to, msg):
@@ -104,7 +113,44 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        self.privmsg(cinfo[1], "Commands: %s." %(', '.join(cmds.keys())))
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc == 1:
+            self.privmsg(cinfo[1], "Commands: %s." %(', '.join(cmds.keys())))
+        else:
+            cmd = self.get_cmd_from_alias(argv[1])
+            if cmd == "":
+                self.privmsg(cinfo[1], "Command not found: %s." %(argv[1]))
+                return None
+            getattr(self, "cmd_help_"+cmd)(_from, to, msg)
+        return None
+
+    def cmd_help_help(self, _from, to, msg):
+        """
+        Help for help command ...
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        self.privmsg(cinfo[1], "-_-'")
+        return None
+
+    def cmd_help_quit(self, _from, to, msg):
+        """
+        Help for quit command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cinfo[0] == 4:
+            access = "root"
+        elif cinfo[0] == self.irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cinfo[0] == self.irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
+                "the IRC server and exit. Aliases: " +\
+                ", ".join(cmds[self.get_cmd(msg)])+'.'+" Access: "+access+'.')
         return None
 
     def cmd_quit(self, _from, to, msg):

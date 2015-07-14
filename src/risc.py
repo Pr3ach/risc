@@ -100,9 +100,9 @@ class Risc():
                 if lvl in ("root", "r"):
                     cmd.cmds[c][cmd.CMD_LEVEL] = 4
                 elif lvl in ("op", "o"):
-                    cmd.cmds[c][cmd.CMD_LEVEL] = 2
+                    cmd.cmds[c][cmd.CMD_LEVEL] = self.irc.LEVEL_MASKS['o']
                 elif lvl in ("voice", "v"):
-                    cmd.cmds[c][cmd.CMD_LEVEL] = 1
+                    cmd.cmds[c][cmd.CMD_LEVEL] = self.irc.LEVEL_MASKS['v']
                 else:
                     cmd.cmds[c][cmd.CMD_LEVEL] = 0
         return None
