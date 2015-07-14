@@ -30,7 +30,6 @@ from warnings import filterwarnings
 from mechanize import Browser
 import debug
 import irc
-import ioq3
 import cmd
 
 INIPATH = "risc.ini"

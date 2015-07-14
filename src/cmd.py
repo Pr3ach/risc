@@ -22,12 +22,13 @@ from irc import COLOR
 import time
 import json
 import requests
+import ioq3
+import re
 
 cmds = {"help": [["h", "help"], 0],
         "quit": [["quit", "leave", "disconnect", "q"], 0],
         "google": [["google", "g"], 0],
-        "status": [["status", "st"], 0],
-        "players": [["players", "p"], 0],
+        "server": [["server", "sv"], 0],
         "base64": [["b64", "base64"], 0],
         "search": [['search', "s"], 0],
         "uptime": [["uptime"], 0],
@@ -44,6 +45,7 @@ class Cmd():
         self.risc = risc
         self.irc = risc.irc
         self.privmsg = self.irc.privmsg
+        self.debug = self.risc.debug
 
     def clean_list(self, l):
         """
@@ -99,7 +101,8 @@ class Cmd():
         """
         cmd = self.get_cmd(msg)
         if cmd != "":
-            getattr(self, "cmd_"+cmd)(_from, to, msg)
+            if hasattr(self, "cmd_"+cmd):
+                getattr(self, "cmd_"+cmd)(_from, to, msg)
         return None
 
     def cmd_help(self, _from, to, msg):
@@ -124,7 +127,8 @@ class Cmd():
             if cmd == "":
                 self.privmsg(cinfo[1], "Command not found: %s." %(argv[1]))
                 return None
-            getattr(self, "_cmd_help_"+cmd)(_from, to, msg, cmd)
+            if hasattr(self, "_cmd_help_"+cmd):
+                getattr(self, "_cmd_help_"+cmd)(_from, to, msg, cmd)
         return None
 
     def _cmd_help_help(self, _from, to, msg, cmd):
@@ -209,19 +213,88 @@ class Cmd():
 
         i = 0
         search_str = ' '.join(msg.split(' ')[1:])
-
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % search_str
         res = requests.get(url)
 
         if len(json.loads(res.text)['responseData']['results']):
-            self.privmsg(cinfo[1], "Top hits: ")
+            self.privmsg(cinfo[1], "Top hits:")
         else:
             self.privmsg(cinfo[1], "No results.")
             return None
 
-        for hit in json.loads(res.text)['responseData']['results']:
+        for hit in json.loads(res.text)["responseData"]["results"]:
             self.privmsg(cinfo[1], hit["url"])
             i+=1
             if i > 4:
                 break
+        return None
+
+    #TODO: code all remaining functions called here
+    #TODO: filter words "add", "rm" etc and re_ip & re_full_ip patterns in _cmd_server_add
+    def cmd_server(self, _from, to, msg):
+        """
+        Display game information about the specified server
+        server [<ip:opt_port> | <name> | add <ip:opt_port> <name> | rm <name> | rename <old_name> <new_name> | list]
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 2:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
+            return None
+
+        if argv[1].lower() == "add":
+            if argc < 4:
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
+                return None
+            self._cmd_server_add(argv[2], argv[3])
+            return None
+        elif argv[1].lower() in ("rm", "del"):
+            if argc < 3:
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
+                return None
+            self._cmd_server_rm(argv[2])
+            return None
+        elif argv[1].lower() in ("rename", "mv"):
+            if argc < 4:
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
+                return None
+            self._cmd_server_rename(argv[2], argv[3])
+            return None
+        elif argv[1].lower() in ("list", "ls"):
+            self._cmd_server_list()
+            return None
+
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
+
+        if re.match(re_full_ip, argv[1]):
+            ip = argv[1].split(':')[0]
+            port = int(argv[1].split(':')[1])
+        elif re.match(re_ip, argv[1]):
+            ip = argv[1]
+            port = 27960
+        else:
+            tmp = self._cmd_server_retrieve(argv[1])
+            if not tmp:
+                self.privmsg(cinfo[1], "No such server.")
+                return None
+            ip = tmp[0]
+            port = tmp[1]
+
+        try:
+            sv = ioq3.Ioq3(ip, port)
+        except, e:
+            self.debug.error("cmd_server: Exception: '%s'" %(e))
+            self.privmsg(cinfo[1], COLOR["boldred"]+"Error"+COLOR["rewind"])
+            return None
+
+        self._cmd_server_display(sv)
         return None
