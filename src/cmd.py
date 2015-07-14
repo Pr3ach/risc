@@ -18,7 +18,6 @@
 #
 
 from irc import COLOR
-from irc import LEVEL_MASKS
 import time
 import json
 import requests
@@ -144,9 +143,9 @@ class Cmd():
 
         if cinfo[0] == 4:
             access = "root"
-        elif cinfo[0] == LEVEL_MASKS['o']:
+        elif cinfo[0] == irc.LEVEL_MASKS['o']:
             access = "op"
-        elif cinfo[0] == LEVEL_MASKS['v']:
+        elif cinfo[0] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
         self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
