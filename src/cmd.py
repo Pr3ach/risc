@@ -293,7 +293,7 @@ class Cmd():
             sv = ioq3.Ioq3(ip, port)
         except Exception, e:
             self.debug.error("cmd_server: Exception: '%s'" %(e))
-            self.privmsg(cinfo[1], COLOR["boldred"]+"Error"+COLOR["rewind"])
+            self.privmsg(info[1], COLOR["boldred"] + "Server seems unreachable." + COLOR["rewind"])
             return None
 
         self._cmd_server_display(sv, cinfo)
@@ -472,7 +472,6 @@ class Cmd():
         Display game info from an ioq3.Ioq3 instance
         """
         nb_cl = 0
-        use_pings = False
         players = []
         nb_bot = 0
 
@@ -481,7 +480,9 @@ class Cmd():
         elif sv.cl_list != -1:
             nb_cl = len(sv.cl_list)
 
-        if len(sv.cl_pings) == len(sv.cl_list):
+        if sv.cl_list == -1:
+            use_pings = False
+        elif len(sv.cl_pings) == len(sv.cl_list):
             use_pings = True
 
         for i in range(len(sv.cl_list)):
@@ -507,4 +508,3 @@ class Cmd():
         else:
             self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) + '+' + str(nb_cl) + '/' + str(sv.max_clients) + "):" + ','.join(players))
         return None
-
