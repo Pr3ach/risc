@@ -41,7 +41,7 @@ class Risc():
     """
     def __init__(self):
         try:
-            self.debug = debug.Debug(0, "risc")
+            self.debug = debug.Debug("risc")
             self.load_config()
             self.irc = irc.Irc(self.host, self.port, self.channel, self.nick)
             self.cmd = cmd.Cmd(self)
@@ -131,7 +131,7 @@ class Risc():
 
             cur.commit()
             con.close()
-        except, e:
+        except Exception, e:
             if con:
                 con.close()
             self.debug.critical("init_db: Exception '%s'" %e)
@@ -151,6 +151,7 @@ class Risc():
         Stop the IRC module and leave
         """
         self.debug.info("Exiting")
+        self.debug.close()
         self.irc.stop()
         return None
 

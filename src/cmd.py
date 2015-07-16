@@ -291,7 +291,7 @@ class Cmd():
 
         try:
             sv = ioq3.Ioq3(ip, port)
-        except, e:
+        except Exception, e:
             self.debug.error("cmd_server: Exception: '%s'" %(e))
             self.privmsg(cinfo[1], COLOR["boldred"]+"Error"+COLOR["rewind"])
             return None
@@ -442,8 +442,12 @@ class Cmd():
             l.append(t[0])
 
         con.close()
-        self.privmsg(cinfo[1], COLOR["boldgreen"]+"Current servers:"+COLOR["rewind"])
-        self.privmsg(cinfo[1], ", ".join(l))
+
+        if len(l) == 0:
+            self.privmsg(cinfo[1], "Server list is empty.")
+        else:
+            self.privmsg(cinfo[1], COLOR["boldgreen"]+"Current servers:"+COLOR["rewind"])
+            self.privmsg(cinfo[1], ", ".join(l))
         return None
 
     def _cmd_server_retrieve(self, name):
