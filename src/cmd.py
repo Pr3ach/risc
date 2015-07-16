@@ -470,7 +470,7 @@ class Cmd():
             ret = [res[0][0], int(res[0][1])]
         else:
             cur.execute("""SELECT ip, port FROM ioq3_servers WHERE name LIKE '%s'""" %(mysql.escape_string(name)))
-            if c.rowcount == 1:
+            if cur.rowcount == 1:
                 res = cur.fetchall()
                 ret = [res[0][0], int(res[0][1])]
             con.close()
