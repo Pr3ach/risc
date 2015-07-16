@@ -485,13 +485,14 @@ class Cmd():
         elif len(sv.cl_pings) == len(sv.cl_list):
             use_pings = True
 
-        for i in range(len(sv.cl_list)):
-            if use_pings and sv.cl_pings[i] == '0':
-                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
-                        ' (' + COLOR["boldblue"] + "BOT" + COLOR["rewind"] + ')')
-                nb_bot += 1
-            else:
-                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
+        if sv.cl_list != -1:
+            for i in range(len(sv.cl_list)):
+                if use_pings and sv.cl_pings[i] == '0':
+                    players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
+                            ' (' + COLOR["boldblue"] + "BOT" + COLOR["rewind"] + ')')
+                    nb_bot += 1
+                else:
+                    players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
         status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
                 ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + '+' + str(nb_bot) + COLOR['rewind'] + '/' + str(sv.max_clients) +\
