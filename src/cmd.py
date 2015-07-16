@@ -458,6 +458,7 @@ class Cmd():
         """
         Retrieve a server ip/port from the database given its name
         """
+        ret = ["", 0]
         con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
         cur = con.cursor()
 
@@ -466,10 +467,15 @@ class Cmd():
         if cur.rowcount == 1:
             res = cur.fetchall()
             con.close()
-            return [res[0][0], int(res[0][1])]
+            ret = [res[0][0], int(res[0][1])]
+        else:
+            cur.execute("""SELECT ip, port FROM ioq3_servers WHERE name LIKE '%s'""" %(mysql.escape_string(name)))
+            if c.rowcount == 1:
+                res = cur.fetchall()
+                ret = [res[0][0], int(res[0][1])]
+            con.close()
 
-        con.close()
-        return ["", 0]
+        return ret
 
     def _cmd_server_display(self, sv, cinfo):
         """
