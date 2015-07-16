@@ -18,12 +18,13 @@
 #
 
 import irc
+import ioq3
 from irc import COLOR
 import time
 import json
 import requests
-import ioq3
 import re
+import MySQLdb as mysql
 
 cmds = {"help": [["h", "help"], 0],
         "quit": [["quit", "leave", "disconnect", "q"], 0],
@@ -230,7 +231,6 @@ class Cmd():
         return None
 
     #TODO: code all remaining functions called here
-    #TODO: filter words "add", "rm" etc and re_ip & re_full_ip patterns in _cmd_server_add
     def cmd_server(self, _from, to, msg):
         """
         Display game information about the specified server
@@ -254,22 +254,22 @@ class Cmd():
             if argc < 4:
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
                 return None
-            self._cmd_server_add(argv[2], argv[3])
+            self._cmd_server_add(argv[2], argv[3], cinfo, _from)
             return None
-        elif argv[1].lower() in ("rm", "del"):
+        elif argv[1].lower() in ("drop", "rm"):
             if argc < 3:
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
                 return None
-            self._cmd_server_rm(argv[2])
+            self._cmd_server_drop(argv[2], cinfo)
             return None
         elif argv[1].lower() in ("rename", "mv"):
             if argc < 4:
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help server.")
                 return None
-            self._cmd_server_rename(argv[2], argv[3])
+            self._cmd_server_rename(argv[2], argv[3], cinfo)
             return None
         elif argv[1].lower() in ("list", "ls"):
-            self._cmd_server_list()
+            self._cmd_server_list(cinfo)
             return None
 
         re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
@@ -283,7 +283,7 @@ class Cmd():
             port = 27960
         else:
             tmp = self._cmd_server_retrieve(argv[1])
-            if not tmp:
+            if tmp[0] == "":
                 self.privmsg(cinfo[1], "No such server.")
                 return None
             ip = tmp[0]
@@ -296,5 +296,211 @@ class Cmd():
             self.privmsg(cinfo[1], COLOR["boldred"]+"Error"+COLOR["rewind"])
             return None
 
-        self._cmd_server_display(sv)
+        self._cmd_server_display(sv, cinfo)
         return None
+
+    def _cmd_server_add(self, ip, name, cinfo, _from):
+        """
+        Add a server to the database
+        """
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
+
+        if re.match(re_full_ip, name) or re.match(re_ip, name) or name.lower() in ("add", "drop", "rm", "list", "ls", "rename", "mv") or len(mysql.escape_string(name)) >= 16:
+            self.privmsg(cinfo[1], "Invalid server name.")
+            return None
+
+        if re.match(re_ip, ip):
+            port = 27960
+        elif re.match(re_full_ip, ip):
+            port = int(ip.split(':')[1])
+            ip = ip.split(':')[0]
+        else:
+            self.privmsg(cinfo[1], "Invalid IP address.")
+            return None
+
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM ioq3_blacklist WHERE ip = '%s' AND port = %d""" %(ip, port))
+
+        if cur.rowcount:
+            con.close()
+            self.privmsg(cinfo[1], "Invalid IP address.")
+            return None
+
+        cur.execute("""SELECT * FROM ioq3_servers WHERE (ip = '%s' AND port = %d) OR name = '%s'""" %(ip, port, mysql.escape_string(name)))
+
+        if cur.rowcount:
+            con.close()
+            self.privmsg(cinfo[1], "Server already exists.")
+            return None
+
+        cur.execute("""SELECT * FROM ioq3_servers""")
+
+        if cur.rowcount > 32:
+            con.close()
+            self.privmsg(cinfo[1], "Server limit reached.")
+            return None
+
+        try:
+            sv = ioq3.Ioq3(ip, port, name)
+        except:
+            cur.execute("""INSERT INTO ioq3_blacklist(ip, port, name, added_by)
+                    VALUES ('%s', %d, '%s', '%s')""" %(ip, port, mysql.escape_string(name), _from))
+            self.privmsg(cinfo[1], "Invalid IP address.")
+            return None
+
+        cur.execute("""INSERT INTO ioq3_servers(ip, port, name, added_by)
+                VALUES ('%s', %d, '%s', '%s')""" %(ip, port, mysql.escape_string(name), _from))
+        self.privmsg(cinfo[1], "Operation successful.")
+        return None
+
+    def _cmd_server_drop(self, name, cinfo):
+        """
+        Remove a server from the database
+        """
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(name)))
+
+        if cur.rowcount == 0:
+            self.privmsg(cinfo[1], "No such server.")
+        elif cur.rowcount == 1:
+            cur.execute("""DELETE FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(name)))
+            if cur.rowcount == 1:
+                cur.commit()
+                self.privmsg(cinfo[1], "Operation successful.")
+            else:
+                con.rollback()
+                self.privmsg(cinfo[1], "Operation failed.")
+        else:
+            self.privmsg(cinfo[1], "Operation failed.")
+
+        con.close()
+        return None
+
+    def _cmd_server_rename(self, old_name, new_name, cinfo):
+        """
+        Rename a server in the database
+        """
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
+
+        if len(mysql.escape_string(old_name)) >= 16 or len(mysql.escape_string(new_name)) >= 16:
+            self.privmsg(cinfo[1], "Invalid server name(s).")
+            return None
+
+        if re.match(re_full_ip, mysql.escape_string(new_name)) or re.match(re_ip, mysql.escape_string(new_name)):
+            self.privmsg(cinfo[1], "Invalid new server name.")
+            return None
+
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(old_name)))
+
+        if cur.rowcount == 0:
+            self.privmsg(cinfo[1], "No such server.")
+        elif cur.rowcount == 1:
+            cur.execute("""SELECT * FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(new_name)))
+            if cur.rowcount != 0:
+                self.privmsg(cinfo[1], "Server name in use.")
+                con.close()
+                return None
+            cur.execute("""UPDATE ioq3_servers SET name = '%s' WHERE name = '%s'"""
+                    %(mysql.escape_string(new_name), mysql.escape_string(old_name)))
+            if cur.rowcount == 1:
+                cur.commit()
+                self.privmsg(cinfo[1], "Operation successful.")
+            else:
+                con.rollback()
+                self.privmsg(cinfo[1], "Operation failed.")
+        else:
+            self.privmsg(cinfo[1], "Operation failed.")
+
+        con.close()
+        return None
+
+    def _cmd_server_list(self, cinfo):
+        """
+        List the servers in the db
+        """
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT name FROM ioq3_servers""")
+
+        if cur.rowcount > 32:
+            con.close()
+            self.privmsg(cinfo[1], "Server limit reached.")
+            return None
+
+        l = []
+        for t in cur.fetchall():
+            l.append(t[0])
+
+        con.close()
+        self.privmsg(cinfo[1], COLOR["boldgreen"]+"Current servers:"+COLOR["rewind"])
+        self.privmsg(cinfo[1], ", ".join(l))
+        return None
+
+    def _cmd_server_retrieve(self, name):
+        """
+        Retrieve a server ip/port from the database given its name
+        """
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT ip, port FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(name)))
+
+        if cur.rowcount == 1:
+            res = cur.fetchall()
+            con.close()
+            return [res[0][0], int(res[0][1])]
+
+        con.close()
+        return ["", 0]
+
+    def _cmd_server_display(self, sv, cinfo):
+        """
+        Display game info from an ioq3.Ioq3 instance
+        """
+        nb_cl = 0
+        use_pings = False
+        players = []
+        nb_bot = 0
+
+        if sv.clients != -1:
+            nb_cl = sv.clients
+        elif sv.cl_list != -1:
+            nb_cl = len(sv.cl_list)
+
+        if len(sv.cl_pings) == len(sv.cl_list):
+            use_pings = True
+
+        for i in range(len(sv.cl_list)):
+            if use_pings and sv.cl_pings[i] == '0':
+                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
+                        ' (' + COLOR["boldblue"] + "BOT" + COLOR["rewind"] + ')')
+                nb_bot += 1
+            else:
+                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
+
+        status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
+                ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + '+' + str(nb_bot) + COLOR['rewind'] + '/' + str(sv.max_clients) +\
+                ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
+                ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap +\
+                ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(sv.gametype) + COLOR['rewind'] +\
+                ', version:' + COLOR['boldblue'] + ' ' + sv.version + COLOR['rewind'] +\
+                ", IP:" + COLOR["boldblue"] + ' ' + str(sv.ip) + ':' + str(sv.port) + COLOR["rewind"]
+
+        self.privmsg(cinfo[1], status)
+
+        if nb_cl == 0:
+            self.privmsg(cinfo[1], "Server is currently empty.")
+        else:
+            self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) + '+' + str(nb_cl) + '/' + str(sv.max_clients) + "):" + ','.join(players))
+        return None
+

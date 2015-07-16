@@ -34,7 +34,6 @@ import cmd
 
 INIPATH = "risc.ini"
 init_time = int(time.time())
-MAX_Q3_SERVERS = 32
 
 class Risc():
     """
@@ -46,9 +45,9 @@ class Risc():
             self.load_config()
             self.irc = irc.Irc(self.host, self.port, self.channel, self.nick)
             self.cmd = cmd.Cmd(self)
-            filterwarnings("ignore", category = mysql.Warning)
+            self.init_db()
         except:
-            self.debug.critical("Risc.__init__: Exception caught while loading config settings - Make sure there's no missing field")
+            self.debug.critical("Risc.__init__: Exception occured while loading config settings - Make sure there's no missing field")
             raise SystemExit
 
     def load_config(self):
@@ -59,25 +58,23 @@ class Risc():
         self.cfg.read(INIPATH)
 
         # Gather config info
-        self.host = self.cfg.get('irc', 'host')
-        self.port = int(self.cfg.get('irc', 'port'))
+        self.host = self.cfg.get("irc", "host")
+        self.port = int(self.cfg.get("irc", "port"))
         self.channel = self.cfg.get("irc", "channel")
         self.nick = self.cfg.get("irc", "nick")
-        self.db_host = self.cfg.get('db', 'host')
-        self.db_user = self.cfg.get('db', 'user')
-        self.db_passwd = self.cfg.get('db', 'passwd')
-        self.db_name = self.cfg.get('db', 'self_db')                                    # db for risc settings (admins etc)
+        self.auth = self.cfg.get("irc", "auth")
+        self.auth_passwd = self.cfg.get("irc", "auth_passwd")
+
+        self.db_host = self.cfg.get("db", "host")
+        self.db_user = self.cfg.get("db", "user")
+        self.db_passwd = self.cfg.get("db", "passwd")
+        self.db_name = self.cfg.get("db", "db")
+
         self.anti_spam_threshold = int(self.cfg.get("risc", "anti_spam_threshold"))
         self.on_kick_delay = int(self.cfg.get("risc", "on_kick_delay"))
         self.on_timeout_delay = int(self.cfg.get("risc", "on_timeout_delay"))
-        self.svs = self.cfg.get('var', 'servers').split(',')                            # Get servers, their dbs
-        self.auth = self.cfg.get('irc', 'auth')
-        self.auth_passwd = self.cfg.get('irc', 'auth_passwd')
-        self.cmd_prefix = self.cfg.get('risc', 'cmd_prefix')
-        self.cmd_prefix_global = self.cfg.get('risc', 'cmd_prefix_global')
-
-        if len(self.svs) > MAX_Q3_SERVERS:
-            self.debug.error('Too many servers. Max: %u' %(MAX_Q3_SERVERS))
+        self.cmd_prefix = self.cfg.get("risc", "cmd_prefix")
+        self.cmd_prefix_global = self.cfg.get("risc", "cmd_prefix_global")
 
         if len(self.cmd_prefix) != 1:
             self.cmd_prefix = '!'
@@ -104,6 +101,40 @@ class Risc():
                     cmd.cmds[c][cmd.CMD_LEVEL] = irc.LEVEL_MASKS['v']
                 else:
                     cmd.cmds[c][cmd.CMD_LEVEL] = 0
+        return None
+
+    def init_db(self):
+        """
+        Create databases if they dont exist
+        """
+        filterwarnings("ignore", category = mysql.Warning)
+
+        try:
+            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+            cur = con.cursor()
+
+            cur.execute("""CREATE IF NOT EXISTS ioq3_servers(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
+                                                             ip VARCHAR(16) NOT NULL,
+                                                             port INT NOT NULL,
+                                                             name VARCHAR(16) NOT NULL,
+                                                             added_by VARCHAR(64) DEFAULT NULL,
+                                                             added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
+
+            cur.commit()
+
+            cur.execute("""CREATE IF NOT EXISTS ioq3_blacklist(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
+                                                               ip VARCHAR(16) NOT NULL,
+                                                               port INT NOT NULL,
+                                                               name VARCHAR(16) NOT NULL,
+                                                               added_by VARCHAR(64) DEFAULT NULL,
+                                                               added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
+
+            cur.commit()
+            con.close()
+        except, e:
+            if con:
+                con.close()
+            self.debug.critical("init_db: Exception '%s'" %e)
         return None
 
     def start(self):
@@ -183,7 +214,7 @@ class Risc():
                 br.open(url)
                 self.irc.privmsg(self.channel, "Title: " + br.title())
             except Exception, e:
-                self.debug.error("process_irc: Exception caught: '%s'." % e)
+                self.debug.error("process_irc: Exception '%s'." % e)
         return None
 
 def main():

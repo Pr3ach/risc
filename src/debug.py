@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.1"
+__version__ = "1.2"
 
 import time
 import sys
@@ -27,35 +27,43 @@ class Debug():
     """
     Set of functions providing simple logging/debugging capabilities
     """
-    def __init__(self, use__stdout__, log_prefix=""):
+    def __init__(self, log_prefix=""):
         t = time.time()
         self.log_file = ""
 
-        if not use__stdout__:
+        if log_prefix != "":
             self.log_file = log_prefix + "_"+ str(int(t)) + ".log"
-            sys.stdout = open(self.log_file, "w+", 0)
+            sys.stdout = open(self.log_file, "w+")
 
     def info(self, info_msg):
         t = time.localtime()
-        print ("%d/%d/%d %d:%d:%d INFO     %s" %(t[1], t[2], t[0], t[3], t[4], t[5], info_msg))
+        print ("%02d/%02d/%04d %02d:%02d:%02d INFO     %s" %(t[1], t[2], t[0], t[3], t[4], t[5], info_msg))
         return None
 
     def debug(self, debug_msg):
         t = time.localtime()
-        print ("%d/%d/%d %d:%d:%d DEBUG    %s" %(t[1], t[2], t[0], t[3], t[4], t[5], debug_msg))
+        print ("%02d/%02d/%04d %02d:%02d:%02d DEBUG    %s" %(t[1], t[2], t[0], t[3], t[4], t[5], debug_msg))
         return None
 
     def warning(self, warning_msg):
         t = time.localtime()
-        print ("%d/%d/%d %d:%d:%d WARNING  %s" %(t[1], t[2], t[0], t[3], t[4], t[5], warning_msg))
+        print ("%02d/%02d/%04d %02d:%02d:%02d WARNING  %s" %(t[1], t[2], t[0], t[3], t[4], t[5], warning_msg))
         return None
 
     def error(self, error_msg):
         t = time.localtime()
-        print ("%d/%d/%d %d:%d:%d ERROR    %s" %(t[1], t[2], t[0], t[3], t[4], t[5], error_msg))
+        print ("%02d/%02d/%04d %02d:%02d:%02d ERROR    %s" %(t[1], t[2], t[0], t[3], t[4], t[5], error_msg))
         return None
 
     def critical(self, critical_msg):
         t = time.localtime()
-        print ("%d/%d/%d %d:%d:%d CRITICAL %s" %(t[1], t[2], t[0], t[3], t[4], t[5], critical_msg))
+        print ("%02d/%02d/%04d %02d:%02d:%02d CRITICAL %s" %(t[1], t[2], t[0], t[3], t[4], t[5], critical_msg))
+        return None
+
+    def close(self):
+        """
+        Close the log file, if stdout is not used
+        """
+        if self.log_file != "":
+            sys.stdout.close()
         return None
