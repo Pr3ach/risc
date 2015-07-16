@@ -30,6 +30,7 @@ cmds = {"help": [["h"], 0],
         "quit": [["leave", "disconnect", "q"], 0],
         "google": [["g"], 0],
         "server": [["status", "sv", "st"], 0],
+        "hash": [[], 0],
         "base64": [["b64"], 0],
         "search": [["s"], 0],
         "uptime": [["uptime"], 0],
@@ -522,8 +523,8 @@ class Cmd():
                 players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
         status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
-                ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + (('+' + str(nb_bot)) if nb_bot != 0 else '') +\
-                COLOR['rewind'] + '/' + str(sv.max_clients) +\
+                ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + (('+' +\
+                str(nb_bot)) if nb_bot != 0 else '') + COLOR['rewind'] + '/' + str(sv.max_clients) +\
                 ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
                 ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap + COLOR["rewind"] +\
                 ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(sv.gametype) + COLOR['rewind'] +\
@@ -535,5 +536,34 @@ class Cmd():
         if nb_cl == 0:
             self.privmsg(cinfo[1], "Server is currently empty.")
         else:
-            self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) + ('+' + str(nb_bot) if nb_bot != 0 else '') + '/' + str(sv.max_clients) + "):" + ','.join(players))
+            self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) +\
+                    ('+' + str(nb_bot) if nb_bot != 0 else '') + '/' +\
+                    str(sv.max_clients) + "):" + ','.join(players))
+        return None
+
+    def cmd_hash(self, _from, to, msg):
+        """
+        Hash data using a specified hash algotithm
+        hash [md5 | sha1 | sha256 | sha512] <data>
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 3:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help hash.")
+            return None
+
+        if argv[1].lower() not in hashlib.algorithms:
+            self.privmsg(cinfo[1], "Hash algorithm not available. Check "+self.risc_cmd_prefix+"help hash.")
+            return None
+
+        data = ' '.join(msg.split(' ')[2:])
+        self.privmsg(cinfo[1], getattr(hashlib, argv[1].lower())(data).hexdigest())
         return None
