@@ -230,7 +230,6 @@ class Cmd():
                 break
         return None
 
-    #TODO: code all remaining functions called here
     def cmd_server(self, _from, to, msg):
         """
         Display game information about the specified server
@@ -348,11 +347,15 @@ class Cmd():
         except:
             cur.execute("""INSERT INTO ioq3_blacklist(ip, port, name, added_by)
                     VALUES ('%s', %d, '%s', '%s')""" %(ip, port, mysql.escape_string(name), _from))
+            con.commit()
+            con.close()
             self.privmsg(cinfo[1], "Invalid IP address.")
             return None
 
         cur.execute("""INSERT INTO ioq3_servers(ip, port, name, added_by)
                 VALUES ('%s', %d, '%s', '%s')""" %(ip, port, mysql.escape_string(name), _from))
+        con.commit()
+        con.close()
         self.privmsg(cinfo[1], "Operation successful.")
         return None
 
