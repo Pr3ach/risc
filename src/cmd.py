@@ -503,7 +503,8 @@ class Cmd():
                 players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
         status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
-                ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + '+' + str(nb_bot) + COLOR['rewind'] + '/' + str(sv.max_clients) +\
+                ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + (('+' + str(nb_bot)) if nb_bot != 0 else '') +\
+                COLOR['rewind'] + '/' + str(sv.max_clients) +\
                 ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
                 ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap + COLOR["rewind"] +\
                 ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(sv.gametype) + COLOR['rewind'] +\
