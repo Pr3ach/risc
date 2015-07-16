@@ -112,14 +112,14 @@ class Risc():
         con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
         cur = con.cursor()
 
-        cur.execute("""CREATE TABLE IF NOT EXISTS ioq3_servers(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
+        cur.execute("""CREATE TABLE IF NOT EXISTS ioq3_servers(id TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                                                ip VARCHAR(16) NOT NULL,
                                                                port INT NOT NULL,
                                                                name VARCHAR(16) NOT NULL,
                                                                added_by VARCHAR(64) DEFAULT NULL,
                                                                added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
 
-        cur.execute("""CREATE TABLE IF NOT EXISTS ioq3_blacklist(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
+        cur.execute("""CREATE TABLE IF NOT EXISTS ioq3_blacklist(id TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                                                  ip VARCHAR(16) NOT NULL,
                                                                   port INT NOT NULL,
                                                                   name VARCHAR(16) NOT NULL,
