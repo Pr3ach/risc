@@ -509,5 +509,5 @@ class Cmd():
         if nb_cl == 0:
             self.privmsg(cinfo[1], "Server is currently empty.")
         else:
-            self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) + '+' + str(nb_cl) + '/' + str(sv.max_clients) + "):" + ','.join(players))
+            self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) + '+' + str(nb_bot) + '/' + str(sv.max_clients) + "):" + ','.join(players))
         return None
