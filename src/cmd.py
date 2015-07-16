@@ -292,7 +292,7 @@ class Cmd():
             sv = ioq3.Ioq3(ip, port)
         except Exception, e:
             self.debug.error("cmd_server: Exception: '%s'" %(e))
-            self.privmsg(info[1], COLOR["boldred"] + "Server seems unreachable." + COLOR["rewind"])
+            self.privmsg(cinfo[1], COLOR["boldred"] + "Server seems unreachable." + COLOR["rewind"])
             return None
 
         self._cmd_server_display(sv, cinfo)
@@ -372,8 +372,8 @@ class Cmd():
             self.privmsg(cinfo[1], "No such server.")
         elif cur.rowcount == 1:
             cur.execute("""DELETE FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(name)))
+            con.commit()
             if cur.rowcount == 1:
-                con.commit()
                 self.privmsg(cinfo[1], "Operation successful.")
             else:
                 con.rollback()
@@ -414,6 +414,7 @@ class Cmd():
                 return None
             cur.execute("""UPDATE ioq3_servers SET name = '%s' WHERE name = '%s'"""
                     %(mysql.escape_string(new_name), mysql.escape_string(old_name)))
+            con.commit()
             if cur.rowcount == 1:
                 con.commit()
                 self.privmsg(cinfo[1], "Operation successful.")
@@ -474,36 +475,34 @@ class Cmd():
         """
         Display game info from an ioq3.Ioq3 instance
         """
-        nb_cl = 0
         players = []
         nb_bot = 0
 
         if sv.clients != -1:
-            nb_cl = int(sv.clients)
-        elif sv.cl_list != -1:
+            nb_cl = sv.clients
+        elif sv.cl_list != []:
             nb_cl = len(sv.cl_list)
 
-        if sv.cl_list == -1:
+        if sv.cl_list == []:
             use_pings = False
         elif len(sv.cl_pings) == len(sv.cl_list):
             use_pings = True
 
-        if sv.cl_list != -1:
-            for i in range(len(sv.cl_list)):
-                if use_pings and sv.cl_pings[i] == '0':
-                    players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
-                            ' (' + COLOR["boldblue"] + "BOT" + COLOR["rewind"] + ')')
-                    nb_bot += 1
-                else:
-                    players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
+        for i in range(len(sv.cl_list)):
+            if use_pings and sv.cl_pings[i] == 0:
+                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
+                        ' (' + COLOR["boldblue"] + "BOT" + COLOR["rewind"] + ')')
+                nb_bot += 1
+            else:
+                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
         status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
                 ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + '+' + str(nb_bot) + COLOR['rewind'] + '/' + str(sv.max_clients) +\
                 ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
                 ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap + COLOR["rewind"] +\
-                ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(int(sv.gametype)) + COLOR['rewind'] +\
+                ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(sv.gametype) + COLOR['rewind'] +\
                 ', version:' + COLOR['boldblue'] + ' ' + sv.version + COLOR['rewind'] +\
-                ", IP:" + COLOR["boldblue"] + ' ' + str(sv.ip) + ':' + str(sv.port) + COLOR["rewind"]
+                ", IP:" + COLOR["boldblue"] + ' ' + sv.ip + ':' + str(sv.port) + COLOR["rewind"]
 
         self.privmsg(cinfo[1], status)
 

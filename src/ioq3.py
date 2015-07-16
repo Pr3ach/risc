@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.2"
+__version__ = "1.3"
 
 import socket
 import re
@@ -69,6 +69,8 @@ class Ioq3():
         if self.sock:
             self.sock.close()
 
+        self.check_vars()
+
     def list_clean(self, l):
         """
         Clean a list after a split
@@ -80,15 +82,17 @@ class Ioq3():
         return ret
 
     def clean_color_string(self, s):
-        return re.sub('\^.', '', s)
+        return re.sub('\^\d', '', s)
 
     def get_client_list(self, raw):
         """
         Return the player list and set the ping list
         """
         cl = re.findall('".+', raw[-1])         # Find nicks, which are surrounded by "
+
         if not cl:
-            return -1                           # No players
+            return []
+
         for i in range(len(cl)):
             cl[i] = self.clean_color_string(cl[i])[1:][:-1]
 
@@ -96,18 +100,18 @@ class Ioq3():
         pings = re.findall('\\n[0-9]{1,3}\s[0-9]{1,3}\s', raw[-1])
         if len(pings) > 0:
             for i in range(len(pings)):
-                pings[i] = pings[i].split(' ')[1]
+                pings[i] = int(pings[i].split(' ')[1])
             self.cl_pings = pings
         return cl
 
     def get_var(self, l, var):
         """
-        Return the content of the requested cvar if available in the buffer, otherwise return -1
+        Return the content of the requested cvar if available in the buffer, otherwise return ""
         """
         for i in range(len(l)):
             if l[i] == var:
                 return l[i+1]
-        return -1
+        return ""
 
     def getstatus(self):
         try:
@@ -144,3 +148,25 @@ class Ioq3():
         if gametype in GAMETYPES:
             return GAMETYPES[gametype]
         return ""
+
+    def check_vars(self):
+        """
+        Check data types to avoid TypeError
+        """
+        if self.allowvote == "":
+            self.allowvote = -1
+        if self.gametype == "":
+            self.gametype = -1
+        if self.clients == "":
+            self.clients = -1
+        if self.auth == "":
+            self.auth = -1
+        if self.max_clients == "":
+            self.max_clients = -1
+
+        self.allowvote = int(self.allowvote)
+        self.gametype = int(self.gametype)
+        self.clients = int(self.clients)
+        self.auth = int(self.auth)
+        self.max_clients = int(self.max_clients)
+        return None
