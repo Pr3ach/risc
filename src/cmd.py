@@ -500,7 +500,7 @@ class Cmd():
         status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
                 ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + '+' + str(nb_bot) + COLOR['rewind'] + '/' + str(sv.max_clients) +\
                 ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
-                ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap +\
+                ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap + COLOR["rewind"] +\
                 ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(int(sv.gametype)) + COLOR['rewind'] +\
                 ', version:' + COLOR['boldblue'] + ' ' + sv.version + COLOR['rewind'] +\
                 ", IP:" + COLOR["boldblue"] + ' ' + str(sv.ip) + ':' + str(sv.port) + COLOR["rewind"]
