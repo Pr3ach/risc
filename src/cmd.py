@@ -178,6 +178,25 @@ class Cmd():
                 ", ".join(cmds[cmd][CMD_ALIASES])+'.'+" Access: "+access+'.')
         return None
 
+    def _cmd_help_server(self, _from, to, msg, cmd):
+        """
+        Help for server command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: server [<ip:opt_port> | <name> | add "\
+                "<ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> "\
+                "| list]. Description: Manage ioq3 based game servers. Access: "+access+'.')
+        return None
+
     def cmd_quit(self, _from, to, msg):
         """
         Simply leave
@@ -233,7 +252,7 @@ class Cmd():
     def cmd_server(self, _from, to, msg):
         """
         Display game information about the specified server
-        server [<ip:opt_port> | <name> | add <ip:opt_port> <name> | rm <name> | rename <old_name> <new_name> | list]
+        server [<ip:opt_port> | <name> | add <ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> | list]
         """
         cinfo = self.init_cmd(_from, to, msg)
 
