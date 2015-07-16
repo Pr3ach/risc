@@ -109,32 +109,25 @@ class Risc():
         """
         filterwarnings("ignore", category = mysql.Warning)
 
-        try:
-            con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
-            cur = con.cursor()
+        con = mysql.connect(self.db_host, self.db_user, self.db_passwd, self.db_name)
+        cur = con.cursor()
 
-            cur.execute("""CREATE IF NOT EXISTS ioq3_servers(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
-                                                             ip VARCHAR(16) NOT NULL,
-                                                             port INT NOT NULL,
-                                                             name VARCHAR(16) NOT NULL,
-                                                             added_by VARCHAR(64) DEFAULT NULL,
-                                                             added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
-
-            cur.commit()
-
-            cur.execute("""CREATE IF NOT EXISTS ioq3_blacklist(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
+        cur.execute("""CREATE TABLE IF NOT EXISTS ioq3_servers(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
                                                                ip VARCHAR(16) NOT NULL,
                                                                port INT NOT NULL,
                                                                name VARCHAR(16) NOT NULL,
                                                                added_by VARCHAR(64) DEFAULT NULL,
                                                                added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
 
-            cur.commit()
-            con.close()
-        except Exception, e:
-            if con:
-                con.close()
-            self.debug.critical("init_db: Exception '%s'" %e)
+        cur.execute("""CREATE TABLE IF NOT EXISTS ioq3_blacklist(id TINYINT NOT NULL AUTO_INCREEMENT PRIMARY KEY,
+                                                                 ip VARCHAR(16) NOT NULL,
+                                                                  port INT NOT NULL,
+                                                                  name VARCHAR(16) NOT NULL,
+                                                                  added_by VARCHAR(64) DEFAULT NULL,
+                                                                  added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
+
+        cur.commit()
+        con.close()
         return None
 
     def start(self):
