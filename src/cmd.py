@@ -1,4 +1,4 @@
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 #
 #  Copyright (C) 2015 - Preacher
@@ -25,6 +25,7 @@ import json
 import requests
 import re
 import MySQLdb as mysql
+import hashlib
 
 cmds = {"help": [["h"], 0],
         "quit": [["leave", "disconnect", "q"], 0],
@@ -561,7 +562,7 @@ class Cmd():
             return None
 
         if argv[1].lower() not in hashlib.algorithms:
-            self.privmsg(cinfo[1], "Hash algorithm not available. Check "+self.risc_cmd_prefix+"help hash.")
+            self.privmsg(cinfo[1], "Hash algorithm not available. Check "+self.risc.cmd_prefix+"help hash.")
             return None
 
         data = ' '.join(msg.split(' ')[2:])
