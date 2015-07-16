@@ -370,7 +370,7 @@ class Cmd():
         elif cur.rowcount == 1:
             cur.execute("""DELETE FROM ioq3_servers WHERE name = '%s'""" %(mysql.escape_string(name)))
             if cur.rowcount == 1:
-                cur.commit()
+                con.commit()
                 self.privmsg(cinfo[1], "Operation successful.")
             else:
                 con.rollback()
@@ -412,7 +412,7 @@ class Cmd():
             cur.execute("""UPDATE ioq3_servers SET name = '%s' WHERE name = '%s'"""
                     %(mysql.escape_string(new_name), mysql.escape_string(old_name)))
             if cur.rowcount == 1:
-                cur.commit()
+                con.commit()
                 self.privmsg(cinfo[1], "Operation successful.")
             else:
                 con.rollback()

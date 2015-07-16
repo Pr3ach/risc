@@ -126,7 +126,7 @@ class Risc():
                                                                   added_by VARCHAR(64) DEFAULT NULL,
                                                                   added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
 
-        cur.commit()
+        con.commit()
         con.close()
         return None
 
