@@ -476,7 +476,7 @@ class Cmd():
         nb_bot = 0
 
         if sv.clients != -1:
-            nb_cl = sv.clients
+            nb_cl = int(sv.clients)
         elif sv.cl_list != -1:
             nb_cl = len(sv.cl_list)
 
