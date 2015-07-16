@@ -26,16 +26,16 @@ import requests
 import re
 import MySQLdb as mysql
 
-cmds = {"help": [["h", "help"], 0],
-        "quit": [["quit", "leave", "disconnect", "q"], 0],
-        "google": [["google", "g"], 0],
-        "server": [["server", "sv"], 0],
-        "base64": [["b64", "base64"], 0],
-        "search": [['search', "s"], 0],
+cmds = {"help": [["h"], 0],
+        "quit": [["leave", "disconnect", "q"], 0],
+        "google": [["g"], 0],
+        "server": [["status", "sv", "st"], 0],
+        "base64": [["b64"], 0],
+        "search": [["s"], 0],
         "uptime": [["uptime"], 0],
-        "version": [["version", "v"], 0],
-        "roulette": [["roulette", "r"], 0],
-        "kill": [["kill", "k"], 0],
+        "version": [["v"], 0],
+        "roulette": [["r"], 0],
+        "kill": [["k"], 0],
         "raw": [["raw"], 0]}
 
 CMD_ALIASES = 0
@@ -514,6 +514,8 @@ class Cmd():
 
         if nb_cl == 0:
             self.privmsg(cinfo[1], "Server is currently empty.")
-        else:
+        elif nb_bot != 0:
             self.privmsg(cinfo[1], "Playing (" + str(nb_cl - nb_bot) + '+' + str(nb_bot) + '/' + str(sv.max_clients) + "):" + ','.join(players))
+        else:
+            self.privmsg(cinfo[1], "Playing (" + str(nb_cl) + '/' + str(sv.max_clients) + "):" + ','.join(players))
         return None
