@@ -325,7 +325,7 @@ class Cmd():
             access = "voice"
 
         self.privmsg(cinfo[1], "Usage: roulette. Description: Russian roulette game. "\
-                " Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
+                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
         return None
 
     def cmd_quit(self, _from, to, msg):
