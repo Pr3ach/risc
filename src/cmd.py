@@ -310,6 +310,24 @@ class Cmd():
                         ". Access: "+access+'.')
         return None
 
+    def _cmd_help_roulette(self, _from, to, msg, cmd):
+        """
+        Help for roulette command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: roulette. Description: Russian roulette game. "\
+                " Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
+        return None
+
     def cmd_quit(self, _from, to, msg):
         """
         Simply leave
