@@ -367,7 +367,7 @@ class Cmd():
             access = "voice"
 
         usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": kill <opt_user> <opt_weapon>."
-        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": UrT-like kill messages. the <opt_user> "\
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": UrT-like kill messages. The <opt_user> "\
                 "parameter can be any user on the channel or -all, <opt_weapon> can be any UrT weapon."
         aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
         access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
@@ -891,9 +891,9 @@ class Cmd():
             return None
 
         if r_bullet == r_chamber:
-            self.irc.kick(_from, "rekt")
             self.privmsg(cinfo[1], COLOR["boldred"] + "* BANG *" + COLOR["rewind"]+" -" + COLOR["boldred"] +\
                     ' ' + _from + ' ' + COLOR["rewind"] + "is no more.")
+            self.irc.kick(_from, "rekt")
             r_bullet = random.randint(1, 0xffff) % 7
             r_chamber = random.randint(1, 0xffff) % 7
         else:
