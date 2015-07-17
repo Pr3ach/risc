@@ -32,8 +32,9 @@ import debug
 import irc
 import cmd
 
-INIPATH = "risc.ini"
+INIPATH = "riscrc"
 init_time = int(time.time())
+debug_mode = 1
 
 class Risc():
     """
@@ -136,6 +137,7 @@ class Risc():
         """
         self.irc.set_callback("on_welcome", self.on_welcome)
         self.irc.set_callback("on_privmsg", self.on_privmsg)
+        self.irc.set_callback("on_all", self.on_all)
         self.irc.start()
         return None
 
@@ -178,6 +180,14 @@ class Risc():
         self.debug.info("Joining " + self.channel + " ...")
         self.irc.join()
         self.debug.info("Done")
+        return None
+
+    def on_all(self, line):
+        """
+        Intercept every IRC message
+        """
+        if debug_mode:
+            self.debug.debug(line)
         return None
 
     def xurls(self, raw_msg):

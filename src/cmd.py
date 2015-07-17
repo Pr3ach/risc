@@ -963,7 +963,7 @@ class Cmd():
         elif argc >= 3:
             if not argv[1] in self.irc.users:
                 self.privmsg(cinfo[1], "This person doesn't exist.")
-            elif argv[2] in weapons:
+            elif argv[2].lower() in weapons:
                 self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + COLOR['rewind'] + weapons[argv[2].lower()][0] +\
                         COLOR["boldgreen"] + _from + COLOR["rewind"] + weapons[argv[2].lower()][1])
             else:
