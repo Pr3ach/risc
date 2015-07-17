@@ -828,11 +828,11 @@ class Cmd():
         if r_bullet == r_chamber:
             self.irc.kick(_from, "rekt")
             self.privmsg(cinfo[1], COLOR["boldred"] + "* BANG *" + COLOR["rewind"]+" -" + COLOR["boldred"] +\
-                    ' ' + _from + ' ' + COLOR["rewind"] + "is no more." %(_from))
+                    ' ' + _from + ' ' + COLOR["rewind"] + "is no more.")
             r_bullet = random.randint(1, 0xffff) % 7
             r_chamber = random.randint(1, 0xffff) % 7
         else:
             self.privmsg(cinfo[1], COLOR["boldgreen"] + "* BANG *" + COLOR["rewind"]+" -" + COLOR["boldgreen"] +\
-                    ' ' + _from + ' ' + COLOR["rewind"] + "is safe." %(_from))
+                    ' ' + _from + ' ' + COLOR["rewind"] + "is safe.")
             r_chamber = (r_chamber + 1) % 7
         return None
