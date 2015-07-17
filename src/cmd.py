@@ -375,6 +375,28 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
+    def _cmd_help_raw(self, _from, to, msg, cmd):
+        """
+        Help for raw command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": raw <data>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Send raw commands to the IRC server."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
+        return None
+
     def cmd_quit(self, _from, to, msg):
         """
         Simply leave
