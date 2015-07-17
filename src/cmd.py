@@ -922,7 +922,7 @@ class Cmd():
                 "ump45": [" danced the ump tango to ", "'s sweet sweet music."],
                 "mp5": [" was MP5K spammed without mercy by ", "'s MP5K."],
                 "mac11": [" was minced to death by ", "'s Mac 11."],
-                "lr300": [" played 'catch the shiny bullet with ", " LR-300 rounds."],
+                "lr300": [" played 'catch the shiny bullet with ", "'s LR-300 rounds."],
                 "g36": [" was on the wrong end of ", "'s G36."],
                 "ak103": [" was torn asunder by ", "'s crass AK103."],
                 "m4": [" got a lead enema from ", "'s retro M4."],
