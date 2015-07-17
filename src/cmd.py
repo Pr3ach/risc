@@ -558,7 +558,7 @@ class Cmd():
         if len(l) == 0:
             self.privmsg(cinfo[1], "Server list is empty.")
         else:
-            self.privmsg(cinfo[1], COLOR["boldgreen"]+"Current servers:"+COLOR["rewind"])
+            self.privmsg(cinfo[1], COLOR["boldgreen"]+"Current servers"+COLOR["rewind"]+':')
             self.privmsg(cinfo[1], ", ".join(l))
         return None
 
@@ -610,7 +610,7 @@ class Cmd():
             else:
                 players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
-        status = COLOR['boldgreen'] + sv.hostname + COLOR['rewind'] +\
+        status = COLOR['boldwhite'] + sv.hostname + COLOR['rewind'] +\
                 ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + (('+' +\
                 str(nb_bot)) if nb_bot != 0 else '') + COLOR['rewind'] + '/' + str(sv.max_clients) +\
                 ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
@@ -717,4 +717,61 @@ class Cmd():
         self.privmsg(cinfo[1], "Version" + COLOR["boldwhite"] + ' ' + risc.__version__ +\
                 ' ' + COLOR["rewind"] + "by" + COLOR["boldwhite"] + ' ' + risc.__author__ +\
                 COLOR["rewind"])
+        return None
+
+    def cmd_search(self, _from, to, msg):
+        """
+        Search for a player in the server list
+        search <player>
+        """
+        ret = []
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 2:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help search.")
+            return None
+
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT ip, port, name FROM ioq3_servers""")
+
+        if cur.rowcount == 0:
+            con.close()
+            self.privmsg(cinfo[1], "Server list is empty.")
+            return None
+
+        for info in cur.fetchall():
+            sv = None
+            use_pings = False
+            try:
+                sv = ioq3.Ioq3(info[0], int(info[1]), info[2])
+            except:
+                continue
+
+            if len(sv.cl_list) == len(sv.cl_pings):
+                use_pings = True
+
+            for cl in sv.cl_list:
+                if len(ret) >= 11:
+                    self.privmsg(cinfo[1], "Too many matches. Try to be more specific.")
+                    return None
+                if re.search(argv[1].lower(), cl.lower()):
+                    if use_pings and sv.cl_pings[sv.cl_list.index(cl)] == 0:
+                        ret.append(COLOR["boldgreen"] + cl + ' ' + COLOR["rewind"] + '(' + COLOR["boldblue"] +\
+                                "BOT" + COLOR["rewind"] + ', ' + COLOR["boldblue"] + sv.name + COLOR["rewind"] + ')')
+                    else:
+                        ret.append(COLOR["boldgreen"] + cl + ' ' + COLOR["rewind"] + '(' + COLOR["boldblue"] +\
+                                sv.name + COLOR["rewind"] + ')')
+
+        self.privmsg(cinfo[1], COLOR["boldwhite"] + "Players matching the request" + COLOR["rewind"] + ':')
+        self.privmsg(cinfo[1], ", ".join(ret))
         return None
