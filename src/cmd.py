@@ -29,6 +29,7 @@ import re
 import MySQLdb as mysql
 import hashlib
 import base64
+import random
 
 cmds = {"help": [["h"], 0],
         "quit": [["leave", "disconnect", "q"], 0],
@@ -45,6 +46,10 @@ cmds = {"help": [["h"], 0],
 
 CMD_ALIASES = 0
 CMD_LEVEL = 1
+
+# Russian roulette game variables
+r_bullet = random.randint(1, 0xffff) % 7
+r_chamber = random.randint(1, 0xffff) % 7
 
 class Cmd():
     def __init__(self, risc):
@@ -810,5 +815,24 @@ class Cmd():
         Russian roulette game
         roulette
         """
-        self.irc.kick("Preacher", "dbg")
+        global r_bullet
+        global r_chamber
+
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        if r_bullet == r_chamber:
+            self.irc.kick(_from, "rekt")
+            self.privmsg(cinfo[1], COLOR["boldred"] + "* BANG *" + COLOR["rewind"]+" -" + COLOR["boldred"] +\
+                    ' ' + _from + ' ' + COLOR["rewind"] + "is no more." %(_from))
+            r_bullet = random.randint(1, 0xffff) % 7
+            r_chamber = random.randint(1, 0xffff) % 7
+        else:
+            self.privmsg(cinfo[1], COLOR["boldgreen"] + "* BANG *" + COLOR["rewind"]+" -" + COLOR["boldgreen"] +\
+                    ' ' + _from + ' ' + COLOR["rewind"] + "is safe." %(_from))
+            r_chamber = (r_chamber + 1) % 7
         return None
