@@ -286,6 +286,25 @@ class Cmd():
                 ". Access: "+access+'.')
         return None
 
+    def _cmd_help_search(self, _from, to, msg, cmd):
+        """
+        Help for search command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: search <player>. Description: Search for "
+                "<player> in the server list. Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
+                        ". Access: "+access+'.')
+        return None
+
     def cmd_quit(self, _from, to, msg):
         """
         Simply leave
@@ -610,14 +629,14 @@ class Cmd():
             else:
                 players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
-        status = COLOR['boldwhite'] + sv.hostname + COLOR['rewind'] +\
-                ': Playing:' + COLOR['boldblue'] + ' ' + str(nb_cl - nb_bot) + (('+' +\
+        status = COLOR["boldwhite"] + sv.hostname + COLOR["rewind"] +\
+                ': Playing:' + COLOR["boldgreen"] + ' ' + str(nb_cl - nb_bot) + (('+' +\
                 str(nb_bot)) if nb_bot != 0 else '') + COLOR['rewind'] + '/' + str(sv.max_clients) +\
-                ', map:' + COLOR['boldblue'] + ' ' + sv.map + COLOR['rewind'] +\
-                ', nextmap:' + COLOR['boldblue'] + ' ' + sv.nextmap + COLOR["rewind"] +\
-                ', gametype:' + COLOR['boldblue'] + ' ' + sv.gametype2str(sv.gametype) + COLOR['rewind'] +\
-                ', version:' + COLOR['boldblue'] + ' ' + sv.version + COLOR['rewind'] +\
-                ", IP:" + COLOR["boldblue"] + ' ' + sv.ip + ':' + str(sv.port) + COLOR["rewind"]
+                ', map:' + COLOR["boldgreen"] + ' ' + sv.map + COLOR["rewind"] +\
+                ', nextmap:' + COLOR["boldgreen"] + ' ' + sv.nextmap + COLOR["rewind"] +\
+                ', gametype:' + COLOR["boldgreen"] + ' ' + sv.gametype2str(sv.gametype) + COLOR["rewind"] +\
+                ', version:' + COLOR["boldgreen"] + ' ' + sv.version + COLOR["rewind"] +\
+                ", IP:" + COLOR["boldgreen"] + ' ' + sv.ip + ':' + str(sv.port) + COLOR["rewind"]
 
         self.privmsg(cinfo[1], status)
 
@@ -772,6 +791,9 @@ class Cmd():
                         ret.append(COLOR["boldgreen"] + cl + ' ' + COLOR["rewind"] + '(' + COLOR["boldblue"] +\
                                 sv.name + COLOR["rewind"] + ')')
 
-        self.privmsg(cinfo[1], COLOR["boldwhite"] + "Players matching the request" + COLOR["rewind"] + ':')
-        self.privmsg(cinfo[1], ", ".join(ret))
+        if len(ret) > 0:
+            self.privmsg(cinfo[1], COLOR["boldwhite"] + "Players matching the request" + COLOR["rewind"] + ':')
+            self.privmsg(cinfo[1], ", ".join(ret))
+        else:
+            self.privmsg(cinfo[1], "No players matching the request.")
         return None
