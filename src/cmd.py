@@ -905,7 +905,7 @@ class Cmd():
                         ' ' + COLOR["rewind"] + "has been murdered by" + ' ' + COLOR["boldgreen"] + _from + COLOR['rewind']+".")
             elif _from.lower() == argv[1].lower():
                 self.privmsg(cinfo[1], COLOR["boldred"] + _from + ' ' + COLOR["rewind"] + "went an hero.")
-            elif self.nick.lower() == argv[1].lower():
+            elif self.irc.nick.lower() == argv[1].lower():
                 self.privmsg(cinfo[1], "You cannot kill me," + ' ' + COLOR['boldred'] + "I KILL YOU!" + COLOR["rewind"])
                 self.irc.kick(_from, "I KILL YOU!")
             elif argv[1] in self.irc.users:
