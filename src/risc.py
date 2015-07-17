@@ -137,7 +137,7 @@ class Risc():
         """
         self.irc.set_callback("on_welcome", self.on_welcome)
         self.irc.set_callback("on_privmsg", self.on_privmsg)
-        self.irc.set_callback("on_all", self.on_all)
+        self.irc.set_callback("all", self.hook)
         self.irc.start()
         return None
 
@@ -182,7 +182,7 @@ class Risc():
         self.debug.info("Done")
         return None
 
-    def on_all(self, line):
+    def hook(self, line):
         """
         Intercept every IRC message
         """
