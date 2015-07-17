@@ -42,7 +42,7 @@ cmds = {"help": [["h"], 0],
         "search": [["s"], 0],
         "roulette": [["r"], 0],
         "kill": [["k"], 0],
-        "raw": [["raw"], 0]}
+        "raw": [[], 0]}
 
 CMD_ALIASES = 0
 CMD_LEVEL = 1
@@ -972,4 +972,23 @@ class Cmd():
 
         else:
             self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help kill.")
+        return None
+
+    def cmd_raw(self, _from, to, msg):
+        """
+        Send raw commands to the IRC server
+        raw <command>
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        cmd = ' '.join(argv[1:])
+        self.irc._send(self.risc.ident + ' ' + cmd)
         return None

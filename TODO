@@ -1,7 +1,5 @@
 - fix youtube and possibly other websites SSL issues
-- add option to encode/decode base64
 - add remindme cmd
-- change sha1/md5 to some more generic "hash <hash_algo> <data>" function
 - use YouTube api
 - Write root user auth
 - Fix new bug on join: list index overflow smth smth

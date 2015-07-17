@@ -47,6 +47,7 @@ class Risc():
             self.irc = irc.Irc(self.host, self.port, self.channel, self.nick)
             self.cmd = cmd.Cmd(self)
             self.init_db()
+            self.ident = ""
         except:
             self.debug.critical("Risc.__init__: Exception occured while loading config settings - Make sure there's no missing field")
             raise SystemExit
@@ -188,6 +189,10 @@ class Risc():
         """
         if debug_mode:
             self.debug.debug(line)
+
+        ident = re.match("^"+self.nick+"!~"+self.nick+"@.* JOIN "+self.channel, line)
+        if ident:
+            self.ident = ident.group(0)
         return None
 
     def xurls(self, raw_msg):
