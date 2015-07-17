@@ -776,6 +776,7 @@ class Cmd():
                 sv = ioq3.Ioq3(info[0], int(info[1]), name=info[2], timeout=0.3)
             except Exception, e:
                 fails.append(info[2] + ' (' + COLOR["boldred"] + str(e) + COLOR["rewind"])
+                continue
 
             if len(sv.cl_list) == len(sv.cl_pings):
                 use_pings = True
