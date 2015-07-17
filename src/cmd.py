@@ -854,3 +854,75 @@ class Cmd():
                     ' ' + _from + ' ' + COLOR["rewind"] + "is safe.")
             r_chamber = (r_chamber + 1) % 7
         return None
+
+    def cmd_kill(self, _from, to, msg):
+        """
+        UrT-like kill messages
+        kill <opt_user> <opt_weapon>
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        weapons = {"colt": [" was given a new breathing hole by ", "'s Colt 1911."],
+                "spas": [" was turned into peppered steak by ", "'s SPAS blast."],
+                "ump45": [" danced the ump tango to ", "'s sweet sweet music."],
+                "mp5": [" was MP5K spammed without mercy by ", "'s MP5K."],
+                "mac11": [" was minced to death by ", "'s Mac 11."],
+                "lr300": [" played 'catch the shiny bullet with ", " LR-300 rounds."],
+                "g36": [" was on the wrong end of ", "'s G36."],
+                "ak103": [" was torn asunder by ", "'s crass AK103."],
+                "m4": [" got a lead enema from ", "'s retro M4."],
+                "psg1": [" was taken out by ", "'s PSG1. Plink!"],
+                "hk69": [" HEARD ", "'s HK69 gren... didn't AVOID it. Sucka."],
+                "boot": [" git himself some lovin' from ", "'s boot o' passion."],
+                "sr8": [" managed to slow down ", "'s SR-8 round just a little."],
+                "bleed": [" bled to death from ", "'s attacks."],
+                "negev": [" got shredded to pieces by ", "'s Negev."],
+                "knife": [" was sliced a new orifice by ", "."],
+                "knife_throw": [" managed to sheath ", "'s flying knife in their flesh."],
+                "beretta": [" was pistol whipped by ", "."],
+                "g18": [" got a whole plastic surery with ", "'s Glock"],
+                "de": [" got a whole lot of hole from ", "'s DE round."],
+                "nuke": [" has been nuked by ", "."],
+                "bfg": [" has been blasted by ", "'s BFG."],
+                "rpg": [" ate ", "'s rockets."],
+                "lightning": [" has been deep fried by ", "."],
+                "slap": [" has been slapped to death by ", "."]}
+
+        if argc == 1:
+            self.privmsg(cinfo[1], COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "has an urge to kill ...")
+
+        elif argc == 2:
+            if argv[1].lower() in ("-all", "-channel", "-everyone"):
+                self.privmsg(cinfo[1], COLOR["boldred"] + random.choice(["The whole channel", "Everyone", "Everybody"]) +\
+                        ' ' + COLOR["rewind"] + "has been murdered by" + ' ' + COLOR["boldgreen"] + _from + COLOR['rewind']+".")
+            elif _from.lower() == argv[1].lower():
+                self.privmsg(cinfo[1], COLOR["boldred"] + _from + ' ' + COLOR["rewind"] + "went an hero.")
+            elif self.nick.lower() == argv[1].lower():
+                self.privmsg(cinfo[1], "You cannot kill me," + ' ' + COLOR['boldred'] + "I KILL YOU!" + COLOR["rewind"])
+                self.irc.kick(_from, "I KILL YOU!")
+            elif argv[1] in self.irc.users:
+                self.privmsg(cinfo[1], COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "killed " + argv[1] + ".")
+            else:
+                self.privmsg(cinfo[1], "This person doesn't exist.")
+
+        elif argc >= 3:
+            if not argv[1] in self.irc.users:
+                self.privmsg(cinfo[1], "This person doesn't exist.")
+            elif argv[2] in weapons:
+                self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + COLOR['rewind'] + weapons[argv[2].lower()][0] +\
+                        COLOR["boldgreen"] + _from + COLOR["rewind"] + weapons[argv[2].lower][1])
+            else:
+                self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + ' ' + COLOR["rewind"] + "has been creatively killed by" +\
+                        ' ' + COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "using a " + argv[2] + ".")
+
+        else:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help kill.")
+        return None
