@@ -34,10 +34,10 @@ cmds = {"help": [["h"], 0],
         "google": [["g"], 0],
         "server": [["status", "sv", "st"], 0],
         "hash": [[], 0],
-        "uptime": [[], 0],
         "base64": [["b64"], 0],
-        "search": [["s"], 0],
+        "uptime": [[], 0],
         "version": [["v"], 0],
+        "search": [["s"], 0],
         "roulette": [["r"], 0],
         "kill": [["k"], 0],
         "raw": [["raw"], 0]}
@@ -225,6 +225,27 @@ class Cmd():
                 ". Access: "+access+'.')
         return None
 
+    def _cmd_help_base64(self, _from, to, msg, cmd):
+        """
+        Help for base64 command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: base64 [d | e] <data>. "\
+                "Description: Base64 decode/encode <data>. "\
+                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
+                ". Access: "+access+'.')
+        return None
+
+
     def _cmd_help_uptime(self, _from, to, msg, cmd):
         """
         Help for uptime command
@@ -242,6 +263,25 @@ class Cmd():
         self.privmsg(cinfo[1], "Usage: uptime. "\
                 "Description: Display risc's uptime. "\
                 "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
+                ". Access: "+access+'.')
+        return None
+
+    def _cmd_help_version(self, _from, to, msg, cmd):
+        """
+        Help for version command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: version. Description: Display risc version and "\
+                "author information. Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
                 ". Access: "+access+'.')
         return None
 
@@ -615,6 +655,36 @@ class Cmd():
         self.privmsg(cinfo[1], getattr(hashlib, argv[1].lower())(data).hexdigest())
         return None
 
+    def cmd_base64(self, _from, to, msg):
+        """
+        Base64 encode/decode data
+        base64 [d|e] <data>
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 3:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help base64.")
+            return None
+
+        data = ' '.join(msg.split(' ')[2:])
+
+        if argv[1].lower() in ("d", "decode"):
+            self.privmsg(cinfo[1], base64.b64decode(data))
+        elif argv[1].lower() in ("e", "encode"):
+            self.privmsg(cinfo[1], base64.b64encode(data))
+        else:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help base64.")
+            return None
+        return None
+
     def cmd_uptime(self, _from, to, msg):
         """
         Display risc's uptime
@@ -627,5 +697,23 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        self.privmsg(cinfo[1], "Uptime: " + str(datetime.timedelta(seconds=int(time.time()) - risc.init_time)))
+        self.privmsg(cinfo[1], COLOR["boldwhite"] + "Uptime: " + COLOR["rewind"] +\
+                str(datetime.timedelta(seconds=int(time.time()) - risc.init_time)))
+        return None
+
+    def cmd_version(self, _from, to, msg):
+        """
+        Display version and author(s) info
+        version
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        self.privmsg(cinfo[1], "Version" + COLOR["boldwhite"] + ' ' + risc.__version__ +\
+                ' ' + COLOR["rewind"] + "by" + COLOR["boldwhite"] + ' ' + risc.__author__ +\
+                COLOR["rewind"])
         return None
