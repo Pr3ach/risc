@@ -78,6 +78,9 @@ class Cmd():
         """
         Retrieve the original cmd name from an alias, if it exists, return "" otherwise
         """
+        if cmd_alias in cmds:
+            return cmd_alias
+
         for cmd in cmds:
             if cmd_alias in cmds[cmd][CMD_ALIASES]:
                 return cmd
@@ -177,7 +180,7 @@ class Cmd():
 
         self.privmsg(cinfo[1], "Usage: google <query>. Description: Search for <query> in google "\
                 "and display the results. Aliases: " +\
-                ", ".join(cmds[cmd][CMD_ALIASES])+'.'+" Access: "+access+'.')
+                ", ".join(cmds[cmd][CMD_ALIASES])+". Access: "+access+'.')
         return None
 
     def _cmd_help_server(self, _from, to, msg, cmd):
@@ -197,7 +200,7 @@ class Cmd():
         self.privmsg(cinfo[1], "Usage: server [<ip:opt_port> | <name> | add "\
                 "<ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> "\
                 "| list]. Description: Manage ioq3 based game servers. Aliases: " +\
-                ", ".join(cmds[cmd][CMD_ALIASES]) + " Access: "+access+'.')
+                ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: "+access+'.')
         return None
 
     def _cmd_help_hash(self, _from, to, msg, cmd):
@@ -217,7 +220,7 @@ class Cmd():
         self.privmsg(cinfo[1], "Usage: hash [md5 | sha1 | sha256 | sha512] <data>. "\
                 "Description: Hash <data> using the specified algorithm. "\
                 "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
-                " Access: "+access+'.')
+                ". Access: "+access+'.')
         return None
 
     def cmd_quit(self, _from, to, msg):
