@@ -196,7 +196,28 @@ class Cmd():
 
         self.privmsg(cinfo[1], "Usage: server [<ip:opt_port> | <name> | add "\
                 "<ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> "\
-                "| list]. Description: Manage ioq3 based game servers. Access: "+access+'.')
+                "| list]. Description: Manage ioq3 based game servers. Aliases: " +\
+                ", ".join(cmds[cmd][CMD_ALIASES]) + " Access: "+access+'.')
+        return None
+
+    def _cmd_help_hash(self, _from, to, msg, cmd):
+        """
+        Help for hash command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: hash [md5 | sha1 | sha256 | sha512] <data>. "\
+                "Description: Hash <data> using the specified algorithm. "\
+                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
+                " Access: "+access+'.')
         return None
 
     def cmd_quit(self, _from, to, msg):
@@ -544,7 +565,7 @@ class Cmd():
 
     def cmd_hash(self, _from, to, msg):
         """
-        Hash data using a specified hash algotithm
+        Hash data using the specified hash algotithm
         hash [md5 | sha1 | sha256 | sha512] <data>
         """
         cinfo = self.init_cmd(_from, to, msg)
