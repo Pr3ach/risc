@@ -167,9 +167,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: quit. Description: Close the connection to "\
-                "the IRC server and exit. Aliases: " +\
-                ", ".join(cmds[cmd][CMD_ALIASES])+'.'+" Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] ": quit."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Close the connection to the IRC server and exit."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_google(self, _from, to, msg, cmd):
@@ -326,6 +329,25 @@ class Cmd():
 
         self.privmsg(cinfo[1], "Usage: roulette. Description: Russian roulette game. "\
                 "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
+        return None
+
+    def _cmd_help_kill(self, _from, to, msg, cmd):
+        """
+        Help for kill command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: kill <opt_user> <opt_weapon>. Description: UrT-like kill "\
+                "messages. The <opt_user> parametercan be any user on the channel or '-all', "\
+                "<opt_weapon> can be any valid UrT weapon. Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
         return None
 
     def cmd_quit(self, _from, to, msg):
@@ -918,7 +940,7 @@ class Cmd():
                 self.privmsg(cinfo[1], "This person doesn't exist.")
             elif argv[2] in weapons:
                 self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + COLOR['rewind'] + weapons[argv[2].lower()][0] +\
-                        COLOR["boldgreen"] + _from + COLOR["rewind"] + weapons[argv[2].lower][1])
+                        COLOR["boldgreen"] + _from + COLOR["rewind"] + weapons[argv[2].lower()][1])
             else:
                 self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + ' ' + COLOR["rewind"] + "has been creatively killed by" +\
                         ' ' + COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "using a " + argv[2] + ".")
