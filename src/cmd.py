@@ -74,11 +74,11 @@ class Cmd():
         """
         cmd = self.clean_list(msg.split(' '))[0][1:]
 
-        if cmd in cmds:
-            return cmd
+        if cmd.lower() in cmds:
+            return cmd.lower()
 
         for c in cmds:
-            if cmd in cmds[c][CMD_ALIASES]:
+            if cmd.lower() in cmds[c][CMD_ALIASES]:
                 return c
         return ""
 
