@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.4"
+__version__ = "1.5.1"
 
 import socket
 import re
@@ -79,6 +79,19 @@ class Ioq3():
 
     def clean_color_string(self, s):
         return re.sub('\^\d', '', s)
+
+    def is_int(self, a):
+        """
+        Check for int repr
+        """
+        if type(a) is int:
+            return True
+        elif type(a) is str:
+            for x in a:
+                if ord(x) < 0x30 or ord(x) > 0x39:
+                    return False
+            return True
+        return False
 
     def get_client_list(self, raw):
         """
@@ -147,7 +160,7 @@ class Ioq3():
         """
         if gametype in GAMETYPES:
             return GAMETYPES[gametype]
-        return ""
+        return "FFA" # Default gametype is FFA
 
     def check_vars(self):
         """
@@ -164,9 +177,28 @@ class Ioq3():
         if self.max_clients == "":
             self.max_clients = -1
 
-        self.allowvote = int(self.allowvote)
-        self.gametype = int(self.gametype)
-        self.clients = int(self.clients)
-        self.auth = int(self.auth)
-        self.max_clients = int(self.max_clients)
+        if self.is_int(self.allowvote):
+            self.allowvote = int(self.allowvote)
+        else:
+            self.allowvote = -1
+
+        if self.is_int(self.gametype):
+            self.gametype = int(self.gametype)
+        else:
+            self.gametype = -1
+
+        if self.is_int(self.clients):
+            self.clients = int(self.clients)
+        else:
+            self.clients = -1
+
+        if self.is_int(self.auth):
+            self.auth = int(self.auth)
+        else:
+            self.auth = -1
+
+        if self.is_int(self.max_clients):
+            self.max_clients = int(self.max_clients)
+        else:
+            self.max_clients = -1
         return None
