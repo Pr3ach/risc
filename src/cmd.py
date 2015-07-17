@@ -832,7 +832,7 @@ class Cmd():
             r_bullet = random.randint(1, 0xffff) % 7
             r_chamber = random.randint(1, 0xffff) % 7
         else:
-            self.privmsg(cinfo[1], COLOR["boldgreen"] + "* BANG *" + COLOR["rewind"]+" -" + COLOR["boldgreen"] +\
+            self.privmsg(cinfo[1], COLOR["boldgreen"] + "+ click +" + COLOR["rewind"]+" -" + COLOR["boldgreen"] +\
                     ' ' + _from + ' ' + COLOR["rewind"] + "is safe.")
             r_chamber = (r_chamber + 1) % 7
         return None
