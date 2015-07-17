@@ -167,7 +167,7 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] ": quit."
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": quit."
         desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Close the connection to the IRC server and exit."
         aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
         access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
@@ -189,9 +189,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: google <query>. Description: Search for <query> in google "\
-                "and display the results. Aliases: " +\
-                ", ".join(cmds[cmd][CMD_ALIASES])+". Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": google <query>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Search for <query> using google and display the results."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_server(self, _from, to, msg, cmd):
@@ -208,10 +211,13 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: server [<ip:opt_port> | <name> | add "\
-                "<ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> "\
-                "| list]. Description: Manage ioq3 based game servers. Aliases: " +\
-                ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": server [<ip:opt_port> | <name> | "\
+                "add <ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> | list]."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Manage IoQ3 based game servers."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_hash(self, _from, to, msg, cmd):
@@ -228,10 +234,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: hash [md5 | sha1 | sha256 | sha512] <data>. "\
-                "Description: Hash <data> using the specified algorithm. "\
-                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
-                ". Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": hash [md5 | sha1 | sha256 | sha512] <data>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Hash <data> using the specified algorithm."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_base64(self, _from, to, msg, cmd):
@@ -248,12 +256,13 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: base64 [d | e] <data>. "\
-                "Description: Base64 decode/encode <data>. "\
-                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
-                ". Access: "+access+'.')
-        return None
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": base64 [d | e] <data>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Base64 decode/encode <data>."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
 
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
+        return None
 
     def _cmd_help_uptime(self, _from, to, msg, cmd):
         """
@@ -269,10 +278,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: uptime. "\
-                "Description: Display risc's uptime. "\
-                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
-                ". Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": uptime."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Display risc's uptime."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_version(self, _from, to, msg, cmd):
@@ -289,9 +300,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: version. Description: Display risc version and "\
-                "author information. Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
-                ". Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": version."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Display risc version and author information."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_search(self, _from, to, msg, cmd):
@@ -308,9 +322,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: search <player>. Description: Search for "
-                "<player> in the server list. Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
-                        ". Access: "+access+'.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": search <player>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Search for <player> in the server list."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_roulette(self, _from, to, msg, cmd):
@@ -327,8 +344,12 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: roulette. Description: Russian roulette game. "\
-                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": roulette."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Russian roulette game."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def _cmd_help_kill(self, _from, to, msg, cmd):
@@ -345,9 +366,13 @@ class Cmd():
         elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
             access = "voice"
 
-        self.privmsg(cinfo[1], "Usage: kill <opt_user> <opt_weapon>. Description: UrT-like kill "\
-                "messages. The <opt_user> parametercan be any user on the channel or '-all', "\
-                "<opt_weapon> can be any valid UrT weapon. Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) + ". Access: " + access + '.')
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": kill <opt_user> <opt_weapon>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": UrT-like kill messages. the <opt_user> "\
+                "parameter can be any user on the channel or -all, <opt_weapon> can be any UrT weapon."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
     def cmd_quit(self, _from, to, msg):
