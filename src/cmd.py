@@ -744,6 +744,7 @@ class Cmd():
         search <player>
         """
         ret = []
+        fails = []
         cinfo = self.init_cmd(_from, to, msg)
 
         if self.irc.get_user_level(_from) < cinfo[0]:
@@ -772,9 +773,9 @@ class Cmd():
             sv = None
             use_pings = False
             try:
-                sv = ioq3.Ioq3(info[0], int(info[1]), info[2])
-            except:
-                continue
+                sv = ioq3.Ioq3(info[0], int(info[1]), name=info[2], timeout=0.3)
+            except Exception, e:
+                fails.append(sv.name + ' (' + COLOR["boldred"] + str(e) + COLOR["rewind"])
 
             if len(sv.cl_list) == len(sv.cl_pings):
                 use_pings = True
@@ -790,6 +791,11 @@ class Cmd():
                     else:
                         ret.append(COLOR["boldgreen"] + cl + ' ' + COLOR["rewind"] + '(' + COLOR["boldblue"] +\
                                 sv.name + COLOR["rewind"] + ')')
+
+        if len(fails) > 0 and len(fails) < 6:
+            self.privmsg(cinfo[1], "Failed to query the following servers: %s." %(", ".join(fails)))
+        elif len(fails) > 5:
+            self.privmsg(cinfo[1], "%s servers failed to respond." %(COLOR["boldred"] + str(len(fails)) + COLOR["rewind"]))
 
         if len(ret) > 0:
             self.privmsg(cinfo[1], COLOR["boldwhite"] + "Players matching the request" + COLOR["rewind"] + ':')

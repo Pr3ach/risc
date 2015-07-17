@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.3"
+__version__ = "1.4"
 
 import socket
 import re
@@ -38,7 +38,7 @@ class Ioq3():
     """
     Get info about a game server running an IoQ3 engine
     """
-    def __init__(self, ip, port, name="server"):
+    def __init__(self, ip, port, name="server", timeout=0.5):
         if re.match('^([0-9]{1,3}\.){3}[0-9]{1,3}$', ip) is None:
             raise Exception('Invalid IP address')
 
@@ -46,25 +46,21 @@ class Ioq3():
         self.port = port
         self.name = name
         self.cl_pings = []
+        self.timeout = timeout
 
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.sock.connect((ip, port))
-            self.sock.settimeout(2)
+            self.sock.settimeout(self.timeout)
+        except socket.timeout:
+            raise Exception("timeout")
         except Exception, e:
             if self.sock:
                 self.sock.close()
             raise Exception("Couldn't connect to the given server: '%s'" % e)
 
-        if not self.getstatus():
-            if self.sock:
-                self.sock.close()
-            raise Exception("getstatus failed")
-
-        if not self.getinfo():
-            if self.sock:
-                self.sock.close()
-            raise Exception("getinfo failed")
+        self.getstatus()
+        self.getinfo()
 
         if self.sock:
             self.sock.close()
@@ -118,28 +114,32 @@ class Ioq3():
             self.sock.send(b'\xff'*4+b'getstatus')
             raw_status = str(self.sock.recv(4096))
             list_status = self.list_clean(raw_status.split('\\'))
-        except Exception, e:
-            return 0
+        except socket.timeout:
+            raise Exception("timeout")
+        except Exception:
+            raise Exception("getstatus failed")
         self.allowvote = self.get_var(list_status, 'g_allowvote')
         self.version = self.clean_color_string(self.get_var(list_status, 'version'))
         self.gametype = self.get_var(list_status, 'g_gametype')
         self.nextmap = self.clean_color_string(self.get_var(list_status, 'g_NextMap'))
         self.cl_list = self.get_client_list(list_status)
         self.hostname = self.clean_color_string(self.get_var(list_status, 'sv_hostname'))
-        return 1
+        return None
 
     def getinfo(self):
         try:
             self.sock.send(b'\xff'*4+b'getinfo')
             raw_info = str(self.sock.recv(2048))
             list_info = self.list_clean(raw_info.split('\\'))
-        except Exception, e:
-            return 0
+        except socket.timeout:
+            raise Exception("timeout")
+        except Exception:
+            raise Exception("getinfo failed")
         self.clients = self.get_var(list_info, 'clients')
         self.auth = self.get_var(list_info, 'auth_notoriety')
         self.max_clients = self.get_var(list_info, "sv_maxclients")
         self.map = self.clean_color_string(self.get_var(list_info, 'mapname'))
-        return 1
+        return None
 
     def gametype2str(self, gametype):
         """
