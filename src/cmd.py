@@ -678,7 +678,7 @@ class Cmd():
         data = ' '.join(msg.split(' ')[2:])
 
         if argv[1].lower() in ("d", "decode"):
-            self.privmsg(cinfo[1], base64.b64decode(data))
+            self.privmsg(cinfo[1], "'" + base64.b64decode(data) + "'")
         elif argv[1].lower() in ("e", "encode"):
             self.privmsg(cinfo[1], base64.b64encode(data))
         else:
