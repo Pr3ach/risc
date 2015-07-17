@@ -28,6 +28,7 @@ import requests
 import re
 import MySQLdb as mysql
 import hashlib
+import base64
 
 cmds = {"help": [["h"], 0],
         "quit": [["leave", "disconnect", "q"], 0],
