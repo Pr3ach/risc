@@ -22,6 +22,7 @@ import ioq3
 import risc
 from irc import COLOR
 import time
+import datetime
 import json
 import requests
 import re
@@ -619,4 +620,12 @@ class Cmd():
         Display risc's uptime
         uptime
         """
-        return str(datetime.timedelta(seconds=int(time.time()) - risc.init_time))
+        cinfo = self.init_cmd(_from, to, msg)
+
+        if self.irc.get_user_level(_from) < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        self.privmsg(cinfo[1], "Uptime: " + str(datetime.timedelta(seconds=int(time.time()) - risc.init_time)))
+        return None
