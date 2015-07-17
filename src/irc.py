@@ -379,6 +379,13 @@ class Irc():
         self._send('PRIVMSG %s :%s' % (target, msg))
         return None
 
+    def kick(self, user, reason=""):
+        """
+        Kick an IRC user on the channel
+        """
+        self._send("KICK " + self.channel + ' ' + user + " :" + reason)
+        return None
+
     def _send(self, data):
         """
         sock.send wrapper for the IRC protocol

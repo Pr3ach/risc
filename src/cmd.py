@@ -804,3 +804,11 @@ class Cmd():
         else:
             self.privmsg(cinfo[1], "No players matching the request.")
         return None
+
+    def cmd_roulette(self, _from, to, msg):
+        """
+        Russian roulette game
+        roulette
+        """
+        self.irc.kick("Preacher", "dbg")
+        return None
