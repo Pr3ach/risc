@@ -3,3 +3,4 @@
 - add remindme cmd
 - change sha1/md5 to some more generic "hash <hash_algo> <data>" function
 - use YouTube api
+- Write root user auth

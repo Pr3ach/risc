@@ -19,6 +19,7 @@
 
 import irc
 import ioq3
+import risc
 from irc import COLOR
 import time
 import json
@@ -32,9 +33,9 @@ cmds = {"help": [["h"], 0],
         "google": [["g"], 0],
         "server": [["status", "sv", "st"], 0],
         "hash": [[], 0],
+        "uptime": [[], 0],
         "base64": [["b64"], 0],
         "search": [["s"], 0],
-        "uptime": [["uptime"], 0],
         "version": [["v"], 0],
         "roulette": [["r"], 0],
         "kill": [["k"], 0],
@@ -219,6 +220,26 @@ class Cmd():
 
         self.privmsg(cinfo[1], "Usage: hash [md5 | sha1 | sha256 | sha512] <data>. "\
                 "Description: Hash <data> using the specified algorithm. "\
+                "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
+                ". Access: "+access+'.')
+        return None
+
+    def _cmd_help_uptime(self, _from, to, msg, cmd):
+        """
+        Help for uptime command
+        """
+        cinfo = self.init_cmd(_from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        self.privmsg(cinfo[1], "Usage: uptime. "\
+                "Description: Display risc's uptime. "\
                 "Aliases: " + ", ".join(cmds[cmd][CMD_ALIASES]) +\
                 ". Access: "+access+'.')
         return None
@@ -592,3 +613,10 @@ class Cmd():
         data = ' '.join(msg.split(' ')[2:])
         self.privmsg(cinfo[1], getattr(hashlib, argv[1].lower())(data).hexdigest())
         return None
+
+    def cmd_uptime(self, _from, to, msg):
+        """
+        Display risc's uptime
+        uptime
+        """
+        return str(datetime.timedelta(seconds=int(time.time()) - risc.init_time))
