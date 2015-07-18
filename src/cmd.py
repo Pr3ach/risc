@@ -86,17 +86,17 @@ class Cmd():
         """
         Retrieve the original cmd name from an alias, if it exists, return "" otherwise
         """
-        if cmd_alias in cmds:
-            return cmd_alias
+        if cmd_alias.lower() in cmds:
+            return cmd_alias.lower()
 
         for cmd in cmds:
-            if cmd_alias in cmds[cmd][CMD_ALIASES]:
+            if cmd_alias.lower() in cmds[cmd][CMD_ALIASES]:
                 return cmd
         return ""
 
-    def init_cmd(self, _from, to, msg):
+    def init_cmd(self, ident, _from, to, msg):
         """
-        Return a list [cmd_level, "output"] for a given command
+        Return a list [cmd_level, "privmsg_output", user_level] for a given command
         """
         ret = []
         cmd = self.get_cmd(msg)
@@ -107,26 +107,31 @@ class Cmd():
             ret.append(_from)
         else:
             ret.append(self.risc.channel)
+
+        if self.risc.is_root(ident):
+            ret.append(4)
+        else:
+            ret.append(self.irc.get_user_level(_from))
         return ret
 
-    def process(self, _from, to, msg):
+    def process(self, ident, _from, to, msg):
         """
         Parse IRC messages for valid commands to call the appropriate functions
         """
         cmd = self.get_cmd(msg)
         if cmd != "":
             if hasattr(self, "cmd_"+cmd):
-                getattr(self, "cmd_"+cmd)(_from, to, msg)
+                getattr(self, "cmd_"+cmd)(ident, _from, to, msg)
         return None
 
-    def cmd_help(self, _from, to, msg):
+    def cmd_help(self, ident, _from, to, msg):
         """
         Display the main help message
         help
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -142,22 +147,22 @@ class Cmd():
                 self.privmsg(cinfo[1], "Command not found: %s." %(argv[1]))
                 return None
             if hasattr(self, "_cmd_help_"+cmd):
-                getattr(self, "_cmd_help_"+cmd)(_from, to, msg, cmd)
+                getattr(self, "_cmd_help_"+cmd)(ident, _from, to, msg, cmd)
         return None
 
-    def _cmd_help_help(self, _from, to, msg, cmd):
+    def _cmd_help_help(self, ident, _from, to, msg, cmd):
         """
         Help for help command ...
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         self.privmsg(cinfo[1], "-_-'")
         return None
 
-    def _cmd_help_quit(self, _from, to, msg, cmd):
+    def _cmd_help_quit(self, ident, _from, to, msg, cmd):
         """
         Help for quit command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -175,11 +180,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_google(self, _from, to, msg, cmd):
+    def _cmd_help_google(self, ident, _from, to, msg, cmd):
         """
         Help for google command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -197,11 +202,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_server(self, _from, to, msg, cmd):
+    def _cmd_help_server(self, ident, _from, to, msg, cmd):
         """
         Help for server command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -220,11 +225,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_hash(self, _from, to, msg, cmd):
+    def _cmd_help_hash(self, ident, _from, to, msg, cmd):
         """
         Help for hash command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -242,11 +247,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_base64(self, _from, to, msg, cmd):
+    def _cmd_help_base64(self, ident, _from, to, msg, cmd):
         """
         Help for base64 command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -264,11 +269,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_uptime(self, _from, to, msg, cmd):
+    def _cmd_help_uptime(self, ident, _from, to, msg, cmd):
         """
         Help for uptime command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -286,11 +291,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_version(self, _from, to, msg, cmd):
+    def _cmd_help_version(self, ident, _from, to, msg, cmd):
         """
         Help for version command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -308,11 +313,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_search(self, _from, to, msg, cmd):
+    def _cmd_help_search(self, ident, _from, to, msg, cmd):
         """
         Help for search command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -330,11 +335,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_roulette(self, _from, to, msg, cmd):
+    def _cmd_help_roulette(self, ident, _from, to, msg, cmd):
         """
         Help for roulette command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -352,11 +357,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_kill(self, _from, to, msg, cmd):
+    def _cmd_help_kill(self, ident, _from, to, msg, cmd):
         """
         Help for kill command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -375,11 +380,11 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_raw(self, _from, to, msg, cmd):
+    def _cmd_help_raw(self, ident, _from, to, msg, cmd):
         """
         Help for raw command
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
         access = "all"
 
         if cmds[cmd][CMD_LEVEL] == 4:
@@ -397,14 +402,14 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def cmd_quit(self, _from, to, msg):
+    def cmd_quit(self, ident, _from, to, msg):
         """
         Simply leave
         quit
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -412,14 +417,14 @@ class Cmd():
         self.risc.stop()
         return None
 
-    def cmd_google(self, _from, to, msg):
+    def cmd_google(self, ident, _from, to, msg):
         """
         Query google
         google <query>
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -449,14 +454,14 @@ class Cmd():
                 break
         return None
 
-    def cmd_server(self, _from, to, msg):
+    def cmd_server(self, ident, _from, to, msg):
         """
         Display game information about the specified server
         server [<ip:opt_port> | <name> | add <ip:opt_port> <name> | drop <name> | rename <old_name> <new_name> | list]
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -740,14 +745,14 @@ class Cmd():
                     str(sv.max_clients) + "):" + ','.join(players))
         return None
 
-    def cmd_hash(self, _from, to, msg):
+    def cmd_hash(self, ident, _from, to, msg):
         """
         Hash data using the specified hash algotithm
         hash [md5 | sha1 | sha256 | sha512] <data>
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -767,14 +772,14 @@ class Cmd():
         self.privmsg(cinfo[1], getattr(hashlib, argv[1].lower())(data).hexdigest())
         return None
 
-    def cmd_base64(self, _from, to, msg):
+    def cmd_base64(self, ident, _from, to, msg):
         """
         Base64 encode/decode data
         base64 [d|e] <data>
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -797,30 +802,30 @@ class Cmd():
             return None
         return None
 
-    def cmd_uptime(self, _from, to, msg):
+    def cmd_uptime(self, ident, _from, to, msg):
         """
         Display risc's uptime
         uptime
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        self.privmsg(cinfo[1], COLOR["boldwhite"] + "Uptime: " + COLOR["rewind"] +\
-                str(datetime.timedelta(seconds=int(time.time()) - risc.init_time)))
+        self.privmsg(cinfo[1], COLOR["boldwhite"] + "Uptime" + COLOR["rewind"] +\
+                ': ' + str(datetime.timedelta(seconds=int(time.time()) - risc.init_time)))
         return None
 
-    def cmd_version(self, _from, to, msg):
+    def cmd_version(self, ident, _from, to, msg):
         """
         Display version and author(s) info
         version
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -830,16 +835,16 @@ class Cmd():
                 COLOR["rewind"])
         return None
 
-    def cmd_search(self, _from, to, msg):
+    def cmd_search(self, ident, _from, to, msg):
         """
         Search for a player in the server list
         search <player>
         """
         ret = []
         fails = []
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -897,7 +902,7 @@ class Cmd():
             self.privmsg(cinfo[1], "No players matching the request.")
         return None
 
-    def cmd_roulette(self, _from, to, msg):
+    def cmd_roulette(self, ident, _from, to, msg):
         """
         Russian roulette game
         roulette
@@ -905,9 +910,9 @@ class Cmd():
         global r_bullet
         global r_chamber
 
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -924,14 +929,14 @@ class Cmd():
             r_chamber = (r_chamber + 1) % 7
         return None
 
-    def cmd_kill(self, _from, to, msg):
+    def cmd_kill(self, ident, _from, to, msg):
         """
         UrT-like kill messages
         kill <opt_user> <opt_weapon>
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
@@ -996,14 +1001,14 @@ class Cmd():
             self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help kill.")
         return None
 
-    def cmd_raw(self, _from, to, msg):
+    def cmd_raw(self, ident, _from, to, msg):
         """
         Send raw commands to the IRC server
         raw <command>
         """
-        cinfo = self.init_cmd(_from, to, msg)
+        cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if self.irc.get_user_level(_from) < cinfo[0]:
+        if cinfo[2] < cinfo[0]:
             self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None

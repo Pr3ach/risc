@@ -106,7 +106,7 @@ class Irc():
         Set a callback function for an event
         """
         if cb_name.lower() in self.callbacks:
-            self.callbacks[cb_name] = cb_function
+            self.callbacks[cb_name.lower()] = cb_function
         return None
 
     def on_ping(self, ping_data):
@@ -130,6 +130,7 @@ class Irc():
         if kicked in self.users:
             self.users.pop(kicked)
         if kicked == self.nick:
+            self.users = {}
             self.join()
         return None
 
@@ -218,13 +219,14 @@ class Irc():
         Call the on_privmsg callback function, if set
         """
         if self.callbacks["on_privmsg"] is not None:
+            ident = line.split(' ')[0].split('@')[1]
             _from = line.split('!')[0][1:]
             if _from[0] in ('@', '+', '&'):
                 _from = _from[1:]
             to = line.split(' ')[2]
             msg = ' '.join(line.split(' ')[3:])[1:]
 
-            self.callbacks["on_privmsg"](_from, to, msg)
+            self.callbacks["on_privmsg"](ident, _from, to, msg)
         return None
 
     def call_cb_ping(self, line):

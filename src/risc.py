@@ -77,6 +77,7 @@ class Risc():
         self.on_timeout_delay = int(self.cfg.get("risc", "on_timeout_delay"))
         self.cmd_prefix = self.cfg.get("risc", "cmd_prefix")
         self.cmd_prefix_global = self.cfg.get("risc", "cmd_prefix_global")
+        self.root_ident = self.cfg.get("risc", "root_ident")
 
         if len(self.cmd_prefix) != 1:
             self.cmd_prefix = '!'
@@ -161,14 +162,26 @@ class Risc():
                 ret.append(e)
         return ret
 
-    def on_privmsg(self, _from, to, msg):
+    def is_root(self, ident):
+        """
+        Check if ident == root_ident
+        """
+        if self.root_ident == "":
+            return False
+        elif self.root_ident == ident:
+            return True
+        return False
+
+    def on_privmsg(self, ident, _from, to, msg):
         """
         Called on PRIVMSG
         """
-        if msg[0] in (self.cmd_prefix, self.cmd_prefix_global):
-            self.cmd.process(_from, to, msg)
+        if _from == self.nick:
+            return None
+        elif msg[0] in (self.cmd_prefix, self.cmd_prefix_global):
+            self.cmd.process(ident, _from, to, msg)
         else:
-            self.process_irc(_from, to, msg)
+            self.process_irc(ident, _from, to, msg)
         return None
 
     def on_welcome(self, host, welcome_msg):
@@ -210,7 +223,7 @@ class Risc():
                 ret.append(s)
         return ret
 
-    def process_irc(self, _from, to, msg):
+    def process_irc(self, ident, _from, to, msg):
         """
         Handle IRC messages
         """
