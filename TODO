@@ -1,5 +1,4 @@
 - fix youtube and possibly other websites SSL issues
 - add remindme cmd
 - use YouTube api
-- Write root user auth
 - Fix new bug on join: list index overflow smth smth

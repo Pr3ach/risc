@@ -131,11 +131,6 @@ class Cmd():
         """
         cinfo = self.init_cmd(ident, _from, to, msg)
 
-        if cinfo[2] < cinfo[0]:
-            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
-                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
-            return None
-
         argv = self.clean_list(msg.split(' '))
         argc = len(argv)
 
