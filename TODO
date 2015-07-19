@@ -1,4 +1,4 @@
+- use YouTube api
 - fix youtube and possibly other websites SSL issues
 - add remindme cmd
-- use YouTube api
 - Fix new bug on join: list index overflow smth smth

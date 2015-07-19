@@ -34,6 +34,7 @@ import cmd
 
 INIPATH = "riscrc"
 init_time = int(time.time())
+last_cmd_time= 0
 debug_mode = 1
 
 class Risc():
@@ -176,10 +177,14 @@ class Risc():
         """
         Called on PRIVMSG
         """
+        global last_cmd_time
         if _from == self.nick:
+            return None
+        elif int(time.time()) - last_cmd_time < self.anti_spam_threshold:
             return None
         elif msg[0] in (self.cmd_prefix, self.cmd_prefix_global):
             self.cmd.process(ident, _from, to, msg)
+            last_cmd_time = int(time.time())
         else:
             self.process_irc(ident, _from, to, msg)
         return None
