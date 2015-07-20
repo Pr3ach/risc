@@ -250,7 +250,7 @@ class Risc():
                 self.debug.error("process_irc: Exception '%s'." % e)
         return None
 
-    def process_irc_youtube(self, url):
+    def process_irc_youtube(self, ident, _from, to, msg, url):
         """
         Process IRC messages: youtube URLs
         """
@@ -259,8 +259,8 @@ class Risc():
         res = requests.get(handler)
 
         if res.status_code == 200:
-            res = json(res.text)
-            self.irc.privmsg(cinfo[1], "\x031,4You\x031,0Tube "+res.title)
+            res = json.loads(res.text)
+            self.irc.privmsg(cinfo[1], "\x031,4You\x031,0Tube "+res["title"])
         return None
 
 def main():
