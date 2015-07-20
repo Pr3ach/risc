@@ -28,6 +28,9 @@ import re
 import MySQLdb as mysql
 from warnings import filterwarnings
 from mechanize import Browser
+import tld
+import requests
+import json
 import debug
 import irc
 import cmd
@@ -234,6 +237,9 @@ class Risc():
         """
         # Process URLs posting
         for url in self.xurls(msg):
+            if tld.get_tld(url) == "youtube.com":
+                process_irc_youtube(url)
+                continue
             try:
                 br = Browser()
                 br.set_handle_robots(False)
@@ -242,6 +248,19 @@ class Risc():
                 self.irc.privmsg(self.channel, "Title: " + br.title())
             except Exception, e:
                 self.debug.error("process_irc: Exception '%s'." % e)
+        return None
+
+    def process_irc_youtube(self, url):
+        """
+        Process IRC messages: youtube URLs
+        """
+        cinfo = self.cmd.init_cmd(ident, _from, to, msg)
+        handler = "http://www.youtube.com/oembed?url=%s&format=json" % url
+        res = requests.get(handler)
+
+        if res.status_code == 200:
+            res = json(res.text)
+            self.privmsg(cinfo[1], "\x031,4You\x031,0Tube "+res.title)
         return None
 
 def main():
