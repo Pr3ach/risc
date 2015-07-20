@@ -238,7 +238,7 @@ class Risc():
         # Process URLs posting
         for url in self.xurls(msg):
             if tld.get_tld(url) == "youtube.com":
-                self.process_irc_youtube(ident, _from, to, msg, url)
+                self.process_irc_youtube(url)
                 continue
             try:
                 br = Browser()
@@ -250,17 +250,16 @@ class Risc():
                 self.debug.error("process_irc: Exception '%s'." % e)
         return None
 
-    def process_irc_youtube(self, ident, _from, to, msg, url):
+    def process_irc_youtube(self, url):
         """
         Process IRC messages: youtube URLs
         """
-        cinfo = self.cmd.init_cmd(ident, _from, to, msg)
         handler = "http://www.youtube.com/oembed?url=%s&format=json" % url
         res = requests.get(handler)
 
         if res.status_code == 200:
-            d = json.loads(res.text)
-            self.irc.privmsg(cinfo[1], "\x031,4You\x031,0Tube " + d["title"])
+            res = json.loads(res.text)
+            self.irc.privmsg(self.channel, "\x031,4You\x031,0Tube " + res["title"])
         return None
 
 def main():
