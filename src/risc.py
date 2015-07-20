@@ -238,7 +238,7 @@ class Risc():
         # Process URLs posting
         for url in self.xurls(msg):
             if tld.get_tld(url) == "youtube.com":
-                process_irc_youtube(url)
+                self.process_irc_youtube(ident, _from, to, msg, url)
                 continue
             try:
                 br = Browser()
@@ -259,8 +259,8 @@ class Risc():
         res = requests.get(handler)
 
         if res.status_code == 200:
-            res = json.loads(res.text)
-            self.irc.privmsg(cinfo[1], "\x031,4You\x031,0Tube "+res["title"])
+            d = json.loads(res.text)
+            self.irc.privmsg(cinfo[1], "\x031,4You\x031,0Tube " + d["title"])
         return None
 
 def main():
