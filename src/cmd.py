@@ -436,14 +436,13 @@ class Cmd():
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % search_str
         res = requests.get(url)
 
-        if len(json.loads(res.text)['responseData']['results']):
-            self.privmsg(cinfo[1], "Top hits:")
-        else:
+        if not len(json.loads(res.text)['responseData']['results']):
             self.privmsg(cinfo[1], "No results.")
             return None
 
+        self.privmsg(cinfo[1], "Top hits:")
         for hit in json.loads(res.text)["responseData"]["results"]:
-            self.privmsg(cinfo[1], hit["url"])
+            self.privmsg(cinfo[1], hit["unescapedUrl"])
             i+=1
             if i > 4:
                 break
