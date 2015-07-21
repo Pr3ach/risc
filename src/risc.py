@@ -28,7 +28,6 @@ import re
 import MySQLdb as mysql
 from warnings import filterwarnings
 from mechanize import Browser
-import tld
 import requests
 import json
 import debug
@@ -237,7 +236,7 @@ class Risc():
         """
         # Process URLs posting
         for url in self.xurls(msg):
-            if tld.get_tld(url) == "youtube.com":
+            if re.match("^(http|https)://(www\.|)youtube.com.*", url):
                 self.process_irc_youtube(url)
                 continue
             try:
@@ -283,8 +282,6 @@ def main():
     except Exception, e:
         if str(e) == "risc_exception_irc_timeout":
             main()
-        elif e.__class__.__name__ == "TldDomainNotFound":
-            pass
         else:
             inst.debug.critical("Unhandled exception on Risc(): '%s'. Exiting." % e)
             inst.stop()
