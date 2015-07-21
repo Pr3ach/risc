@@ -1,4 +1,3 @@
-- Fix cmd google url encoding
 - Fix youtube and possibly other websites SSL issues
 - Add remindme cmd
 - Fix new bug on join: list index overflow smth smth
