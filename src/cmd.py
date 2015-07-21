@@ -42,7 +42,9 @@ cmds = {"help": [["h"], 0],
         "search": [["s"], 0],
         "roulette": [["r"], 0],
         "kill": [["k"], 0],
-        "raw": [[], 0]}
+        "raw": [[], 0],
+        "lower": [[], 0],
+        "upper": [[], 0]}
 
 CMD_ALIASES = 0
 CMD_LEVEL = 1
