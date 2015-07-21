@@ -283,6 +283,8 @@ def main():
     except Exception, e:
         if str(e) == "risc_exception_irc_timeout":
             main()
+        elif e.__class__.__name__ == "TldDomainNotFound":
+            pass
         else:
             inst.debug.critical("Unhandled exception on Risc(): '%s'. Exiting." % e)
             inst.stop()
