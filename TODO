@@ -2,8 +2,6 @@
 - Add translate cmd
 - Add remindme cmd
 - Add plugin interface
-- Fix unicode bs on link processing https://www.youtube.com/watch?v=T1ZWE0xvBtU
-- Fix tld exception (TldDomainNotFound) on https://data.archive.moe/board/a/image/1404/60/1404609473782.jpg
 - Fix new bug on join: list index overflow smth smth
 - Fix new bug: @sv rtm random crash (NameError)
 - Fix youtube and possibly other websites SSL issues
