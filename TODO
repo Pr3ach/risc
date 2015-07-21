@@ -2,3 +2,4 @@
 - Add remindme cmd
 - Fix new bug on join: list index overflow smth smth
 - Fix new bug: @sv rtm random crash (NameError)
+- Add plugin interface

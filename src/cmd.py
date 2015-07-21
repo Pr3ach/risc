@@ -397,6 +397,50 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
+    def _cmd_help_lower(self, ident, _from, to, msg, cmd):
+        """
+        Help for lower command
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": lower <string>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Return a lowercased string."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
+        return None
+
+    def _cmd_help_upper(self, ident, _from, to, msg, cmd):
+        """
+        Help for upper command
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": upper <string>."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Return a uppercased string."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
+        return None
+
     def cmd_quit(self, ident, _from, to, msg):
         """
         Simply leave
@@ -1012,4 +1056,48 @@ class Cmd():
 
         cmd = ' '.join(argv[1:])
         self.irc._send(self.risc.ident + ' ' + cmd)
+        return None
+
+    def cmd_lower(self, ident, _from, to, msg):
+        """
+        Return a lowercased string
+        lower <string>
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+
+        if cinfo[2] < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 2:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help lower.")
+            return None
+
+        self.privmsg(cinfo[1], ' '.join(argv[1:]).lower())
+        return None
+
+    def cmd_upper(self, ident, _from, to, msg):
+        """
+        Return a uppercased string
+        upper <string>
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+
+        if cinfo[2] < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 2:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help upper.")
+            return None
+
+        self.privmsg(cinfo[1], ' '.join(argv[1:]).upper())
         return None
