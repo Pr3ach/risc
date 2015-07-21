@@ -259,7 +259,7 @@ class Risc():
 
         if res.status_code == 200:
             res = json.loads(res.text)
-            self.irc.privmsg(self.channel, "\x031,4You\x031,0Tube\x0f " + res["title"])
+            self.irc.privmsg(self.channel, "\x02\x031,0 You \x0f\x02\x030,4 Tube \x0f " + res["title"])
         return None
 
 def main():

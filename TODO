@@ -1,4 +1,5 @@
-- use YouTube api
-- fix youtube and possibly other websites SSL issues
-- add remindme cmd
+- Fix cmd google url encoding
+- Fix youtube and possibly other websites SSL issues
+- Add remindme cmd
 - Fix new bug on join: list index overflow smth smth
+- Fix new bug: @sv rtm random crash (NameError)
