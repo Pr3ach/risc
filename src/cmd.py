@@ -44,7 +44,8 @@ cmds = {"help": [["h"], 0],
         "kill": [["k"], 0],
         "raw": [[], 0],
         "lower": [[], 0],
-        "upper": [[], 0]}
+        "upper": [[], 0],
+        "quote": [["kek", "topkek"], 0]}
 
 CMD_ALIASES = 0
 CMD_LEVEL = 1
@@ -1099,4 +1100,48 @@ class Cmd():
             return None
 
         self.privmsg(cinfo[1], ' '.join(argv[1:]).upper())
+        return None
+
+# TODO: Code the functions called here
+    def cmd_quote(self, ident, _from, to, msg):
+        """
+        Add a quote to the database
+        quote [add <quote> | drop <quote_id> | find <regex> | last]
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+
+        if cinfo[2] < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 2:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+            return None
+
+        if argv[1].lower() == "add":
+            if argc < 3:
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+                return None
+            self._cmd_quote_add(' '.join(msg.split(' ')[2:]), _from, cinfo)
+        elif argv[1].lower() in ("drop", "rm"):
+            if argc < 3:
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+                return None
+            elif not argv[2].isdigit():
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+                return None
+            self._cmd_quote_drop(int(argv[2]), _from, cinfo)
+        elif argv[1].lower() in ("find", "ls", "match"):
+            if argc < 4:
+                self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+                return None
+            self._cmd_quote_find(' '.join(msg.split(' ')[2:]), _from, cinfo)
+        elif argv[1].lower() == "last":
+            self._cmd_quote_last(_from, cinfo)
+        else:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
         return None
