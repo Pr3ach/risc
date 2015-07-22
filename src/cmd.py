@@ -748,10 +748,7 @@ class Cmd():
         players = []
         nb_bot = 0
 
-        if sv.clients != -1:
-            nb_cl = sv.clients
-        elif sv.cl_list != []:
-            nb_cl = len(sv.cl_list)
+        nb_cl = len(sv.cl_list)
 
         if sv.cl_list == []:
             use_pings = False
