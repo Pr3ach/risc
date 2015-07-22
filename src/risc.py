@@ -259,7 +259,7 @@ class Risc():
         if res.status_code == 200:
             res = json.loads(res.text)
             self.irc.privmsg(self.channel, "\x02\x031,0 You \x0f\x02\x030,4 Tube \x0f" +\
-                    COLOR["boldwhite"] + " | " + res["title"].encode("utf-8", errors="ignore") + COLOR["rewind"])
+                    '\x02' + " | " + res["title"].encode("utf-8", errors="ignore") + COLOR["rewind"])
         return None
 
 def main():
