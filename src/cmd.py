@@ -1297,7 +1297,7 @@ class Cmd():
 
     def _cmd_quote_random(self, cinfo):
         """
-        Display a randome quote
+        Display a random quote
         """
         ids = []
         con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
