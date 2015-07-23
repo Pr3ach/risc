@@ -132,6 +132,11 @@ class Risc():
                                                                   added_by VARCHAR(64) DEFAULT NULL,
                                                                   added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
 
+        cur.execute("""CREATE TABLE IF NOT EXISTS quote(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                                                        quote VARCHAR(256) NOT NULL,
+                                                        added_by VARCHAR(64) DEFAULT NULL,
+                                                        added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB""")
+
         con.commit()
         con.close()
         return None

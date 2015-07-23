@@ -444,6 +444,28 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
+    def _cmd_help_upper(self, ident, _from, to, msg, cmd):
+        """
+        Help for quote command
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        usage = COLOR["boldwhite"] + "Usage" + COLOR["rewind"] + ": quote [add <quote> | drop <quote_id> | find <regex> | last]."
+        desc = COLOR["boldwhite"] + "Description" + COLOR["rewind"] + ": Manage quotes."
+        aliases = COLOR["boldwhite"] + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = COLOR["boldwhite"] + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
+        return None
+
     def cmd_quit(self, ident, _from, to, msg):
         """
         Simply leave
@@ -611,7 +633,7 @@ class Cmd():
             sv = ioq3.Ioq3(ip, port, name)
         except:
             cur.execute("""INSERT INTO ioq3_blacklist(ip, port, name, added_by)
-                    VALUES ('%s', %d, '%s', '%s')""" %(ip, port, mysql.escape_string(name), _from))
+                    VALUES ('%s', %d, '%s', '%s')""" %(ip, port, mysql.escape_string(name), mysql.escape_string(_from)))
             con.commit()
             con.close()
             self.privmsg(cinfo[1], "Invalid IP address.")
@@ -1134,14 +1156,132 @@ class Cmd():
             elif not argv[2].isdigit():
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
                 return None
-            self._cmd_quote_drop(int(argv[2]), _from, cinfo)
+            self._cmd_quote_drop(int(argv[2]), cinfo)
         elif argv[1].lower() in ("find", "ls", "match"):
             if argc < 4:
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
                 return None
-            self._cmd_quote_find(' '.join(msg.split(' ')[2:]), _from, cinfo)
+            self._cmd_quote_find(' '.join(msg.split(' ')[2:]), cinfo)
         elif argv[1].lower() == "last":
             self._cmd_quote_last(_from, cinfo)
         else:
             self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+        return None
+
+    def _cmd_quote_add(self, quote, _from, cinfo):
+        """
+        Add a quote to the database
+        """
+        _quote = mysql.escape_string(quote)
+        author = mysql.escape_string(_from)
+
+        if len(_quote) > 256:
+            self.privmsg(cinfo[1], "Quote length overflow.")
+            return None
+
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM quote WHERE quote.quote = '%s'""" %(_quote))
+
+        if c.rowcount:
+            con.close()
+            self.privmsg(cinfo[1], "Quote already exists.")
+            return None
+
+        cur.execute("""INSERT INTO quote(quote, added_by) VALUES('%s', '%s')""" %(_quote, author))
+        con.commit()
+        con.close()
+
+        self.privmsg(cinfo[1], "Operation successful.")
+        return None
+
+    def _cmd_quote_drop(self, quote_id, cinfo):
+        """
+        Remove a quote from the database
+        """
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM quote WHERE id = %d""" %(quote_id))
+
+        if cur.rowcount == 0:
+            self.privmsg(cinfo[1], "No such quote.")
+        elif cur.rowcount == 1:
+            cur.execute("""DELETE FROM quote WHERE id = %d""" %(quote_id))
+            con.commit()
+            if cur.rowcount == 1:
+                self.privmsg(cinfo[1], "Operation successful.")
+            else:
+                con.rollback()
+                self.privmsg(cinfo[1], "Operation failed.")
+        else:
+            self.privmsg(cinfo[1], "Operation failed.")
+
+        con.close()
+        return None
+
+    def _cmd_quote_find(self, regex, cinfo):
+        """
+        Search for a quote in the database
+        """
+        matches = []
+        i = 0
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM quote""")
+
+        for quote in cur.fetchall():
+            if re.search(regex, quote[1]):
+                matches.append(quote)
+
+        con.close()
+
+        if not len(matches):
+            self.privmsg(cinfo[1], "No such quote.")
+            return None
+        else:
+            for quote in matches:
+                self._cmd_quote_display(quote, cinfo)
+                i += 1
+                if i > 4:
+                    break
+        return None
+
+    def _cmd_quote_last(self, cinfo):
+        """
+        Display last quote
+        """
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT * FROM quote ORDER BY id DESC LIMIT 1""")
+
+        if cur.rowcount:
+            self._cmd_quote_display(quote, cinfo)
+        else:
+            self.privmsg(cinfo[1], "Quote list is empty.")
+
+        con.close()
+        return None
+
+    def _cmd_quote_display(self, quote, cinfo):
+        """
+        Display a quote, from quote tuple retrieved in the database
+        quote[0] = id
+        quote[1] = quote
+        quote[2] = added_by
+        quote[3] = added_on
+        """
+        if not quote:
+            return None
+
+        _id = str(quote[0])
+        _quote = quote[1].decode("string_escape")
+        author = quote[2].decode("string_escape")
+        timestamp = quote[3]
+
+        fmt = "\x02#%d\x0f " + _quote + " - \x02%s\x0f - \x02%s\x0f" %(_id, author, timestamp)
+        self.privmsg(cinfo[1], fmt)
         return None

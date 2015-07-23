@@ -1,3 +1,5 @@
+- Update boldwhite to default color (\x02) in help msgs, etc
+- Add quote no arg, get random kek
 - Add quote cmd
 - Add translate cmd
 - Add remindme cmd
