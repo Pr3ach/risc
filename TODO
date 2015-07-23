@@ -1,8 +1,6 @@
-- Update boldwhite to default color (\x02) in help msgs, etc
 - Add translate cmd
 - Add remindme cmd
 - Add plugin interface
-- Fix youtube bug NameError on https://www.youtube.com/watch?v=9ofq4gpG_lM
 - Fix new bug on join: list index overflow smth smth
 - Fix new bug: @sv rtm random crash (NameError)
 - Fix youtube and possibly other websites SSL issues
