@@ -1244,7 +1244,7 @@ class Cmd():
 
         if cur.rowcount:
             for quote in cur.fetchall():
-                if re.search(regex, quote[1]):
+                if re.search(regex, quote[1], re.IGNORECASE):
                     matches.append(quote)
                     if len(matches) > 3:
                         break

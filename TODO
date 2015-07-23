@@ -1,4 +1,3 @@
-- Fix quote find regex "nothing to repeat" bug on !quote find *
 - Update boldwhite to default color (\x02) in help msgs, etc
 - Add quote no arg, get random kek
 - Add quote cmd
