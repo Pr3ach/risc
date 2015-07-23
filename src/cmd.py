@@ -1124,7 +1124,6 @@ class Cmd():
         self.privmsg(cinfo[1], ' '.join(argv[1:]).upper())
         return None
 
-# TODO: Code the functions called here
     def cmd_quote(self, ident, _from, to, msg):
         """
         Add a quote to the database
@@ -1158,7 +1157,7 @@ class Cmd():
                 return None
             self._cmd_quote_drop(int(argv[2]), cinfo)
         elif argv[1].lower() in ("find", "ls", "match"):
-            if argc < 4:
+            if argc < 3:
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
                 return None
             self._cmd_quote_find(' '.join(msg.split(' ')[2:]), cinfo)
@@ -1184,7 +1183,7 @@ class Cmd():
 
         cur.execute("""SELECT * FROM quote WHERE quote.quote = '%s'""" %(_quote))
 
-        if c.rowcount:
+        if cur.rowcount:
             con.close()
             self.privmsg(cinfo[1], "Quote already exists.")
             return None
@@ -1277,11 +1276,11 @@ class Cmd():
         if not quote:
             return None
 
-        _id = str(quote[0])
+        _id = quote[0]
         _quote = quote[1].decode("string_escape")
         author = quote[2].decode("string_escape")
-        timestamp = quote[3]
+        timestamp = str(quote[3])
 
-        fmt = "\x02#%d\x0f " + _quote + " - \x02%s\x0f - \x02%s\x0f" %(_id, author, timestamp)
+        fmt = "\x02#" + str(_id) + "\x0f " + _quote + " - \x02" + author + "\x0f - \x02" + timestamp + "\x0f"
         self.privmsg(cinfo[1], fmt)
         return None
