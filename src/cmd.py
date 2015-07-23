@@ -71,6 +71,13 @@ class Cmd():
                 ret.append(e)
         return ret
 
+    def is_valid_re(self, regex):
+        try:
+            re.compile(regex)
+        except re.error:
+            return False
+        return True
+
     def get_cmd(self, msg):
         """
         Return the original command name from the message if it exists, return "" otherwise
@@ -1225,27 +1232,30 @@ class Cmd():
         Search for a quote in the database
         """
         matches = []
-        i = 0
+
+        if not self.is_valid_re(regex):
+            self.privmsg(cinfo[1], "Invalid regex.")
+            return None
+
         con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
         cur = con.cursor()
 
         cur.execute("""SELECT * FROM quote""")
 
-        for quote in cur.fetchall():
-            if re.search(regex, quote[1]):
-                matches.append(quote)
-
+        if cur.rowcount:
+            for quote in cur.fetchall():
+                if re.search(regex, quote[1]):
+                    matches.append(quote)
+                    if len(matches) > 3:
+                        break
         con.close()
 
-        if not len(matches):
+        if not matches:
             self.privmsg(cinfo[1], "No such quote.")
             return None
-        else:
-            for quote in matches:
-                self._cmd_quote_display(quote, cinfo)
-                i += 1
-                if i > 4:
-                    break
+
+        for quote in matches:
+            self._cmd_quote_display(quote, cinfo)
         return None
 
     def _cmd_quote_last(self, cinfo):
