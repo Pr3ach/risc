@@ -1146,11 +1146,11 @@ class Cmd():
         argv = self.clean_list(msg.split(' '))
         argc = len(argv)
 
-        if argc < 2:
-            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
+        if argc == 1:
+            self._cmd_quote_random(cinfo)
             return None
 
-        if argv[1].lower() == "add":
+        elif argv[1].lower() == "add":
             if argc < 3:
                 self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
                 return None
@@ -1293,4 +1293,28 @@ class Cmd():
 
         fmt = "\x02#" + str(_id) + "\x0f " + _quote + " - \x02" + author + "\x0f - \x02" + timestamp + "\x0f"
         self.privmsg(cinfo[1], fmt)
+        return None
+
+    def _cmd_quote_random(self, cinfo):
+        """
+        Display a randome quote
+        """
+        ids = []
+        con = mysql.connect(self.risc.db_host, self.risc.db_user, self.risc.db_passwd, self.risc.db_name)
+        cur = con.cursor()
+
+        cur.execute("""SELECT id FROM quote""")
+
+        if cur.rowcount == 0:
+            self.privmsg(cinfo[1], "Quote list is empty.")
+        else:
+            for _id in cur.fetchall():
+                ids.append(int(_id[0]))
+
+            _id = random.choice(ids)
+            cur.execute("""SELECT * FROM quote WHERE id = %d""" %(_id))
+
+            self._cmd_quote_display(cur.fetchall()[0], cinfo)
+
+        con.close()
         return None
