@@ -444,7 +444,7 @@ class Cmd():
         self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
         return None
 
-    def _cmd_help_upper(self, ident, _from, to, msg, cmd):
+    def _cmd_help_quote(self, ident, _from, to, msg, cmd):
         """
         Help for quote command
         """
