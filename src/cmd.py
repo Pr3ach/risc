@@ -1162,7 +1162,7 @@ class Cmd():
                 return None
             self._cmd_quote_find(' '.join(msg.split(' ')[2:]), cinfo)
         elif argv[1].lower() == "last":
-            self._cmd_quote_last(_from, cinfo)
+            self._cmd_quote_last(cinfo)
         else:
             self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help quote.")
         return None
@@ -1258,7 +1258,7 @@ class Cmd():
         cur.execute("""SELECT * FROM quote ORDER BY id DESC LIMIT 1""")
 
         if cur.rowcount:
-            self._cmd_quote_display(cur.fetchone()[0], cinfo)
+            self._cmd_quote_display(cur.fetchall()[0], cinfo)
         else:
             self.privmsg(cinfo[1], "Quote list is empty.")
 
