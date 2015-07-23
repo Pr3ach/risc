@@ -1258,7 +1258,7 @@ class Cmd():
         cur.execute("""SELECT * FROM quote ORDER BY id DESC LIMIT 1""")
 
         if cur.rowcount:
-            self._cmd_quote_display(quote, cinfo)
+            self._cmd_quote_display(cur.fetchonce()[0], cinfo)
         else:
             self.privmsg(cinfo[1], "Quote list is empty.")
 
