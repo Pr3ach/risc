@@ -1,4 +1,3 @@
-- Add translate cmd
 - Add remindme cmd
 - Add plugin interface
 - Fix new bug on join: list index overflow smth smth

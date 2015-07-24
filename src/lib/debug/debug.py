@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.3"
+__version__ = "1.3.1"
 
 import time
 import sys
@@ -37,27 +37,27 @@ class Debug():
 
     def info(self, info_msg):
         t = time.localtime()
-        print ("%02d/%02d/%04d %02d:%02d:%02d INFO     %s" %(t[0], t[1], t[2], t[3], t[4], t[5], info_msg))
+        print ("%04d/%02d/%02d %02d:%02d:%02d INFO     %s" %(t[0], t[1], t[2], t[3], t[4], t[5], info_msg))
         return None
 
     def debug(self, debug_msg):
         t = time.localtime()
-        print ("%02d/%02d/%04d %02d:%02d:%02d DEBUG    %s" %(t[0], t[1], t[2], t[3], t[4], t[5], debug_msg))
+        print ("%04d/%02d/%02d %02d:%02d:%02d DEBUG    %s" %(t[0], t[1], t[2], t[3], t[4], t[5], debug_msg))
         return None
 
     def warning(self, warning_msg):
         t = time.localtime()
-        print ("%02d/%02d/%04d %02d:%02d:%02d WARNING  %s" %(t[0], t[1], t[2], t[3], t[4], t[5], warning_msg))
+        print ("%04d/%02d/%02d %02d:%02d:%02d WARNING  %s" %(t[0], t[1], t[2], t[3], t[4], t[5], warning_msg))
         return None
 
     def error(self, error_msg):
         t = time.localtime()
-        print ("%02d/%02d/%04d %02d:%02d:%02d ERROR    %s" %(t[0], t[1], t[2], t[3], t[4], t[5], error_msg))
+        print ("%04d/%02d/%02d %02d:%02d:%02d ERROR    %s" %(t[0], t[1], t[2], t[3], t[4], t[5], error_msg))
         return None
 
     def critical(self, critical_msg):
         t = time.localtime()
-        print ("%02d/%02d/%04d %02d:%02d:%02d CRITICAL %s" %(t[0], t[1], t[2], t[3], t[4], t[5], critical_msg))
+        print ("%04d/%02d/%02d %02d:%02d:%02d CRITICAL %s" %(t[0], t[1], t[2], t[3], t[4], t[5], critical_msg))
         return None
 
     def close(self):
