@@ -24,6 +24,7 @@ __version__ = '1.6-dev'
 
 from lib.debug import debug
 from lib.irc import irc
+from lib.irc.irc import COLOR
 import cmd
 import time
 import ConfigParser
