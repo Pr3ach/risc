@@ -22,6 +22,9 @@ __author__ = 'Preacher'
 __version__ = '1.6-dev'
 
 
+from lib.debug import debug
+from lib.irc import irc
+import cmd
 import time
 import ConfigParser
 import re
@@ -30,9 +33,6 @@ from warnings import filterwarnings
 from mechanize import Browser
 import requests
 import json
-import debug
-import irc
-import cmd
 
 INIPATH = "riscrc"
 init_time = int(time.time())

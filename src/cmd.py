@@ -17,10 +17,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import irc
-import ioq3
+from lib.ioq3 import ioq3
+from lib.mstranslator import mstranslator
+from lib.irc import irc
+from lib.irc.irc import COLOR
 import risc
-from irc import COLOR
 import time
 import datetime
 import json
