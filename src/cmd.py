@@ -1377,7 +1377,7 @@ class Cmd():
             self.privmsg(cinfo[1], "Wrong API credentials.")
             return None
 
-        self.privmsg(cinfo[1], translator.translate(' '.join(msg.split(' ')[2:]), argv[1], argv[2]))
+        self.privmsg(cinfo[1], translator.translate(' '.join(msg.split(' ')[3:]), argv[1], argv[2]))
         return None
 
     def _cmd_translate_init(self):
