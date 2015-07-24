@@ -14,6 +14,10 @@ on_kick_delay=30
 # Ammount of time before restarting risc after a timeout - in seconds.
 on_timeout_delay=340
 
+translator_id=
+
+translator_secret=
+
 [irc]
 host=irc.quakenet.org
 port=6667
