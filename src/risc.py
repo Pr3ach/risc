@@ -81,6 +81,8 @@ class Risc():
         self.cmd_prefix = self.cfg.get("risc", "cmd_prefix")
         self.cmd_prefix_global = self.cfg.get("risc", "cmd_prefix_global")
         self.root_ident = self.cfg.get("risc", "root_ident")
+        self.translator_id = self.cfg.get("risc", "translator_id")
+        self.translator_secret = self.cfg.get("risc", "translator_secret")
 
         if len(self.cmd_prefix) != 1:
             self.cmd_prefix = '!'

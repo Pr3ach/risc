@@ -46,7 +46,8 @@ cmds = {"help": [["h"], 0],
         "raw": [[], 0],
         "lower": [[], 0],
         "upper": [[], 0],
-        "quote": [["kek", "topkek"], 0]}
+        "quote": [["kek", "topkek", "tk"], 0],
+        "translate": [["trans"], 0]}
 
 CMD_ALIASES = 0
 CMD_LEVEL = 1
@@ -54,6 +55,10 @@ CMD_LEVEL = 1
 # Russian roulette game variables
 r_bullet = random.randint(1, 0xffff) % 7
 r_chamber = random.randint(1, 0xffff) % 7
+
+# Translate command
+TRANSLATOR_INIT = 0
+translator = None
 
 class Cmd():
     def __init__(self, risc):
@@ -468,6 +473,28 @@ class Cmd():
 
         usage = '\x02' + "Usage" + COLOR["rewind"] + ": quote [add <quote> | drop <quote_id> | find <regex> | last]."
         desc = '\x02' + "Description" + COLOR["rewind"] + ": Manage quotes."
+        aliases = '\x02' + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
+        access = '\x02' + "Access" + COLOR["rewind"] + ": %s." %access
+
+        self.privmsg(cinfo[1], usage + ' ' + desc + ' ' + aliases + ' ' + access)
+        return None
+
+    def _cmd_help_translate(self, ident, _from, to, msg, cmd):
+        """
+        Help for translate command
+        """
+        cinfo = self.init_cmd(ident, _from, to, msg)
+        access = "all"
+
+        if cmds[cmd][CMD_LEVEL] == 4:
+            access = "root"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['o']:
+            access = "op"
+        elif cmds[cmd][CMD_LEVEL] == irc.LEVEL_MASKS['v']:
+            access = "voice"
+
+        usage = '\x02' + "Usage" + COLOR["rewind"] + ": translate <lang_from> <lang_to> <string>."
+        desc = '\x02' + "Description" + COLOR["rewind"] + ": Translate <string> from <lang_from> to <lang_to>."
         aliases = '\x02' + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
         access = '\x02' + "Access" + COLOR["rewind"] + ": %s." %access
 
@@ -1319,3 +1346,46 @@ class Cmd():
 
         con.close()
         return None
+
+    def cmd_translate(self, ident, _from, to, msg):
+        """
+        Translate a string
+        translate <lang_from> <lang_to> <string>
+        """
+        global TRANSLATOR_INIT
+        cinfo = self.init_cmd(ident, _from, to, msg)
+
+        if cinfo[2] < cinfo[0]:
+            self.privmsg(self.risc.channel, COLOR["boldred"]+_from+COLOR["rewind"]+\
+                    ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
+            return None
+
+        argv = self.clean_list(msg.split(' '))
+        argc = len(argv)
+
+        if argc < 4:
+            self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help translate.")
+            return None
+
+        if TRANSLATOR_INIT == 0:
+            if not self._cmd_translate_init():
+                TRANSLATOR_INIT = -1
+                self.privmsg(cinfo[1], "Wrong API credentials.")
+                return None
+            TRANSLATOR_INIT = 1
+        elif TRANSLATOR_INIT == -1:
+            self.privmsg(cinfo[1], "Wrong API credentials.")
+            return None
+
+        self.privmsg(cinfo[1], translator.translate(' '.join(msg.split(' ')), argv[1], argv[2]))
+        return None
+
+    def _cmd_translate_init(self):
+        global translator
+        try:
+            translator = mstranslator.Translator(self.risc.translator_id, self.risc.translator_secret)
+            translator.translate("hello", "en", "fr")
+        except mstranslator.AccessError:
+            translator = None
+            return False
+        return True
