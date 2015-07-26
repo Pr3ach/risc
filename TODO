@@ -1,3 +1,5 @@
+- Add author for youtube videos
+- Fix b64 decode <non_b64_data> (catch TypeError)
 - Add remindme cmd
 - Add plugin interface
 - Fix new bug on join: list index overflow smth smth
