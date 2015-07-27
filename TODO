@@ -1,7 +1,4 @@
 - Add author for youtube videos
-- Fix b64 decode <non_b64_data> (catch TypeError)
 - Add remindme cmd
 - Add plugin interface
 - Fix new bug on join: list index overflow smth smth
-- Fix new bug: @sv rtm random crash (NameError)
-- Fix youtube and possibly other websites SSL issues

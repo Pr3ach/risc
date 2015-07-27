@@ -805,12 +805,11 @@ class Cmd():
         """
         players = []
         nb_bot = 0
+        use_pings = False
 
         nb_cl = len(sv.cl_list)
 
-        if sv.cl_list == []:
-            use_pings = False
-        elif len(sv.cl_pings) == len(sv.cl_list):
+        if len(sv.cl_pings) == len(sv.cl_list):
             use_pings = True
 
         for i in range(len(sv.cl_list)):
@@ -889,7 +888,11 @@ class Cmd():
         data = ' '.join(msg.split(' ')[2:])
 
         if argv[1].lower() in ("d", "decode"):
-            self.privmsg(cinfo[1], "'" + base64.b64decode(data) + "'")
+            try:
+                self.privmsg(cinfo[1], "'" + base64.b64decode(data) + "'")
+            except TypeError:
+                self.privmsg(cinfo[1], "Invalid base64 string.")
+                return
         elif argv[1].lower() in ("e", "encode"):
             self.privmsg(cinfo[1], base64.b64encode(data))
         else:
