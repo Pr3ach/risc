@@ -912,7 +912,7 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        self.privmsg(cinfo[1], COLOR["boldwhite"] + "Uptime" + COLOR["rewind"] +\
+        self.privmsg(cinfo[1], '\x02' + "Uptime" + COLOR["rewind"] +\
                 ': ' + str(datetime.timedelta(seconds=int(time.time()) - risc.init_time)))
         return None
 
@@ -928,8 +928,8 @@ class Cmd():
                     ": Access denied. Check "+self.risc.cmd_prefix+"help "+self.get_cmd(msg)+'.')
             return None
 
-        self.privmsg(cinfo[1], "Version" + COLOR["boldwhite"] + ' ' + risc.__version__ +\
-                ' ' + COLOR["rewind"] + "by" + COLOR["boldwhite"] + ' ' + risc.__author__ +\
+        self.privmsg(cinfo[1], "Version" + '\x02' + ' ' + risc.__version__ +\
+                ' ' + COLOR["rewind"] + "by" + '\x02' + ' ' + risc.__author__ +\
                 COLOR["rewind"])
         return None
 

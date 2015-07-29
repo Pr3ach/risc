@@ -1,5 +1,3 @@
-- Switch to default bold colors in cmd_{version, uptime}
-- Add author for youtube videos
 - Add remindme cmd
 - Add plugin interface
 - Fix new bug on join: list index overflow smth smth
