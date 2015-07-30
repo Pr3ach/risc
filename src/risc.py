@@ -268,8 +268,8 @@ class Risc():
             res = json.loads(res.text)
             self.irc.privmsg(self.channel, "\x02\x031,0 You \x0f\x02\x030,4 Tube \x0f" +\
                     " |\x02 " + res["title"].encode("utf-8", errors="ignore") +\
-                    COLOR["rewind"] + ' - ' + '\x02' + res['author_name'].encode("utf-8",\
-                    errors="ignore") + COLOR["rewind"])
+                    COLOR["rewind"] + ' (by ' + res['author_name'].encode("utf-8",\
+                    errors="ignore") + ')' + COLOR["rewind"])
         return None
 
 def main():

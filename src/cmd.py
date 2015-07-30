@@ -817,6 +817,9 @@ class Cmd():
                 players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
                         ' (' + COLOR["boldblue"] + "BOT" + COLOR["rewind"] + ')')
                 nb_bot += 1
+            elif use_pings and sv.cl_pings[i] == 999:
+                players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"] +\
+                        ' (' + COLOR["boldred"] + "CI" + COLOR["rewind"] + ')')
             else:
                 players.append(COLOR["boldgreen"] + ' ' + sv.cl_list[i] + COLOR["rewind"])
 
