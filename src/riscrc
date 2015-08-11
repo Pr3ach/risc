@@ -1,22 +1,27 @@
 [risc]
-# Prefix for commands, output in private.
+# Prefix for commands, output in private
 cmd_prefix=.
 
-# Prefix for commands, output in channel.
+# Prefix for commands, output in channel
 cmd_prefix_global=@
 
-# Anti-spam: time between two commands - in seconds.
+# Anti-spam: time between two commands - in seconds
 anti_spam_threshold=2
 
-# Ammount of time before re-joining the channel after being kicked.
+# Amount of time before re-joining the channel after being kicked
 on_kick_delay=30
 
-# Ammount of time before restarting risc after a timeout - in seconds.
+# Amount of time before restarting risc after a timeout - in seconds
 on_timeout_delay=340
 
+# Your translator API id
 translator_id=
 
+# Your translator API secret
 translator_secret=
+
+# The ident of the root user
+root_ident=<auth>.users.quakenet.org
 
 [irc]
 host=irc.quakenet.org
@@ -26,34 +31,41 @@ channel=#your_channel
 # The bot's nick.
 nick=risc
 
-# The bot's auth if any, ie. quakenet account name.
+# The bot's auth if any, ie. quakenet account name
 auth=risc
 
-# Password associated to the above auth.
+# Password associated to the above auth
 auth_passwd=password
 
 [db]
-# Address for the mysql server. Most of the time localhost.
+# Address for the mysql server. Most of the time localhost
 host=localhost
 
-# The mysql user name for risc to access the databases. You need to create a mysql user for risc.
+# The mysql user name for risc to access the databases. You need to create a mysql user for risc
 user=risc_db_user
 
-# The mysql password associated with the mysql name.
+# The mysql password associated with the mysql name
 passwd=risc_db_user_password
 
-# The bot's own database, mostly for its own settings. You need to create it.
+# The bot's own database, for its own settings. You need to create it
 db=risc
 
 [levels]
-# You can set your own level for some commands which require some rights. These include op, voice, root.
-cmd_quit=0
-cmd_ikick=0
-cmd_ileveltest=0
-cmd_iputgroup=0
-cmd_chat=0
-cmd_say=0
-cmd_server_add=0
-cmd_server_rm=0
-cmd_server_rename=0
-cmd_server_ls=0
+# You can set your own level for some commands which require some rights.
+# These include 'voice' or 'v', 'op' or 'o' and 'root' or 'r'. Any other value or missing cmd will be available to everyone
+cmd_help=0
+cmd_quit=root
+cmd_google=voice
+cmd_server=voice
+cmd_hash=0
+cmd_base64=0
+cmd_uptime=0
+cmd_version=0
+cmd_search=voice
+cmd_roulette=0
+cmd_kill=0
+cmd_raw=root
+cmd_lower=0
+cmd_upper=0
+cmd_quote=voice
+cmd_translate=voice

@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.2-dev"
+__version__ = "1.2"
 
 import socket
 import re

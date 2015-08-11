@@ -19,7 +19,7 @@
 #
 
 __author__ = 'Preacher'
-__version__ = '1.6-dev'
+__version__ = '2.0'
 
 
 from lib.debug import debug
@@ -38,7 +38,7 @@ import json
 INIPATH = "riscrc"
 init_time = int(time.time())
 last_cmd_time= 0
-debug_mode = 1
+debug_mode = 0
 
 class Risc():
     """
