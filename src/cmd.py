@@ -593,7 +593,7 @@ class Cmd():
             self._cmd_server_list(cinfo)
             return None
 
-        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{1,5}$')
         re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
 
         if re.match(re_full_ip, argv[1]):
@@ -624,7 +624,7 @@ class Cmd():
         """
         Add a server to the database
         """
-        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{5}$')
+        re_full_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{1,5}$')
         re_ip = re.compile('^([0-9]{1,3}\.){3}[0-9]{1,3}$')
 
         if re.match(re_full_ip, name) or re.match(re_ip, name) or name.lower() in ("add", "drop", "rm", "list", "ls", "rename", "mv") or len(mysql.escape_string(name)) >= 16:
