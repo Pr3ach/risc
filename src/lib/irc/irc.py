@@ -458,6 +458,3 @@ class Irc():
 
                 elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
                     self.call_cb_nicknameinuse(line)
-
-                elif re.search("ERROR :Closing Link: "+self.nick+" by .* \(Ping timeout\)", line):
-                    self.call_cb_timeout(line)

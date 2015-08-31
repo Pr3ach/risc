@@ -38,7 +38,7 @@ import json
 INIPATH = "riscrc"
 init_time = int(time.time())
 last_cmd_time= 0
-debug_mode = 0
+debug_mode = 1
 
 class Risc():
     """

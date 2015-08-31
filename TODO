@@ -1,3 +1,4 @@
-- Add remindme cmd
-- Add plugin interface
-- Fix new bug on join: list index overflow smth smth
++ Add remindme cmd
++ Add plugin interface
++ Fix new bug on join: list index overflow smth smth
++ Fix on_timeout event - check connection (gethostbyname for instance) when time-last_event_time > x, reco if needed
