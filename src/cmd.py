@@ -540,7 +540,7 @@ class Cmd():
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s' % search_str
         res = requests.get(url)
 
-        if not len(json.loads(res.text)['responseData']['results']):
+        if res.status_code != 200 or not len(json.loads(res.text)['responseData']['results']):
             self.privmsg(cinfo[1], "No results.")
             return None
 
