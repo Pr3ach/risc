@@ -438,7 +438,7 @@ class Irc():
                 elif re.search(" KICK ", line):
                     self.call_cb_kick(line)
 
-                elif re.search(" PART ", line):
+                elif re.search(" PART ", line) or re.search(" PART ", line):
                     self.call_cb_part(line)
 
                 elif re.search(" JOIN ", line):
@@ -458,3 +458,6 @@ class Irc():
 
                 elif re.search(' '+ERR_NICKNAMEINUSE+' ', line):
                     self.call_cb_nicknameinuse(line)
+
+                elif re.search("ERROR :Closing Link: "+self.nick+" by .* \(Ping timeout\)", line):
+                    self.call_cb_timeout(line)
