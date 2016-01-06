@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.2"
+__version__ = "1.2.1"
 
 import socket
 import re
@@ -438,7 +438,7 @@ class Irc():
                 elif re.search(" KICK ", line):
                     self.call_cb_kick(line)
 
-                elif re.search(" PART ", line) or re.search(" PART ", line):
+                elif re.search(" PART ", line) or re.search(" QUIT ", line):
                     self.call_cb_part(line)
 
                 elif re.search(" JOIN ", line):
