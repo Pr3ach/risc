@@ -1095,8 +1095,8 @@ class Cmd():
                 self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + COLOR['rewind'] + weapons[argv[2].lower()][0] +\
                         COLOR["boldgreen"] + _from + COLOR["rewind"] + weapons[argv[2].lower()][1])
             else:
-                self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + ' ' + COLOR["rewind"] + "has been creatively killed by" +\
-                        ' ' + COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "using a " + argv[2] + ".")
+                elf.privmsg(cinfo[1], COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "[" + argv[2] + "]" +\
+                                                ' ' + COLOR["boldred"] + argv[1])
 
         else:
             self.privmsg(cinfo[1], "Check "+self.risc.cmd_prefix+"help kill.")
