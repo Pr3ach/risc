@@ -1056,7 +1056,7 @@ class Cmd():
                 "m4": [" got a lead enema from ", "'s retro M4."],
                 "psg1": [" was taken out by ", "'s PSG1. Plink!"],
                 "hk69": [" HEARD ", "'s HK69 gren... didn't AVOID it. Sucka."],
-                "boot": [" git himself some lovin' from ", "'s boot o' passion."],
+                "boot": [" got himself some lovin' from ", "'s boot o' passion."],
                 "sr8": [" managed to slow down ", "'s SR-8 round just a little."],
                 "bleed": [" bled to death from ", "'s attacks."],
                 "negev": [" got shredded to pieces by ", "'s Negev."],
