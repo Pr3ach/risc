@@ -339,7 +339,7 @@ class Cmd():
             access = "voice"
 
         usage = '\x02' + "Usage" + COLOR["rewind"] + ": search <player>."
-        desc = '\x02' + "Description" + COLOR["rewind"] + ": Search for <player> in the server list."
+        desc = '\x02' + "Description" + COLOR["rewind"] + ": Search for <player> in the server list using a regular expression."
         aliases = '\x02' + "Aliases" + COLOR["rewind"] + ': ' +  ", ".join(cmds[cmd][CMD_ALIASES]) + '.'
         access = '\x02' + "Access" + COLOR["rewind"] + ": %s." %access
 
@@ -951,6 +951,9 @@ class Cmd():
             return None
 
         argv = self.clean_list(msg.split(' '))
+        if not self.is_valid_re(argv[1]):
+            self.privmsg(cinfo[1], "Invalid regex.")
+            return None
         argc = len(argv)
 
         if argc < 2:
@@ -1095,7 +1098,7 @@ class Cmd():
                 self.privmsg(cinfo[1], COLOR["boldred"] + argv[1] + COLOR['rewind'] + weapons[argv[2].lower()][0] +\
                         COLOR["boldgreen"] + _from + COLOR["rewind"] + weapons[argv[2].lower()][1])
             else:
-                elf.privmsg(cinfo[1], COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "[" + argv[2] + "]" +\
+                self.privmsg(cinfo[1], COLOR["boldgreen"] + _from + ' ' + COLOR["rewind"] + "[" + argv[2] + "]" +\
                                                 ' ' + COLOR["boldred"] + argv[1])
 
         else:
