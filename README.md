@@ -7,6 +7,7 @@ This software requires some python2 libs before you can run it, you can install 
 * `tld`
 * `requests`
 * `mechanize`
+* `MySQLdb`
 
 ## Installation
 Clone the repository in any directory you want.
