@@ -65,6 +65,8 @@ class Cmd():
         self.risc = risc
         self.irc = risc.irc
         self.privmsg = self.irc.privmsg
+        self.notice = self.irc.notice
+        self.action = self.irc.action
         self.debug = self.risc.debug
 
     def clean_list(self, l):

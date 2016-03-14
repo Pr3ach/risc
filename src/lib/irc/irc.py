@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #
-#  Copyright (C) 2015 - Preacher
+#  Copyright (C) 2016 - Preacher
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #
 
 __author__ = "Preacher"
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 import socket
 import re
@@ -379,6 +379,20 @@ class Irc():
         Send a PRIVMSG message
         """
         self._send('PRIVMSG %s :%s' % (target, msg))
+        return None
+
+    def notice(self, target, msg):
+        """
+        Send a NOTICE message
+        """
+        self._send('NOTICE %s :%s' % (target, msg))
+        return None
+
+    def action(self, target, msg):
+        """
+        Send an ACTION message
+        """
+        self._send('PRIVMSG %s :\x01ACTION %s\x01' % (target, msg))
         return None
 
     def kick(self, user, reason=""):
